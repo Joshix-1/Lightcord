@@ -1,0 +1,11 @@
+{
+  "files": [
+    "discord_hook.node", 
+    "e3bbef833e\\DiscordHook.dll", 
+    "e3bbef833e\\DiscordHook64.dll", 
+    "e3bbef833e\\DiscordHookHelper.exe", 
+    "e3bbef833e\\DiscordHookHelper64.exe", 
+    "index.js", 
+    "manifest.json"
+  ]
+}

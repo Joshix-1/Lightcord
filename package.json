@@ -1,0 +1,30 @@
+{
+  "name": "lightcord",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/launcher.js",
+  "scripts": {
+    "test": "tsc && electron .",
+    "run": "electron .",
+    "build": "electron-packager . --ignore=\"(distApp|builds|\\.ts)\" --arch=ia32 --win32metadata.ProductName=\"Lightcord\" --win32metadata.CompanyName=\"Lightcord Inc.\" --protocol=discord --platform=\"win32\" --out=builds --icon=app.ico --executable-name=\"Lightcord\" --asar.unpack=*.{node,dll} --overwrite"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bytenode": "^1.1.6",
+    "mkdirp": "^1.0.4",
+    "request": "^2.88.2",
+    "rimraf": "^3.0.2",
+    "yauzl": "^2.10.0"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/electron": "^1.6.10",
+    "@types/mkdirp": "^1.0.0",
+    "@types/rimraf": "^3.0.0",
+    "@types/yauzl": "^2.9.1",
+    "devtron": "^1.4.0",
+    "electron": "^8.2.4",
+    "terser": "^4.6.13"
+  }
+}

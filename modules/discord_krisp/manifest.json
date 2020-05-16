@@ -1,0 +1,10 @@
+{
+  "files": [
+    "discord_krisp.node", 
+    "VAD_weight.thw", 
+    "NC_weight.thw", 
+    "NC_small_16k.thw", 
+    "index.js", 
+    "manifest.json"
+  ]
+}

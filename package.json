@@ -23,6 +23,7 @@
     "@types/mkdirp": "^1.0.0",
     "@types/rimraf": "^3.0.0",
     "@types/yauzl": "^2.9.1",
+    "@types/node": "12.12.39",
     "devtron": "^1.4.0",
     "electron": "^7.1.11",
     "terser": "^4.6.13"

@@ -1,7 +1,7 @@
 const child_process = require("child_process")
-//const fs = require("fs")
+const fs = require("fs")
 const path = require("path")
-/*
+
 const MODULES_DIRNAME = path.join(__dirname, "modules")
 
 fs.readdirSync(MODULES_DIRNAME, {withFileTypes: true})
@@ -17,12 +17,23 @@ fs.readdirSync(MODULES_DIRNAME, {withFileTypes: true})
         cwd: MODULE_DIRNAME,
         env: process.env
     }, () => {})
-})*/
+})
 
 
 const MODULE_DIRNAME = path.join(__dirname, "modules", "discord_desktop_core", "core")
+const BETTERDISCORD_DIRNAME = path.join(__dirname, "BetterDiscordApp")
+
 child_process.spawn((process.platform === "win32" ? "npm.cmd" : "npm"), ["i"], {
     cwd: MODULE_DIRNAME,
+    env: process.env,
+    stdio: "inherit"
+}).on("error", (err) => {
+    console.error(err)
+    process.exit(1)
+})
+
+child_process.spawn((process.platform === "win32" ? "npm.cmd" : "npm"), ["i"], {
+    cwd: BETTERDISCORD_DIRNAME,
     env: process.env,
     stdio: "inherit"
 }).on("error", (err) => {

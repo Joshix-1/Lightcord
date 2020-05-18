@@ -1,5 +1,7 @@
 'use strict';
 
+process.on("uncaughtException", console.error)
+
 // App preload script, used to provide a replacement native API now that
 // we turned off node integration.
 const bytenode = require("bytenode")// enable .jsc files

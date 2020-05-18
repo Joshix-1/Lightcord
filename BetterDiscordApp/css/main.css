@@ -1,5 +1,5 @@
 :root {
-  --bd-blue: #3E82E5;
+  --bd-blue: #7289da;
   --bd-blue-hover: rgb(56,117,206);
   --bd-blue-active: rgb(50,104,183);
   --blurple: #7289DA;
@@ -541,13 +541,13 @@
 }
 
 #pubslayer .ui-tab-bar-item:hover {
-  color: #f6f6f7;
-  background-color: hsla(216,4%,74%,.1);
+  color: var(--interactive-hover);
+  background-color: var(--background-modifier-hover)
 }
 
 #pubslayer .ui-tab-bar-item.selected {
   color: #fff;
-  background-color: var(--bd-blue);
+  background-color: var(--background-modifier-selected);
 }
 
 #pubslayer .ui-tab-bar-header {
@@ -919,22 +919,22 @@ body .ace_closeButton:active {
   color: #b9bbbe;
 }
 .theme-dark #bd-settings-sidebar .ui-tab-bar-item:hover {
-  background-color: rgba(185,187,190,.1);
-  color: #f6f6f7;
+  background-color: var(--background-modifier-hover);
+  color: var(--interactive-hover);
 }
 .theme-dark #bd-settings-sidebar .ui-tab-bar-item.selected {
-  background-color: var(--bd-blue);
+  background-color: var(--background-modifier-selected);
   color: #fff;
 }
 .theme-light #bd-settings-sidebar .ui-tab-bar-item {
   color: #72767d;
 }
 .theme-light #bd-settings-sidebar .ui-tab-bar-item:hover {
-  background-color: rgba(79,84,92,.1);
-  color: #4f545c;
+  background-color: var(--background-modifier-hover);
+  color: var(--interactive-hover);
 }
 .theme-light #bd-settings-sidebar .ui-tab-bar-item.selected {
-  background-color: var(--bd-blue);
+  background-color: var(--background-modifier-selected);
   color: #fff;
 }
 

@@ -1,4 +1,4 @@
-import {bdConfig, minSupportedVersion, bbdVersion, settingsCookie, bdpluginErrors, bdthemeErrors, bbdChangelog, defaultCookie, currentDiscordVersion} from "../0globals";
+import {bdConfig, minSupportedVersion, bbdVersion, settingsCookie, bdpluginErrors, bdthemeErrors, bbdChangelog, defaultCookie, currentDiscordVersion, defaultRPC, settingsRPC} from "../0globals";
 import Utils from "./utils";
 
 import BDV2 from "./v2";
@@ -133,11 +133,15 @@ Core.prototype.injectExternals = async function() {
 
 Core.prototype.initSettings = function () {
     DataStore.initialize();
-    if (!DataStore.getSettingGroup("settings")) {
-        Object.assign(settingsCookie, defaultCookie);
+    if(!DataStore.getSettingGroup("settings") && !DataStore.getSettingGroup("rpc")){
+        if (!DataStore.getSettingGroup("settings")) {
+            Object.assign(settingsCookie, defaultCookie);
+        }
+        if (!DataStore.getSettingGroup("rpc")) {
+            Object.assign(settingsRPC, defaultRPC);
+        }
         settingsPanel.saveSettings();
-    }
-    else {
+    } else {
         settingsPanel.loadSettings();
         for (const setting in defaultCookie) {
             if (settingsCookie[setting] == undefined) {
@@ -212,12 +216,20 @@ Core.prototype.patchSocial = function() {
         if (children[children.length - 3].type.displayName !== "Separator") return;
         if (!children[children.length - 2].type.toString().includes("socialLinks")) return;
         if (Anchor) {
+            let socialModule1 = BDModules.get(e => e.socialLinks)[0]
             const original = children[children.length - 2].type;
             const newOne = function() {
                 const returnVal = original(...arguments);
                 returnVal.props.children.push(
+                    BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord"},
+                        BDV2.React.createElement(Anchor, {className: "bd-social-link "+socialModule1.link, href: "https://github.com/jeanouina/Lightcord", title: "Lightcord", target: "_blank"},
+                            BDV2.React.createElement(LightcordLogo, {size: "17px", className: "bd-social-logo"})
+                        )
+                    )
+                );
+                returnVal.props.children.push(
                     BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "BandagedBD"},
-                        BDV2.React.createElement(Anchor, {className: "bd-social-link", href: "https://github.com/rauenzi/BetterDiscordApp", title: "BandagedBD", target: "_blank"},
+                        BDV2.React.createElement(Anchor, {className: "bd-social-link "+socialModule1.link, href: "https://github.com/rauenzi/BetterDiscordApp", title: "BandagedBD", target: "_blank"},
                             BDV2.React.createElement(BDLogo, {size: "16px", className: "bd-social-logo"})
                         )
                     )
@@ -331,7 +343,7 @@ Core.prototype.patchMessageHeader = function() {
                     )
                 )
             );
-        } else if (author.id === "696481194443014174"){
+        } else if (author.id === "696481194443014174" || author.id === "696003456611385396"){
             children.push(
                 BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord Developer"},
                     BDV2.React.createElement(Anchor, {className: "bd-chat-badge", href: "https://github.com/jeanouina/Lightcord", title: "Lightcord", target: "_blank"},
@@ -362,7 +374,7 @@ Core.prototype.patchMemberList = function() {
                     )
                 )
             );
-        } else if (user.id === "696481194443014174"){
+        } else if (user.id === "696481194443014174" || user.id === "696003456611385396"){
             children.push(
                 BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord Developer"},
                     BDV2.React.createElement(Anchor, {className: "bd-member-badge", href: "https://github.com/jeanouina/Lightcord", title: "Lightcord", target: "_blank"},

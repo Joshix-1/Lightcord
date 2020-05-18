@@ -5,7 +5,7 @@
   "main": "dist/launcher.js",
   "scripts": {
     "test": "tsc && electron .",
-    "run": "electron .",
+    "run": "NODE_OPTIONS.bat && electron .",
     "build": "electron-packager . --ignore=\"(distApp|builds|\\.ts)\" --arch=ia32 --win32metadata.ProductName=\"Lightcord\" --win32metadata.CompanyName=\"Lightcord Inc.\" --protocol=discord --platform=\"win32\" --out=builds --icon=app.ico --executable-name=\"Lightcord\" --asar.unpack=*.{node,dll} --overwrite"
   },
   "author": "",

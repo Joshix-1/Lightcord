@@ -98,7 +98,7 @@ export default new class DevMode {
                 }
             }
     
-            process.nextTick(attach);
+            setTimeout(attach, 1);
         }catch(e){
             console.error(e)
         }

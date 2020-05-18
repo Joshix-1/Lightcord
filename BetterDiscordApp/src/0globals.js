@@ -103,6 +103,16 @@ export const defaultCookie = {
 
 export const settingsCookie = {};
 
+export const settingsRPC = {};
+export const defaultRPC = {
+    name: "Lightcord",
+    application_id: "711416957718757418",
+    type: 0,
+    details: "Browsing Discord",
+    state: "Lightcord",
+    "timestamps.start": Date.now()
+};
+
 export const bdpluginErrors = [];
 export const bdthemeErrors = []; // define for backwards compatibility
 

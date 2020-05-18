@@ -89,7 +89,9 @@ async function privateInit(){
         set(data){return !!window.lightcordSettings.devMode}
     })
 
-    const BetterDiscord = window.BetterDiscord = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
+    await ensureGuildClasses()
+
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
     BetterDiscord.init()
 
     events.emit("ready")
@@ -120,4 +122,27 @@ const BetterDiscordConfig = window.BetterDiscordConfig = {
     "version": "0.3.2",
     dataPath: (process.platform == "win32" ? process.env.APPDATA : process.platform == "darwin" ? process.env.HOME + "/Library/Preferences" :  process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME + "/.config") + "/LightCord_BD/",
     os: process.platform
+}
+
+function ensureGuildClasses(){
+    return new Promise((resolve) => {
+        let classs = getGuildClasses()
+        if(classs && classs.wrapper)return resolve()
+
+        let intergay = setInterval(() => {
+            classs = getGuildClasses()
+            if(classs && classs.wrapper){
+                clearInterval(intergay)
+                resolve()
+                return
+            }
+        }, 200);
+    })
+}
+
+function getGuildClasses() {
+    const guildsWrapper = BDModules.get(e => e.wrapper && e.unreadMentionsBar)[0];
+    const guilds = BDModules.get(e => e.guildsError && e.selected)[0]
+    const pill = BDModules.get(e => e.blobContainer)[0]
+    return Object.assign({}, guildsWrapper, guilds, pill);
 }

@@ -1,4 +1,4 @@
-import {settings, settingsCookie, bdplugins, bdthemes} from "../0globals";
+import {settings, settingsCookie, bdplugins, bdthemes, settingsRPC} from "../0globals";
 import DataStore from "./dataStore";
 import V2_SettingsPanel_Sidebar from "./settingsPanelSidebar";
 import Utils from "./utils";
@@ -238,10 +238,12 @@ export default new class V2_SettingsPanel {
 
     saveSettings() {
         DataStore.setSettingGroup("settings", settingsCookie);
+        DataStore.setSettingGroup("rpc", settingsRPC);
     }
 
     loadSettings() {
         Object.assign(settingsCookie, DataStore.getSettingGroup("settings"));
+        Object.assign(settingsRPC, DataStore.getSettingGroup("rpc"));
     }
 
     showOriginal() {

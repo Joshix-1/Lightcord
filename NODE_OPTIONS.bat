@@ -1,0 +1,1 @@
+SET NODE_OPTIONS="--no-force-async-hooks-checks"

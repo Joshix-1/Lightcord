@@ -4,6 +4,7 @@
   "main": "app/index.js",
   "private": true,
   "dependencies": {
+    "discordrpcgenerator": "^1.2.0",
     "invariant": "2.2.4",
     "lodash": "4.17.11",
     "mkdirp": "^0.5.1",

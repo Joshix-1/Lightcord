@@ -1,9 +1,0 @@
-{
-  "name": "discord_desktop_core",
-  "version": "0.0.0",
-  "private": "true",
-  "main": "index.js",
-  "dependencies": {
-    "discordrpcgenerator": "^1.2.0"
-  }
-}

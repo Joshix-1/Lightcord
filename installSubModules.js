@@ -13,10 +13,14 @@ fs.readdirSync(MODULES_DIRNAME, {withFileTypes: true})
     
     console.log(`Installing modules in ${e.name}.`)
 
-    child_process.exec("npm i", {
+    child_process.spawn((process.platform === "win32" ? "npm.cmd" : "npm"), ["i"], {
         cwd: MODULE_DIRNAME,
-        env: process.env
-    }, () => {})
+        env: process.env,
+        stdio: "inherit"
+    }).on("error", (err) => {
+        console.error(err)
+        process.exit(1)
+    })
 })
 
 

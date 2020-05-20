@@ -9,6 +9,8 @@ exports.init = init;
 exports.handleSingleInstance = handleSingleInstance;
 exports.setMainWindowVisible = setMainWindowVisible;
 
+var glasstron = require("glasstron")
+
 var _electron = require('electron');
 
 var _path = require('path');
@@ -339,7 +341,7 @@ function launchMainAppWindow(isVisible) {
     height: DEFAULT_HEIGHT,
     minWidth: MIN_WIDTH,
     minHeight: MIN_HEIGHT,
-    transparent: true,
+    transparent: false,
     frame: false,
     resizable: true,
     show: isVisible,
@@ -363,6 +365,11 @@ function launchMainAppWindow(isVisible) {
   mainWindow = new _electron.BrowserWindow(mainWindowOptions);
   mainWindowId = mainWindow.id;
   global.mainWindowId = mainWindowId;
+	glasstron.update(mainWindow, {
+		windows: {blurType: 'acrylic'},
+		macos: {vibrancy: 'fullscreen-ui'},
+		linux: {requestBlur: true} // KWin
+	});
   
   mainWindow.webContents.session.webRequest.onHeadersReceived(function(details, callback) {
     if (!details.responseHeaders["content-security-policy-report-only"] && !details.responseHeaders["content-security-policy"]) return callback({cancel: false});

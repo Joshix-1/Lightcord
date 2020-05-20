@@ -1,3 +1,8 @@
+/** Glasstron */
+import * as glasstron from "glasstron"
+glasstron.init()
+
+/** Modules */
 import * as electron from "electron"
 import * as fs from "fs"
 import * as path from "path"

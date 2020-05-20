@@ -3,6 +3,7 @@ const { EventEmitter } = require("events")
 const Logger = require("./Logger")
 const fs = require("fs")
 const path = require("path")
+const electron = require("electron")
 
 const events = exports.events = new EventEmitter()
 const logger = exports.logger = new Logger("LightCord")
@@ -113,15 +114,11 @@ require.extensions[".css"] = (m, filename) => {
 }
 
 const BetterDiscordConfig = window.BetterDiscordConfig = {
-	"local": true,
-	"localServer": "//localhost:8080",
-	"repo": "rauenzi",
-	"branch": "master",
-	"injectorBranch": "injector",
-	"minified": true,
-    "version": "0.3.2",
+	"branch": "lightcord",
     dataPath: (process.platform == "win32" ? process.env.APPDATA : process.platform == "darwin" ? process.env.HOME + "/Library/Preferences" :  process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME + "/.config") + "/LightCord_BD/",
-    os: process.platform
+    os: process.platform,
+    latestVersion: "0.0.0",
+    version: "0.0.0"
 }
 
 function ensureGuildClasses(){
@@ -146,3 +143,15 @@ function getGuildClasses() {
     const pill = BDModules.get(e => e.blobContainer)[0]
     return Object.assign({}, guildsWrapper, guilds, pill);
 }
+
+let originalResolve = path.resolve
+
+path.resolve = (...args) => {
+    args = args.map(e => {
+        if(e === "BetterDiscord/")return "LightCord_BD/" // replacing default directory of BetterDiscord plugins/themes by lightcord's directory. Open an issue if that's a problem.
+        return e
+    })
+    return originalResolve.call(path, ...args)
+}
+
+path.originalResolve = originalResolve

@@ -6,10 +6,6 @@
         "jsx": "react",
         "outDir": "./dist",
         "resolveJsonModule": true,
-        "esModuleInterop": true,
         "rootDir": "./src"
-    },
-    "exclude": [
-        "./DiscordJS"
-    ]
+    }
 }

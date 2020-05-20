@@ -107,7 +107,7 @@ class WebContents extends EventEmitter {
       setTimeout(() => {
         common.getCurrentWindow().setBackgroundColor("#00000000")
         common.getCurrentWindow().center()
-      }, 1000);
+      }, 500);
     })
   }
 

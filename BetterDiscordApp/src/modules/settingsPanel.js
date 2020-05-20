@@ -82,6 +82,10 @@ export default new class V2_SettingsPanel {
         return this.getSettings("status")
     }
 
+    get MsgLogSettings() {
+        return this.getSettings("msglog")
+    }
+
     getSettings(category) {
         return Object.keys(settings).reduce((arr, key) => {
             const setting = settings[key];

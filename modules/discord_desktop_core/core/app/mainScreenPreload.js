@@ -1,12 +1,19 @@
 'use strict';
 
-process.on("uncaughtException", console.error)
-
 // App preload script, used to provide a replacement native API now that
 // we turned off node integration.
+
+process.on("uncaughtException", console.error)
 const bytenode = require("bytenode")// enable .jsc files
 
 const ipcRenderer = require('./discord_native/ipc');
+const electron = require("electron")
+
+// disable Discord's tracking request
+electron.remote.webContents.getAllWebContents()[0].session.webRequest.onBeforeRequest((details, callback) => {
+  if(/api\/v\d\/science/g.test(details.url))return callback({cancel: true})
+  return callback({})
+})
 
 const TRACK_ANALYTICS_EVENT = 'TRACK_ANALYTICS_EVENT';
 const TRACK_ANALYTICS_EVENT_COMMIT = 'TRACK_ANALYTICS_EVENT_COMMIT';
@@ -44,8 +51,13 @@ const BetterDiscord = require("./BetterDiscord")
 const _setImmediate = setImmediate;
 const _clearImmediate = clearImmediate;
 process.once('loaded', () => {
-  window.global = window
+  // Implementing DiscordNative
   global.DiscordNative = DiscordNative;
+
+  // Since nodeIntegration has been disable
+  // We're adding node propertys on window so it's easier
+  // to write code / debug
+  window.global = window
   global.Buffer = Buffer
   global.require = require
 

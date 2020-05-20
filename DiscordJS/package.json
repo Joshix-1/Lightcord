@@ -1,0 +1,14 @@
+{
+  "name": "discord.js-lightcord",
+  "version": "11.6.4",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jeanouina",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/collection": "^0.1.5"
+  }
+}

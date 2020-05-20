@@ -9,12 +9,6 @@ const bytenode = require("bytenode")// enable .jsc files
 const ipcRenderer = require('./discord_native/ipc');
 const electron = require("electron")
 
-// disable Discord's tracking request
-electron.remote.webContents.getAllWebContents()[0].session.webRequest.onBeforeRequest((details, callback) => {
-  if(/api\/v\d\/science/g.test(details.url))return callback({cancel: true})
-  return callback({})
-})
-
 const TRACK_ANALYTICS_EVENT = 'TRACK_ANALYTICS_EVENT';
 const TRACK_ANALYTICS_EVENT_COMMIT = 'TRACK_ANALYTICS_EVENT_COMMIT';
 
@@ -75,5 +69,11 @@ process.once('loaded', () => {
   BetterDiscord.events.on("debug", BetterDiscord.logger.log.bind(BetterDiscord.logger))
   BetterDiscord.events.on("ready", () => {
     BetterDiscord.logger.log("BetterDiscord Loaded. took: "+(Date.now() - ftime)+"ms.")
+  })
+
+  // disable Discord's tracking request
+  electron.remote.getCurrentWebContents().session.webRequest.onBeforeRequest((details, callback) => {
+    if(/api\/v\d\/science/g.test(details.url))return callback({cancel: true})
+    return callback({})
   })
 });

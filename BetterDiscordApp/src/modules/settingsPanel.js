@@ -199,12 +199,12 @@ export default new class V2_SettingsPanel {
             else reactDevTools.stop();
         }
         if (id === "lightcord-1") {
-            if (enabled) window.lightcordSettings.devMode = true
-            else window.lightcordSettings.devMode = false
+            if (enabled) window.Lightcord.Settings.devMode = true
+            else window.Lightcord.Settings.devMode = false
         }
         if (id === "lightcord-2") {
-            if (enabled) window.lightcordSettings.callRingingBeat = true
-            else window.lightcordSettings.callRingingBeat = false
+            if (enabled) window.Lightcord.Settings.callRingingBeat = true
+            else window.Lightcord.Settings.callRingingBeat = false
         }
 
         if (id === "lightcord-presence-1") {
@@ -225,8 +225,8 @@ export default new class V2_SettingsPanel {
         if (settingsCookie["bda-gs-6"]) tfHour.inject24Hour();
         if (settingsCookie["bda-gs-7"]) coloredText.injectColoredText();
         if (settingsCookie["fork-ps-4"]) ClassNormalizer.start();
-        if (settingsCookie["lightcord-1"]) window.lightcordSettings.devMode = true
-        if (settingsCookie["lightcord-2"]) window.lightcordSettings.callRingingBeat = true
+        if (settingsCookie["lightcord-1"]) window.Lightcord.Settings.devMode = true
+        if (settingsCookie["lightcord-2"]) window.Lightcord.Settings.callRingingBeat = true
         if (settingsCookie["lightcord-presence-1"]) CustomRichPresence.enable()
 
         if (settingsCookie["fork-ps-5"]) {

@@ -42,11 +42,6 @@ async function privateInit(){
 
     //disabling sentry
     BDModules.get(e => e.getCurrentHub)[0].getCurrentHub().getClient().getOptions().enabled = false
-
-    window.lightcordSettings = {
-        devMode: false,
-        callRingingBeat: true
-    }
     
     let original = BDModules.get((e) =>  e.createSound)[0].createSound
     BDModules.get((e) =>  e.createSound)[0].createSound = function(sound){
@@ -55,7 +50,7 @@ async function privateInit(){
             let returned = original(...arguments)
             Object.defineProperty(returned, "name", {
                 get(){
-                    return window.lightcordSettings.callRingingBeat ? "call_ringing_beat" : "call_ringing"
+                    return window.Lightcord.Settings.callRingingBeat ? "call_ringing_beat" : "call_ringing"
                 },
                 set(data){
                     console.log("Attempting to set call_ringing value. Canceling "+data)
@@ -69,7 +64,7 @@ async function privateInit(){
     }
 
     let constants = ModuleLoader.get(m=>m.API_HOST)[0]
-    let dispatcher = ModuleLoader.get(m=>m.Dispatcher&&m.default&&m.default.dispatch)[0]
+    let dispatcher = ModuleLoader.get(m=>m.Dispatcher&&m.default&&m.default.dispatch)[0].default
     require("../../../../../BetterDiscordApp/css/main.css")
     require("./lightcord.css")
 
@@ -86,8 +81,8 @@ async function privateInit(){
     
     // setting Discord Internal Developer Mode for developement and test purposes.
     Object.defineProperty(ModuleLoader.get(e => e.default && typeof e.default === "object" && ("isDeveloper" in e.default))[0].default, "isDeveloper", {
-        get(){return !!window.lightcordSettings.devMode},
-        set(data){return !!window.lightcordSettings.devMode}
+        get(){return !!window.Lightcord.Settings.devMode},
+        set(data){return !!window.Lightcord.Settings.devMode}
     })
 
     await ensureGuildClasses()
@@ -96,6 +91,19 @@ async function privateInit(){
     BetterDiscord.init()
 
     events.emit("ready")
+
+    const Discord = require("../../../../../DiscordJS/dist")
+
+    window.Lightcord = {
+        DiscordModules: {
+            dispatcher,
+            constants
+        },
+        Settings: {
+            devMode: false,
+            callRingingBeat: true
+        }
+    }
 }
 
 require.extensions[".css"] = (m, filename) => {
@@ -117,8 +125,8 @@ const BetterDiscordConfig = window.BetterDiscordConfig = {
 	"branch": "lightcord",
     dataPath: (process.platform == "win32" ? process.env.APPDATA : process.platform == "darwin" ? process.env.HOME + "/Library/Preferences" :  process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME + "/.config") + "/LightCord_BD/",
     os: process.platform,
-    latestVersion: "0.0.0",
-    version: "0.0.0"
+    latestVersion: "0.3.4",
+    version: "0.3.4"
 }
 
 function ensureGuildClasses(){
@@ -155,3 +163,28 @@ path.resolve = (...args) => {
 }
 
 path.originalResolve = originalResolve
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.ohgodohfuck = function(){
+    let style=document.createElement("style");style.innerHTML=`html:after{content:"";position:absolute;top:0;left:0 ;width:100vw;height:100vh;background-image:url("https://media.giphy.com/media/l378vg4Pm9LGnmD6M/giphy.gif");background-size:cover;background-position:center;background-color:transparent !important;opacity:0.9;mix-blend-mode:hue;z-index:999999999999;pointer-events:none}@keyframes ohgodohfuck{from{transform:rotateZ(0deg)}to{transform:rotateZ(360deg)}}#app-mount{animation:ohgodohfuck 5s infinite alternate}`;document.body.append(style);setTimeout(()=>document.body.removeChild(style),5000); 
+}

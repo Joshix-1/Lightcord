@@ -87,11 +87,6 @@ async function privateInit(){
 
     await ensureGuildClasses()
 
-    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
-    BetterDiscord.init()
-
-    events.emit("ready")
-
     const Discord = require("../../../../../DiscordJS/dist")
 
     window.Lightcord = {
@@ -104,6 +99,11 @@ async function privateInit(){
             callRingingBeat: true
         }
     }
+
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
+    BetterDiscord.init()
+
+    events.emit("ready")
 }
 
 require.extensions[".css"] = (m, filename) => {

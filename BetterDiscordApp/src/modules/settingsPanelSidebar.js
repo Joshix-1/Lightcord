@@ -15,10 +15,10 @@ export default class V2_SettingsPanel_Sidebar {
 
     get items() {
         return [{
-            text: "Lightcord",
+            text: "Lightcord Settings",
             id: "lightcord"
         }, {
-            text: "Settings", 
+            text: "BetterDiscord Settings", 
             id: "core"
         }, {
             text: "Plugins", 
@@ -30,7 +30,7 @@ export default class V2_SettingsPanel_Sidebar {
             text: "Custom CSS", 
             id: "customcss"
         }, {
-            text: "Presence", 
+            text: "RichPresence", 
             id: "status"
         }];
     }

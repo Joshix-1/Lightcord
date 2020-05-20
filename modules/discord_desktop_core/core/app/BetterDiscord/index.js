@@ -85,10 +85,6 @@ async function privateInit(){
         set(data){return !!window.Lightcord.Settings.devMode}
     })
 
-    await ensureGuildClasses()
-
-    const Discord = require("../../../../../DiscordJS/dist")
-
     window.Lightcord = {
         DiscordModules: {
             dispatcher,
@@ -99,6 +95,8 @@ async function privateInit(){
             callRingingBeat: true
         }
     }
+
+    await ensureGuildClasses()
 
     const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
     BetterDiscord.init()

@@ -85,6 +85,17 @@ async function privateInit(){
         set(data){return !!window.Lightcord.Settings.devMode}
     })
 
+    /**
+     * @type {typeof import("../../../../../DiscordJS").default}
+     */
+    let DiscordJS
+    try{
+        DiscordJS = require("../../../../../DiscordJS").default
+    }catch(err){
+        console.error(err)
+        DiscordJS = null
+    }
+
     window.Lightcord = {
         DiscordModules: {
             dispatcher,
@@ -102,6 +113,8 @@ async function privateInit(){
     BetterDiscord.init()
 
     events.emit("ready")
+    
+    if(DiscordJS)DiscordJS.client.emit("ready")
 }
 
 require.extensions[".css"] = (m, filename) => {

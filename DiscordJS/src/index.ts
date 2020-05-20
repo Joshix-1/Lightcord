@@ -26,3 +26,5 @@ window.DiscordJSClient = client
 export default DiscordJSExporrts
 
 export type Snowflake = string
+
+export type Channel = any

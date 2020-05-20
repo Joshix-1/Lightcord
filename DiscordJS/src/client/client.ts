@@ -1,8 +1,9 @@
 import { EventEmitter } from "events";
 import DiscordJSError from "../util/DiscordJSError";
 import Collection from "@discordjs/collection";
-import { Snowflake } from "..";
+import { Snowflake, Channel } from "..";
 import { channelsModule } from "../util/DiscordToModules";
+import { createChannel } from "../util/util";
 
 export default class Client extends EventEmitter {
     constructor(){

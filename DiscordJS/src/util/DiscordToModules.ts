@@ -31,7 +31,7 @@ export const channelsModule:{
     getGDMsForRecipients(recipients: Snowflake[]):Set<Snowflake>
 } = requireModule(e => e.default && e.default.getChannels && e.default.getChannel)
 
-interface DiscordChannel {
+export interface DiscordChannel {
     application_id?: Snowflake,
     bitrate?: number,
     guild_id?: Snowflake,

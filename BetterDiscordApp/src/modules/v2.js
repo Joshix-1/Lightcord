@@ -86,13 +86,25 @@ export default new class V2 {
      * @type {typeof React}
      */
     get react() {return this.internal.react;}
+    /**
+     * @type {typeof React}
+     */
     get React() {return this.internal.react;}
+    /**
+     * @type {typeof import("react-dom")}
+     */
     get reactDom() {return this.internal.reactDom;}
+    /**
+     * @type {typeof import("react-dom")}
+     */
     get ReactDom() {return this.internal.reactDom;}
     /**
      * @type {typeof React.Component}
      */
     get reactComponent() {return this.internal.react.Component;}
+    /**
+     * @type {typeof React.Component}
+     */
     get ReactComponent() {return this.internal.react.Component;}
 
     get anchorClasses() {return this.WebpackModules.findByUniqueProperties(["anchorUnderlineOnHover"]) || {anchor: "anchor-3Z-8Bb", anchorUnderlineOnHover: "anchorUnderlineOnHover-2ESHQB"};}

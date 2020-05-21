@@ -49,8 +49,8 @@ export const settings = {
     "Automatic Loading":          {id: "fork-ps-5", info: "Automatically loads, reloads, and unloads plugins and themes", implemented: true,  hidden: false, cat: "core", category: "content manager"},
 
     /* Developer */
-    "Developer Mode":         	  {id: "bda-gs-8",  info: "Developer Mode",                                    implemented: true,  hidden: false, cat: "core", category: "developer settings"},
-    "Copy Selector":			  {id: "fork-dm-1", info: "Adds a \"Copy Selector\" option to context menus when developer mode is active", implemented: true,  hidden: false, cat: "core", category: "developer settings"},
+    "Developer Mode":         	  {id: "bda-gs-8", info: "Developer Mode Toggle", implemented: true, hidden: false, cat: "core", category: "developer settings"},
+    "Copy Selector":			  {id: "fork-dm-1", info: "Adds a \"Copy Selector\" option to context menus when developer mode is active", implemented: true, hidden: false, cat: "core", category: "developer settings"},
     "React DevTools":			  {id: "reactDevTools", info: "Adds react developer tools to the devtools. Must be installed in Google Chrome on your pc.", implemented: true,  hidden: true, cat: "core", category: "developer settings"},
 
     /** LightCord */
@@ -70,7 +70,7 @@ export const defaultCookie = {
     "bda-gs-5": true,
     "bda-gs-6": false,
     "bda-gs-7": false,
-    "bda-gs-8": false,
+    "bda-gs-8": true,
     "bda-es-0": true,
     "bda-es-1": true,
     "bda-es-2": true,

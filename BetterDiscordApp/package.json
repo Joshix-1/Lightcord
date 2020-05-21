@@ -39,6 +39,7 @@
         "webpack-cli": "^3.2.3"
     },
     "dependencies": {
+        "@types/react-dom": "^16.9.8",
         "mkdirp": "^1.0.4",
         "react": "^16.13.1",
         "request": "^2.88.2",

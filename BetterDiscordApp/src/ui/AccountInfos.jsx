@@ -69,6 +69,10 @@ export default class V2C_AccountInfos extends React.Component {
 
     getProfileValue(){
         const user = userModule.getCurrentUser()
+        /**
+         * @type {Date}
+         */
+        const createdAt = user.createdAt
 
         return `+ Username: ${user.username}
 + Discriminator: ${user.discriminator}
@@ -76,13 +80,14 @@ export default class V2C_AccountInfos extends React.Component {
 + ID: ${user.id}
 + Avatar: ${user.avatar}
 + Avatar URL: https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=4096
-+ Email: ${user.email}
++ Creation Date: ${(createdAt.getDate()).toString().padStart(2, "0")}/${(createdAt.getMonth()+1).toString().padStart(2, "0")}/${(createdAt.getFullYear()).toString().padStart(2, "0")} ${createdAt.getHours().toString().padStart(2, "0")}h ${createdAt.getMinutes().toString().padStart(2, "0")}min ${createdAt.getSeconds()}s
 + Flags: ${user.flags}
-+ 2FA: ${user.mfaEnabled ? "Yes" : "No"}
-+ Has Been On Mobile: ${user.mobile ? "Yes" : "No"}
-+ Phone: ${user.phone || "None"}
-+ Verified: ${user.verified}
-+ Has Nitro: ${user.hasPremiumSubscription ? "Yes" : "No"}`
++ Has Nitro: ${user.hasPremiumSubscription ? "Yes" : "No"}
+- Email: ${user.email}
+- 2FA: ${user.mfaEnabled ? "Yes" : "No"}
+- Has Been On Mobile: ${user.mobile ? "Yes" : "No"}
+- Phone: ${user.phone || "None"}
+- Verified: ${user.verified}`
     }
 
     getStatistics(){

@@ -12,6 +12,7 @@ import DOM from "./domtools";
 import BDLogo from "../ui/bdLogo";
 import TooltipWrap from "../ui/tooltipWrap";
 import LightcordLogo from "../ui/lightcordLogo";
+import PluginCertifier from "./pluginCertifier";
 
 function Core() {
     // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
@@ -83,6 +84,8 @@ Core.prototype.init = async function() {
     window.addEventListener("beforeunload", function() {
         if (settingsCookie["bda-dc-0"]) document.querySelector(".btn.btn-disconnect").click();
     });
+
+    new PluginCertifier().start()
 
     Utils.log("Startup", "Removing Loading Icon");
     if (document.getElementsByClassName("bd-loaderv2").length) document.getElementsByClassName("bd-loaderv2")[0].remove();

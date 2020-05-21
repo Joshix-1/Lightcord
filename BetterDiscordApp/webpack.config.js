@@ -21,7 +21,8 @@ module.exports = {
     rimraf: `rimraf`,
     yauzl: `yauzl`,
     mkdirp: `mkdirp`,
-    request: `request`
+    request: `request`,
+    "node-fetch": "node-fetch"
   },
   resolve: {
     extensions: [".js", ".jsx"],

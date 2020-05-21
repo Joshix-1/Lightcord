@@ -11,7 +11,7 @@ function requireModule(filter: (module:any) => boolean){
     return module && module.default || module
 }
 
-export const channelsModule:{
+const channelsModuleInternal1:{
     getChannel(id:Snowflake): DiscordChannel,
     getChannels(): {
         [k:string]: DiscordChannel
@@ -30,6 +30,10 @@ export const channelsModule:{
     },
     getGDMsForRecipients(recipients: Snowflake[]):Set<Snowflake>
 } = requireModule(e => e.default && e.default.getChannels && e.default.getChannel)
+export const channelsModule = {
+    getChannel: channelsModuleInternal1.getChannel,
+    getAllChannels: channelsModuleInternal1.getChannels
+}
 
 export interface DiscordChannel {
     application_id?: Snowflake,

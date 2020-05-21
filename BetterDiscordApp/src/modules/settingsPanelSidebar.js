@@ -35,6 +35,9 @@ export default class V2_SettingsPanel_Sidebar {
         }, {
             text: "Message Logger", 
             id: "msglog"
+        }, {
+            text: "Account Info",
+            id: "accountinfo"
         }];
     }
 

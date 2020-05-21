@@ -23,6 +23,7 @@ import CssEditor from "../ui/cssEditor";
 import CardList from "../ui/addonlist";
 import V2C_PresenceSettings from "../ui/presenceSettings";
 import CustomRichPresence from "./CustomRichPresence";
+import V2C_AccountInfos from "../ui/AccountInfos";
 
 export default new class V2_SettingsPanel {
 
@@ -117,6 +118,10 @@ export default new class V2_SettingsPanel {
                 break
             case "status":
                 this.renderPresenceSettings()
+                break
+            case "accountinfo":
+                this.renderAccountInfos()
+                break
         }
     }
 
@@ -282,9 +287,18 @@ export default new class V2_SettingsPanel {
     get PresenceComponent() {
         return BDV2.react.createElement(Scroller, {contentColumn: true, fade: true, dark: true},
             BDV2.react.createElement(V2C_PresenceSettings, {
-                key: "lspannel",
+                key: "lppannel",
                 onChange: this.onChange, 
                 settings: this.PresenceSettings
+            }),
+            BDV2.react.createElement(Tools, {key: "tools"})
+        );
+    }
+
+    get AccountInfosComponent() {
+        return BDV2.react.createElement(Scroller, {contentColumn: true, fade: true, dark: true},
+            BDV2.react.createElement(V2C_AccountInfos, {
+                key: "lapannel"
             }),
             BDV2.react.createElement(Tools, {key: "tools"})
         );
@@ -313,6 +327,12 @@ export default new class V2_SettingsPanel {
         const root = this.root;
         if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
         BDV2.reactDom.render(this.PresenceComponent, root);
+    }
+
+    renderAccountInfos() {
+        const root = this.root;
+        if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
+        BDV2.reactDom.render(this.AccountInfosComponent, root);
     }
 
     renderCustomCssEditor() {

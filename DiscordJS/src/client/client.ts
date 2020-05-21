@@ -5,8 +5,11 @@ import { Snowflake, Channel } from "..";
 import { channelsModule } from "../util/DiscordToModules";
 import { createChannel } from "../util/util";
 
+let hasInit = false
 export default class Client extends EventEmitter {
     constructor(){
+        if(hasInit)throw new DiscordJSError("Cannot initialized more than one client.")
+        hasInit = true
         super()
     }
 
@@ -28,7 +31,7 @@ export default class Client extends EventEmitter {
     }
 
     get channels():Collection<Snowflake, Channel>{
-        const channels = Object.values(channelsModule.getChannels())
+        const channels = Object.values(channelsModule.getAllChannels())
         return new Collection(channels.map(e => ([e.id, createChannel(e)])))
     }
 }

@@ -4,7 +4,7 @@ import * as crypto from "crypto"
 import BDV2 from "./v2"
 import tooltipWrap from "../ui/tooltipWrap"
 
-const debug = false
+const debug = true
 const cache = {}
 const cache2 = {}
 
@@ -99,21 +99,69 @@ export default class PluginCertifier {
                 })
             })
         })
+
+        const messages = getMessagesModule.getMessages(ChannelModule.getChannelId())
+        process.nextTick(() => {
+            for(const message of messages._array){
+                const attachments = message.attachments || []
+                if(attachments.length === 0)continue // no attachments
+
+                attachments.forEach(attachment => {
+                    processAttachment(attachment)
+                })
+            }
+        })
     }
 }
+/*
+function checkViruses(hash, data){
+    data = data.toString("utf8").split(/[^\w\d]+/g)
+    let isHarmful = false
+    for(let keyword of data){
+        for(let oof of [
+            "token",
+            "email",
+            "phone",
+            "MFA",
+            "2fa",
+            "process.exit",
+            "child_process",
+            "localStorage"
+        ]){
+            if(keyword.toLowerCase().includes(oof.toLowerCase())){
+                console.log(keyword, oof)
+                isHarmful = true
+                break
+            } 
+        }
+        if(isHarmful)break
+    }
+    console.log(isHarmful)
+    if(!isHarmful)return
+    cache[hash] = {
+        suspect: true,
+        name: hashToUrl[hash].split("/").pop(),
+        type: hashToUrl[hash].endsWith(".js") ? "Plugin" : "Theme" 
+    }
+
+    let elements = Array.from(document.querySelectorAll(`a[href="${hashToUrl[hash]}"]`)).filter(e => !e.classList.contains("da-fileNameLink")).map(e => e.parentElement)
+    renderToElements(elements, cache[hash], cache[hash].name)
+}*/
+
+const hashToUrl = {}
 
 function processAttachment(attachment){
     if(!attachment.url.startsWith("https://cdn.discordapp.com/"))return
     if(!attachment.filename.endsWith(".plugin.js") && !attachment.filename.endsWith(".theme.css"))return
 
-    let nextHash = (hash) => {
+    let nextHash = (hash, data) => {
         if(!cache[hash]){
             nodeFetch("https://raw.githubusercontent.com/Lightcord/filehashes/master/hashes/"+hash, {
                 headers: {
                     "User-Agent": electron.remote.getCurrentWebContents().userAgent
                 }
             }).then(async res => {
-                if(res.status !== 200)return
+                if(res.status !== 200)return //checkViruses(hash, data)
                 const result = await res.json()
                 debug&&console.log(`Hash valid:`, result)
 
@@ -124,7 +172,7 @@ function processAttachment(attachment){
             }).catch(()=>{})
         }else{
             const result = cache[hash]
-            debug&&console.log(`Hash valid:`, result)
+            debug&&console.log(`Hash Cached:`, result)
 
             let elements = Array.from(document.querySelectorAll(`a[href="${attachment.url}"]`)).filter(e => !e.classList.contains("da-fileNameLink")).map(e => e.parentElement)
             renderToElements(elements, result, attachment.filename)
@@ -140,14 +188,20 @@ function processAttachment(attachment){
     }).then(res => {
         if(res.status !== 200)throw new Error("File doesn't exist.")
         const hash = crypto.createHash("sha256")
-        res.body.pipe(hash)
+        let data = Buffer.alloc(0)
+        res.body.on("data", chunk => {
+            data = Buffer.concat([data, chunk])
+            hash.update(chunk)
+        })
         res.body.on("end", () => {
             const hashResult = hash.digest("hex")
             debug&&console.log(`Calculated hash for file ${attachment.filename}: ${hashResult}`)
 
             cache2[attachment.url] = hashResult
 
-            nextHash(hashResult)
+            hashToUrl[hashResult] = attachment.url
+
+            nextHash(hashResult, data)
         })
     }).catch(()=>{})
 }
@@ -158,15 +212,34 @@ const childModule = BDModules.get(e => e.childContainer)[0]
 /**
  * 
  * @param {HTMLDivElement[]} elements 
- * @param {{type: "Theme"|"Plugin", name: string}} result
+ * @param {{type: "Theme"|"Plugin", name: string, official?: boolean}|{suspect:true, type: "Theme"|"Plugin", name: string}} result
  */
 function renderToElements(elements, result, filename){
 
     elements.forEach(e => {
         if(e.childNodes.length > 3)return
         const div = document.createElement("div")
-        e.appendChild(div)
-        if(!result.official){
+        e.appendChild(div)/*
+        if(result.suspect){
+            e.style.backgroundColor = "#E13838"
+            /**
+             * 
+             * @param {HTMLElement} node 
+             *//*
+            let nextNode = (node) => {
+                for(let child of node.children){
+                    if(child.tagName === "a"){
+                        child.addEventListener("click", (e) => {
+                            e.preventDefault()
+                            alert("You are about to download a suspect "+result.type.toLowerCase()+". Are you sure ? If yes, then please copy and paste the URL directly into your browser.")
+                        })
+                    }else if(["div"].includes(child.tagName)){
+                        nextNode(child)
+                    }
+                }
+            }
+            nextNode(e)
+        }else */if(!result.official){
             BDV2.reactDom.render(BDV2.react.createElement(tooltipWrap, {text: result.type+" "+result.name+" is certified by Lightcord."}, 
                 BDV2.react.createElement("div", {className: flowerStarModule.flowerStarContainer, style: {width: "16px", height: "16px"}},
                     BDV2.react.createElement("svg", {className: flowerStarModule.flowerStar, "aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2"},

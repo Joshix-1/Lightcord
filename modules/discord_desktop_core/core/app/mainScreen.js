@@ -323,7 +323,6 @@ function getBackgroundColor() {
 
 function setBackgroundColor(color) {
   settings.set(BACKGROUND_COLOR_KEY, color);
-  //mainWindow.setBackgroundColor(color);
   settings.save();
 }
 
@@ -341,7 +340,7 @@ function launchMainAppWindow(isVisible) {
     height: DEFAULT_HEIGHT,
     minWidth: MIN_WIDTH,
     minHeight: MIN_HEIGHT,
-    transparent: false,
+    transparent: true,
     frame: false,
     resizable: true,
     show: isVisible,
@@ -366,7 +365,7 @@ function launchMainAppWindow(isVisible) {
   mainWindowId = mainWindow.id;
   global.mainWindowId = mainWindowId;
 	glasstron.update(mainWindow, {
-		windows: {blurType: 'acrylic'},
+		windows: {blurType: 'blurbehind'},
 		macos: {vibrancy: 'fullscreen-ui'},
 		linux: {requestBlur: true} // KWin
 	});
@@ -424,7 +423,7 @@ function launchMainAppWindow(isVisible) {
     }
 
     webContentsSend(mainWindow != null && mainWindow.isFocused() ? 'MAIN_WINDOW_FOCUS' : 'MAIN_WINDOW_BLUR');
-    mainWindow.setBackgroundColor("#00000000")
+    
     if (!lastPageLoadFailed) {
       connectionBackoff.succeed();
     }

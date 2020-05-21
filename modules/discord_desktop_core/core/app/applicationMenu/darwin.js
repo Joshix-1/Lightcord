@@ -90,11 +90,7 @@ exports.default = [{
     click: () => {
       const window = getWindow();
       if (window) {
-        window.setBackgroundColor(getBackgroundColor())
         window.webContents.reloadIgnoringCache()
-        window.webContents.once("did-finish-load", () => {
-          window.setBackgroundColor("#00000000")
-        })
       }
     },
     accelerator: 'Command+R'

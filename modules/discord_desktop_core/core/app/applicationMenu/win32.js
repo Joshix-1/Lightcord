@@ -36,11 +36,7 @@ exports.default = [{
     label: '&Reload',
     click: () => {
       let window = _electron.BrowserWindow.getFocusedWindow()
-      window.setBackgroundColor(getBackgroundColor())
       window.webContents.reloadIgnoringCache()
-      window.webContents.once("did-finish-load", () => {
-        window.setBackgroundColor("#00000000")
-      })
     },
     accelerator: 'Control+R'
   }, {

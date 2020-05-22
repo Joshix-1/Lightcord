@@ -54,9 +54,12 @@ export const settings = {
     "React DevTools":			  {id: "reactDevTools", info: "Adds react developer tools to the devtools. Must be installed in Google Chrome on your pc.", implemented: true,  hidden: true, cat: "core", category: "developer settings"},
 
     /** LightCord */
-    "Disable BetterDiscord":      {id: "bd-disable", info: "Disable Betterdiscord (plugins, themes, etc).", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+    "Disable BetterDiscord":      {id: "bd-disable",  info: "Disable Betterdiscord (plugins, themes, etc).", implemented: false, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Calling Ring Beat":          {id: "lightcord-2", info: "Enable Discord's special calling beat.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
-    "Developer Mode":             {id: "lightcord-1", info: "Enable Discord's Internal Developer Options. This allow the \"Experiments\" tab and the \"Developer Options\" tab. (must close and reopen settings)", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+    "Developer Options":          {id: "lightcord-1", info: "Enable Discord's Internal Developer Options. This allow the \"Experiments\" tab and the \"Developer Options\" tab. (must close and reopen settings)", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+
+    /** Lightcord Window */
+    "Always-on-Top":              {id: "lightcord-3", info: "Enable window's Always-on-Top mode, where Lightcord stays on top of other applications.", implemented: true, hidden: false, cat: "lightcord", category: "Window"},
     
     /** RichPresence */
     "Enable":                     {id: "lightcord-presence-1", info: "Enable RichPresence below.", implemented: true, hidden: false, cat: "status"}
@@ -97,7 +100,9 @@ export const defaultCookie = {
     "reactDevTools": false,
     "lightcord-1": false,
     "lightcord-2": true,
-    "lightcord-presence-1": false
+    "lightcord-presence-1": false,
+    "lightcord-3": false,
+    "lightcord-4": true
 };
 
 
@@ -105,13 +110,14 @@ export const settingsCookie = {};
 
 export const settingsRPC = {};
 export const defaultRPC = {
-    name: "Lightcord",
-    application_id: "711416957718757418",
-    type: 0,
-    details: "Browsing Discord",
-    state: "Lightcord",
-    "timestamps.start": Date.now()
-};
+    "name": "Lightcord",
+    "application_id": "711416957718757418",
+    "state": "Lightcord Client",
+    "details": "Browsing Discord",
+    "timestamps.start": Date.now(),
+    "assets.small": null,
+    "assets.large": "712323821037682791"
+}
 
 export const bdpluginErrors = [];
 export const bdthemeErrors = []; // define for backwards compatibility
@@ -123,4 +129,3 @@ export const bdplugins = {};
 
 export const pluginCookie = {};
 export const themeCookie = {};
-

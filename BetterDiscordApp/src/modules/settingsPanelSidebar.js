@@ -32,10 +32,10 @@ export default class V2_SettingsPanel_Sidebar {
         }, {
             text: "RichPresence", 
             id: "status"
-        }, {
+        }, /*{
             text: "Message Logger", 
             id: "msglog"
-        }, {
+        }, */{
             text: "Account Info",
             id: "accountinfo"
         }];

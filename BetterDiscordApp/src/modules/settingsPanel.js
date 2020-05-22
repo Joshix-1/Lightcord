@@ -24,6 +24,7 @@ import CardList from "../ui/addonlist";
 import V2C_PresenceSettings from "../ui/presenceSettings";
 import CustomRichPresence from "./CustomRichPresence";
 import V2C_AccountInfos from "../ui/AccountInfos";
+import { remote } from "electron";
 
 export default new class V2_SettingsPanel {
 
@@ -211,10 +212,13 @@ export default new class V2_SettingsPanel {
             if (enabled) window.Lightcord.Settings.callRingingBeat = true
             else window.Lightcord.Settings.callRingingBeat = false
         }
-
         if (id === "lightcord-presence-1") {
             if (enabled) CustomRichPresence.enable()
             else CustomRichPresence.disable()
+        }
+        if (id === "lightcord-3") {
+            if (enabled) remote.getCurrentWindow().setAlwaysOnTop(true)
+            else remote.getCurrentWindow().setAlwaysOnTop(false)
         }
 
         this.saveSettings();
@@ -233,6 +237,7 @@ export default new class V2_SettingsPanel {
         if (settingsCookie["lightcord-1"]) window.Lightcord.Settings.devMode = true
         if (settingsCookie["lightcord-2"]) window.Lightcord.Settings.callRingingBeat = true
         if (settingsCookie["lightcord-presence-1"]) CustomRichPresence.enable()
+        if (settingsCookie["lightcord-3"]) remote.getCurrentWindow().setAlwaysOnTop(true)
 
         if (settingsCookie["fork-ps-5"]) {
             ContentManager.watchContent("plugin");

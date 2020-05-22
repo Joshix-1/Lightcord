@@ -7,7 +7,7 @@
     "test": "tsc && NODE_OPTIONS.bat && electron .",
     "run": "NODE_OPTIONS.bat && electron .",
     "build": "electron-packager . --ignore=\"(distApp|builds|\\.ts)\" --arch=ia32 --win32metadata.ProductName=\"Lightcord\" --win32metadata.CompanyName=\"Lightcord Inc.\" --protocol=discord --platform=\"win32\" --out=builds --icon=app.ico --executable-name=\"Lightcord\" --asar.unpack=*.{node,dll} --overwrite",
-    "devInstall": "npm i -g --arch=ia32 electron@latest && npm i -g typescript && npm i --save-dev @types/node@12.12.39 && npm i --save-dev --arch=ia32 electron@latest && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\""
+    "devInstall": "npm i -g --arch=ia32 electron@8.3.0 && npm i -g typescript && npm i --save-dev @types/node@12.12.39 && npm i --save-dev --arch=ia32 electron@8.3.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\""
   },
   "author": "",
   "license": "ISC",
@@ -26,7 +26,7 @@
     "@types/node": "^12.12.39",
     "@types/rimraf": "^3.0.0",
     "@types/yauzl": "^2.9.1",
-    "devtron": "^1.4.0",
+    "devtron": "8.3.0",
     "electron": "^9.0.0",
     "terser": "^4.6.13"
   }

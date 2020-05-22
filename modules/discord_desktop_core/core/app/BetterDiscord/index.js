@@ -132,9 +132,11 @@ require.extensions[".css"] = (m, filename) => {
     return m.exports
 }
 
+const LightcordBDFolder = path.join(electron.remote.app.getPath("appData"), "Lightcord_BD")
+
 const BetterDiscordConfig = window.BetterDiscordConfig = {
 	"branch": "lightcord",
-    dataPath: (process.platform == "win32" ? process.env.APPDATA : process.platform == "darwin" ? process.env.HOME + "/Library/Preferences" :  process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME + "/.config") + "/LightCord_BD/",
+    dataPath: LightcordBDFolder,
     os: process.platform,
     latestVersion: "0.3.4",
     version: "0.3.4"
@@ -163,14 +165,30 @@ function getGuildClasses() {
     return Object.assign({}, guildsWrapper, guilds, pill);
 }
 
-let originalResolve = path.resolve
+const originalResolve = path.resolve
+const originalJoin = path.join
 
-path.resolve = (...args) => {
-    args = args.map(e => {
-        if(e === "BetterDiscord/")return "LightCord_BD/" // replacing default directory of BetterDiscord plugins/themes by lightcord's directory. Open an issue if that's a problem.
-        return e
-    })
-    return originalResolve.call(path, ...args)
+const BetterDiscordFolder = function() {
+    if (process.env.injDir) return path.resolve(process.env.injDir);
+    switch (process.platform) {
+        case "win32":
+            return path.resolve(process.env.appdata, "BetterDiscord/");
+        case "darwin":
+            return path.resolve(process.env.HOME, "Library/Preferences/", "BetterDiscord/");
+        default:
+            return path.resolve(process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME + "/.config", "BetterDiscord/");
+    }
+}()
+
+path.resolve = (...args) => { // Patching BetterDiscord folder by Lightcord's BetterDiscord folder
+    let resp = originalResolve.call(path, ...args)
+    if(resp.startsWith(BetterDiscordFolder))resp = resp.replace(BetterDiscordFolder, LightcordBDFolder)
+    return resp
+}
+path.join = (...args) => { // Patching BetterDiscord folder by Lightcord's BetterDiscord folder
+    let resp = originalJoin.call(path, ...args)
+    if(resp.startsWith(BetterDiscordFolder))resp = resp.replace(BetterDiscordFolder, LightcordBDFolder)
+    return resp
 }
 
 path.originalResolve = originalResolve

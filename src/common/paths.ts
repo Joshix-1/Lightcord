@@ -10,7 +10,7 @@ let userDataPath = null;
 let resourcesPath = null;
 
 function determineAppUserDataRoot() {
-  return path.join(app.getPath('appData'), "Lightcord");
+  return app.getPath('appData')
 }
 
 function determineUserData(userDataRoot, buildInfo) {

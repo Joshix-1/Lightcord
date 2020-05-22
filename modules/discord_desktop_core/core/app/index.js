@@ -7,7 +7,8 @@ exports.startup = startup;
 exports.handleSingleInstance = handleSingleInstance;
 exports.setMainWindowVisible = setMainWindowVisible;
 const { Menu } = require('electron');
-const request = require("request")
+const yauzl = require("yauzl")
+const fetch = require("node-fetch").default
 
 let mainScreen;
 function startup(bootstrapModules) {
@@ -59,7 +60,7 @@ function startup(bootstrapModules) {
     mainScreen.setMainWindowVisible(true)
   })
   bootstrapModules.splashScreen.events.on("APP_SHOULD_LAUNCH", () => {
-    mainScreen.init()
+    mainScreen.init(false)
   })
 
   mainScreen.events.on("ready", () => {
@@ -74,28 +75,37 @@ function startup(bootstrapModules) {
 
   if(Date.now() - global.appSettings.get("LAST_UPDATE_CHECK_TIMESTAMP", 0) < 6.48e+8){
     console.log("Starting with version "+version+" because it haven't been 1 week since the last check.")
-    mainScreen.init(true)
+    mainScreen.init(false)
   }else{
     initByUpdate = true
     console.log("Checking if version "+version+" is outdated...")
     bootstrapModules.splashScreen.initSplash()
     bootstrapModules.splashScreen.events.on("SPLASH_SCREEN_READY", () => {
-      request.get({
-        url: "https://haste.deroku.xyz/raw/oqigetomog",
-        body: "json"
-      }, (err, res, body) => {
-        if(err || res.statusCode !== 200){
+      fetch("https://haste.deroku.xyz/raw/oqigetomog", {
+        headers: {
+          "User-Agent": "Lightcord-Updater/1.0"
+        }
+      }).then(async res => {
+        const body = await res.json()
+        if(res.status !== 200){
           console.error("Couldn't check updates. Using installed version.")
-          console.log(body)
           bootstrapModules.splashScreen.launchMainWindow()
           return
         }
         global.appSettings.set("LAST_UPDATE_CHECK_TIMESTAMP", Date.now())
         global.appSettings.save()
-        if(body.version !== version){
-          console.error("App Outdated. Please update.")
+        if(body.version > version){
+          console.error("App Outdated. updating...")
+          bootstrapModules.splashScreen.updateSplashState("update-available")
+          updateApp()
+        }else{
+          console.error("Latest version already installed. Opening window.")
           bootstrapModules.splashScreen.launchMainWindow()
         }
+      }).catch(err => {
+        console.error("Couldn't check updates. Using installed version.")
+        console.log(err)
+        bootstrapModules.splashScreen.launchMainWindow()
       })
     })
   }
@@ -107,4 +117,29 @@ function handleSingleInstance(args) {
 
 function setMainWindowVisible(visible) {
   mainScreen.setMainWindowVisible(visible);
+}
+
+function updateApp(version){
+  const bootstrapModules = require('./bootstrapModules')
+  const updateLink = "https://github.com/Lightcord/Lightcord/archive/master.zip"
+
+  bootstrapModules.splashScreen.setSplashState({
+    status: "downloading-updates",
+    progress: 0
+  })
+
+  bootstrapModules.splashScreen.setSplashState({
+    status: "update-manually"
+  })
+  bootstrapModules.splashScreen.focusWindow()
+  delete global.appSettings.settings["LAST_UPDATE_CHECK_TIMESTAMP"]
+  global.appSettings.save()
+  return
+
+  // TODO: DOWNLOAD UPDATES AUTOMATICALLY
+  fetch(updateLink)
+  .then(async res => {
+    if(res.status !== 200){
+    }
+  })
 }

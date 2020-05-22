@@ -1,7 +1,3 @@
-exports.initSplash = initSplash;
-exports.focusWindow = focusWindow;
-exports.pageReady = pageReady;
-
 import * as electron from "electron"
 import {EventEmitter} from "events"
 import * as fs from "fs"
@@ -26,23 +22,32 @@ export const APP_SHOULD_SHOW = 'APP_SHOULD_SHOW';
 export const events = new EventEmitter();
 
 function webContentsSend(win, event, ...args) {
+  if(event === "SPLASH_UPDATE_STATE")lastStatus = args[0].status
   if (win != null && win.webContents != null) {
     win.webContents.send(`DISCORD_${event}`, ...args);
   }
 }
 
-let splashWindow;
+let splashWindow:electron.BrowserWindow;
 let modulesListeners;
 let splashState;
 let launchedMainWindow;
 let quoteCachePath;
+let lastStatus
 
-exports.launchMainWindow = function(){
-  launchMainWindow();
+export function setSplashState(state:any){
+  splashState = state
+  if (splashWindow != null && !splashWindow.isDestroyed() && !splashWindow.webContents.isDestroyed()) {
+    webContentsSend(splashWindow, 'SPLASH_UPDATE_STATE', Object.assign({ status: lastStatus }, splashState));
+  }
+}
+
+export function launchMainWindow(){
+  launchMainWindowInternal();
   updateSplashState(LAUNCHING);
 }
 
-function initSplash(startMinimized = false) {
+export function initSplash(startMinimized = false) {
   modulesListeners = {};
   splashState = {};
   launchedMainWindow = false;
@@ -81,14 +86,13 @@ function removeModulesListeners() {
     moduleUpdater.events.removeListener(event, modulesListeners[event]);
   }
 }
-
-function updateSplashState(event) {
+export function updateSplashState(event) {
   if (splashWindow != null && !splashWindow.isDestroyed() && !splashWindow.webContents.isDestroyed()) {
     webContentsSend(splashWindow, 'SPLASH_UPDATE_STATE', Object.assign({ status: event }, splashState));
   }
 }
 
-function launchSplashWindow(startMinimized) {
+function launchSplashWindow(startMinimized = false) {
   const windowConfig = {
     width: LOADING_WINDOW_WIDTH,
     height: LOADING_WINDOW_HEIGHT,
@@ -99,7 +103,8 @@ function launchSplashWindow(startMinimized) {
     show: false,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    icon: path.join(__dirname, "..", "discord.png")
   };
 
   splashWindow = new electron.BrowserWindow(windowConfig);
@@ -140,6 +145,9 @@ function launchSplashWindow(startMinimized) {
 
     events.emit("SPLASH_SCREEN_READY")
   });
+  ipcMain.default.on('LAUNCH_ANYWAY', () => {
+    launchMainWindowInternal()
+  });
 
   const splashUrl = url.format({
     protocol: 'file',
@@ -150,7 +158,7 @@ function launchSplashWindow(startMinimized) {
   splashWindow.loadURL(splashUrl);
 }
 
-function launchMainWindow() {
+function launchMainWindowInternal() {
   removeModulesListeners();
   if (!launchedMainWindow && splashWindow != null) {
     launchedMainWindow = true;
@@ -160,13 +168,13 @@ function launchMainWindow() {
 
 function scheduleUpdateCheck() {}
 
-function focusWindow() {
+export function focusWindow() {
   if (splashWindow != null) {
     splashWindow.focus();
   }
 }
 
-function pageReady() {
+export function pageReady() {
   destroySplash();
   process.nextTick(() => events.emit(APP_SHOULD_SHOW));
 }

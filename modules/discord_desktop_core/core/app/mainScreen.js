@@ -340,7 +340,7 @@ function launchMainAppWindow(isVisible) {
     height: DEFAULT_HEIGHT,
     minWidth: MIN_WIDTH,
     minHeight: MIN_HEIGHT,
-    transparent: true,
+    transparent: false,
     frame: false,
     resizable: true,
     show: isVisible,

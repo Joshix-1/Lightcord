@@ -76,6 +76,10 @@ process.once('loaded', () => {
         return false
       }
     }catch(e){}
+    setTimeout(() => {
+      electron.remote.getCurrentWindow().setBackgroundColor("#00000000")
+      electron.remote.getCurrentWindow().center()
+    }, 500);
   })
 
   const webRequest = electron.remote.getCurrentWebContents().session.webRequest

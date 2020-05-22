@@ -330,6 +330,7 @@ function setBackgroundColor(color) {
 function launchMainAppWindow(isVisible) {
   if (mainWindow) {
     // TODO: message here?
+    console.log("[MainScreen] Destroying window "+mainWindow.id)
     mainWindow.destroy();
   }
 

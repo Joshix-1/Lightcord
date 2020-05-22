@@ -22,7 +22,8 @@ module.exports = {
     yauzl: `yauzl`,
     mkdirp: `mkdirp`,
     request: `request`,
-    "node-fetch": "node-fetch"
+    "node-fetch": "node-fetch",
+    "glasstron": "glasstron"
   },
   resolve: {
     extensions: [".js", ".jsx"],

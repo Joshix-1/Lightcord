@@ -15,19 +15,19 @@ export default class Utils {
 
     static getAllWindowPreferences() {
         return {
-            transparent: settingsCookie["fork-wp-1"] || settingsCookie.transparency,
+            transparent: true,
             frame: settingsCookie.frame
         };
     }
     
     static getWindowPreference(key) {
-        if (key === "transparent") return settingsCookie["fork-wp-1"] || settingsCookie.transparency;
+        if (key === "transparent") return true;
         if (key === "frame") return settingsCookie.frame;
         return null;
     }
     
     static setWindowPreference(key, value) {
-        if (key === "transparent") return settingsCookie["fork-wp-1"] = settingsCookie.transparency = value;
+        if (key === "transparent") return true;
         if (key === "frame") return settingsCookie.frame = value;
         return null;
     }

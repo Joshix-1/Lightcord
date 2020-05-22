@@ -12,7 +12,7 @@ export const bbdChangelog = {
                 "**LightCord** is now using BandagedBD. That means all plugins you were using can be used too !",
                 "**Window Transparency** changes were made to more compatible with external window managers and addons like Glasscord.",
                 "Initialization sequence has once again been changed slightly to hopefully improve loading times.",
-                "We removed emotes. That's sad for people who were actually using it, but it was leading to problems like this https://github.com/rauenzi/BetterDiscordApp/issues/348."
+                "We removed emotes. That's sad for people who were actually using it, but it was leading to more loading time and some basic words were emote."
             ]
         },
         {

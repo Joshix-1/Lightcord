@@ -25,6 +25,7 @@ import V2C_PresenceSettings from "../ui/presenceSettings";
 import CustomRichPresence from "./CustomRichPresence";
 import V2C_AccountInfos from "../ui/AccountInfos";
 import { remote } from "electron";
+import AntiAdDM from "./AntiAdDM";
 
 export default new class V2_SettingsPanel {
 
@@ -220,6 +221,13 @@ export default new class V2_SettingsPanel {
             if (enabled) remote.getCurrentWindow().setAlwaysOnTop(true)
             else remote.getCurrentWindow().setAlwaysOnTop(false)
         }
+        if (id === "lightcord-4") {
+            if(enabled){
+                AntiAdDM.enable()
+            }else{
+                AntiAdDM.disable()
+            }
+        }
 
         this.saveSettings();
     }
@@ -238,6 +246,7 @@ export default new class V2_SettingsPanel {
         if (settingsCookie["lightcord-2"]) window.Lightcord.Settings.callRingingBeat = true
         if (settingsCookie["lightcord-presence-1"]) CustomRichPresence.enable()
         if (settingsCookie["lightcord-3"]) remote.getCurrentWindow().setAlwaysOnTop(true)
+        if (settingsCookie["lightcord-4"]) AntiAdDM.enable()
 
         if (settingsCookie["fork-ps-5"]) {
             ContentManager.watchContent("plugin");

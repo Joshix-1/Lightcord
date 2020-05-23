@@ -57,6 +57,7 @@ export const settings = {
     "Disable BetterDiscord":      {id: "bd-disable",  info: "Disable Betterdiscord (plugins, themes, etc).", implemented: false, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Calling Ring Beat":          {id: "lightcord-2", info: "Enable Discord's special calling beat.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Developer Options":          {id: "lightcord-1", info: "Enable Discord's Internal Developer Options. This allow the \"Experiments\" tab and the \"Developer Options\" tab. (must close and reopen settings)", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+    "Ad Block":                   {id: "lightcord-4", info: "Block any BOT that dm you with an invite link. Even in an embed.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
 
     /** Lightcord Window */
     "Always-on-Top":              {id: "lightcord-3", info: "Enable window's Always-on-Top mode, where Lightcord stays on top of other applications.", implemented: true, hidden: false, cat: "lightcord", category: "Window"},
@@ -102,7 +103,7 @@ export const defaultCookie = {
     "lightcord-2": true,
     "lightcord-presence-1": false,
     "lightcord-3": false,
-    "lightcord-4": true
+    "lightcord-4": false
 };
 
 

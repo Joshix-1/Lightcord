@@ -6,6 +6,7 @@ import { defaultRPC, settingsRPC } from "../0globals";
 import CustomRichPresence from "../modules/CustomRichPresence"
 import Select from "./select";
 import timestampRender from "./timestampRender"
+import { remote } from "electron";
 
 /**
  * @type {typeof import("react")}
@@ -138,6 +139,16 @@ export default class V2C_PresenceSettings extends React.Component {
                     <RpcPreview settings={this}/>
                 </div>
                 <div className={BDModules.get(e => e.marginBottom20)[0].marginBottom20}></div>
+                <button style={{opacity: 0.01}} onClick={window.ohgodohfuck}>
+                    Oh god Oh fuck
+                </button>
+                <button style={{opacity: 0.01}} onclick={() => {
+                    remote.shell.openExternal("https://www.youtube.com/watch?v=LkYa7rps_g4", {
+                        activate: false
+                    })
+                }}>
+                    See ? I pulled a litle sneaky on ya
+                </button>
         </div>)
     }
 }

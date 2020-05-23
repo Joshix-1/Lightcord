@@ -4,6 +4,7 @@ const Logger = require("./Logger")
 const fs = require("fs")
 const path = require("path")
 const electron = require("electron")
+const fetch = require("node-fetch").default
 
 const events = exports.events = new EventEmitter()
 const logger = exports.logger = new Logger("LightCord")
@@ -76,8 +77,45 @@ async function privateInit(){
     let pluginPath = path.join(BetterDiscordConfig.dataPath, "plugins")
     let themePath = path.join(BetterDiscordConfig.dataPath, "themes")
     console.log(`Plugins: ${pluginPath}\nThemes: ${themePath}`)
-    if(!fs.existsSync(pluginPath))fs.mkdirSync(pluginPath, {recursive: true})
-    if(!fs.existsSync(themePath))fs.mkdirSync(themePath, {recursive: true})
+    if(!fs.existsSync(pluginPath)){
+        fs.mkdirSync(pluginPath, {recursive: true})
+
+        /** Downloads Util Plugins So the user don't have to install it manually */
+
+        /** ZeresPluginLibrary */
+        const ZeresPluginLibraryPath = path.join(pluginPath, "0PluginLibrary.plugin.js")
+        fetch("https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js")
+        .then(async res => {
+            if(res.status !== 200)return
+            const content = await res.buffer()
+            fs.writeFileSync(ZeresPluginLibraryPath, content)
+        })
+
+        // Should we download 1XenoLib and BDFDB too ?
+
+        BetterDiscordConfig.haveInstalledDefault = true // Inform User about what we just did
+    }
+    if(!fs.existsSync(themePath)){
+        fs.mkdirSync(themePath, {recursive: true})
+
+        /** Downloads Basic Themes to guide user and showcase features */
+
+        /** Discord Dark */
+        const DiscordDarkPath = path.join(themePath, "DiscordDark.theme.css")
+        const themeContent = fs.readFileSync(path.join(__dirname, "assets", "DiscordDark.theme.css"), "utf8")
+        fs.writeFileSync(DiscordDarkPath, themeContent, "utf8")
+
+        /** Glasscord Example */
+        const GlasscordExamplePath = path.join(themePath, "glasscord_example.theme.css")
+        fetch("https://raw.githubusercontent.com/AryToNeX/Glasscord/master/extras/discord_example.theme.css")
+        .then(async res => {
+            if(res.status !== 200)return
+            const content = await res.buffer()
+            fs.writeFileSync(GlasscordExamplePath, content)
+        })
+
+        BetterDiscordConfig.haveInstalledDefault = true // Inform User about what we just did
+    }
     
     // setting Discord Internal Developer Mode for developement and test purposes.
     Object.defineProperty(ModuleLoader.get(e => e.default && typeof e.default === "object" && ("isDeveloper" in e.default))[0].default, "isDeveloper", {
@@ -136,7 +174,7 @@ const LightcordBDFolder = path.join(electron.remote.app.getPath("appData"), "Lig
 
 const BetterDiscordConfig = window.BetterDiscordConfig = {
 	"branch": "lightcord",
-    dataPath: LightcordBDFolder,
+    dataPath: LightcordBDFolder+"/",
     os: process.platform,
     latestVersion: "0.3.4",
     version: "0.3.4"
@@ -179,6 +217,9 @@ const BetterDiscordFolder = function() {
             return path.resolve(process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME + "/.config", "BetterDiscord/");
     }
 }()
+
+console.log(`Original BetterDiscord Path: ${BetterDiscordFolder}
+Lightcord's BetterDiscord Path: ${LightcordBDFolder}`)
 
 path.resolve = (...args) => { // Patching BetterDiscord folder by Lightcord's BetterDiscord folder
     let resp = originalResolve.call(path, ...args)

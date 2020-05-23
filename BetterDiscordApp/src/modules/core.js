@@ -110,6 +110,13 @@ Core.prototype.init = async function() {
     Utils.suppressErrors(this.patchGuildSeparator.bind(this), "BD Guild Separator Patch")();
     Utils.suppressErrors(this.patchMessageHeader.bind(this), "BD Badge Chat Patch")();
     Utils.suppressErrors(this.patchMemberList.bind(this), "BD Badge Member List Patch")();
+
+    if(bdConfig.haveInstalledDefault){
+        let alert = Utils.alert("First Installation", "As it is the first time you install Lightcord, We added two default themes and one default plugin in your plugin/theme folder. Check it in the Plugin/Theme settings.")
+        await new Promise((resolve) => {
+            alert.onClose(resolve)
+        })
+    }   
 };
 
 Core.prototype.checkForGuilds = function() {

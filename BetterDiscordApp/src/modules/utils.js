@@ -234,13 +234,50 @@ export default class Utils {
                     </div>`);
         modal.querySelector(".footer button").addEventListener("click", () => {
             DOM.addClass(modal, "closing");
-            setTimeout(() => { modal.remove(); }, 300);
+            setTimeout(() => { 
+                modal.remove(); 
+                closingListeners.forEach((listener) => {
+                    try{
+                        listener()
+                    }catch(e){
+                        console.error(e)
+                    }
+                })
+            }, 300);
         });
         modal.querySelector(".bd-backdrop").addEventListener("click", () => {
             DOM.addClass(modal, "closing");
-            setTimeout(() => { modal.remove(); }, 300);
+            setTimeout(() => { 
+                modal.remove(); 
+                closingListeners.forEach((listener) => {
+                    try{
+                        listener()
+                    }catch(e){
+                        console.error(e)
+                    }
+                })
+            }, 300);
         });
         DOM.query("#app-mount").append(modal);
+        const closingListeners = []
+        return {
+            close: () => {
+                DOM.addClass(modal, "closing");
+                setTimeout(() => { 
+                    modal.remove(); 
+                    closingListeners.forEach((listener) => {
+                        try{
+                            listener()
+                        }catch(e){
+                            console.error(e)
+                        }
+                    })
+                }, 300);
+            },
+            onClose: (listener) => {
+                closingListeners.push(listener)
+            }
+        }
     }
 
     static showContentErrors({plugins: pluginErrors = [], themes: themeErrors = []}) {

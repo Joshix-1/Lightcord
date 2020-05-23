@@ -3,6 +3,7 @@ import Utils from "./utils"
 const dispatcher = window.Lightcord.DiscordModules.dispatcher
 const ChannelModule = BDModules.get(e => e.default && e.default.getChannel && e.default.hasChannel)[0].default
 const relationShipModule = BDModules.get(e => e.default && e.default.addRelationship)[0].default
+const DMModule = BDModules.get(e => e.default && e.default.closePrivateChannel)[0].default
 
 const blocked = {}
 
@@ -35,13 +36,17 @@ export default new class AntiBotDM {
 
         if(channel.type !== 1)return
 
+        if(blocked[ev.message.author.id])return // If the user unblock the bot, Don't block it again.
+
         if(scanMessage(ev.message)){
+            blocked[ev.message.author.id] = true
             Utils.showToast(`[AdBlock]: Blocked ${ev.message.author.username}#${ev.message.author.discriminator}`, {
                 "type": "warning"
             })
             relationShipModule.addRelationship(ev.message.author.id, {
                 location: "ContextMenu"
             }, 2)
+            DMModule.closePrivateChannel(channel.id, false)
         }
     }
 }
@@ -57,9 +62,9 @@ function EmbedsContains(message, search){
     if(embeds.length === 0)return false
     return embeds.map(embed => {
         if(embed.type !== "rich")return false
-        if(embed.title.includes(search))return true
-        if(embed.description.includes(search))return true
-        if(embed.footer.text.includes(search))return true
+        if((embed.title || "").includes(search))return true
+        if((embed.description || "").includes(search))return true
+        if(((embed.footer || "") && embed.footer.text || "").includes(search))return true
         if(embed.fields.map(e => {
             return e.value.includes(search) || e.name.includes(search)
         }).includes(true))return true

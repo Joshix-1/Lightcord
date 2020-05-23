@@ -167,9 +167,24 @@ export default class V2C_PublicServers extends BDV2.reactComponent {
             invite_code: "0Tmfo5ZbORCRqbAd",
             pinned: true
         };
+        const server2 = {
+            name: "Lightcord",
+            online: "30+",
+            members: "50+",
+            categories: ["community", "programming", "support"],
+            description: "Official Lightcord server for support etc",
+            identifier: "86004744966914048",
+            iconUrl: "https://cdn.discordapp.com/icons/705908350218666117/05a5652f7d1d0ae328ca7d6e2354a82a.webp",
+            nativejoin: true,
+            invite_code: "7eFff2A",
+            pinned: true
+        };
         const guildList = this.SortedGuildStore.getFlattenedGuildIds();
         const defaultList = this.AvatarDefaults.DEFAULT_AVATARS;
-        return BDV2.react.createElement(ServerCard, {server: server, pinned: true, join: this.join, guildList: guildList, fallback: defaultList[Math.floor(Math.random() * 5)]});
+        return [
+            BDV2.react.createElement(ServerCard, {server: server2, pinned: true, join: this.join, guildList: guildList, fallback: defaultList[Math.floor(Math.random() * 5)]}),
+            BDV2.react.createElement(ServerCard, {server: server, pinned: true, join: this.join, guildList: guildList, fallback: defaultList[Math.floor(Math.random() * 5)]})
+        ]
     }
 
     get endPoint() {

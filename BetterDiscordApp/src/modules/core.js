@@ -11,8 +11,9 @@ import DOM from "./domtools";
 
 import BDLogo from "../ui/bdLogo";
 import TooltipWrap from "../ui/tooltipWrap";
-import LightcordLogo from "../ui/lightcordLogo";
+import LightcordLogo from "../svg/lightcord";
 import PluginCertifier from "./pluginCertifier";
+import distant, { uuidv4 } from "./distant";
 
 function Core() {
     // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
@@ -232,8 +233,8 @@ Core.prototype.patchSocial = function() {
                 const returnVal = original(...arguments);
                 returnVal.props.children.push(
                     BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord"},
-                        BDV2.React.createElement(Anchor, {className: "bd-social-link "+socialModule1.link, href: "https://github.com/jeanouina/Lightcord", title: "Lightcord", target: "_blank"},
-                            BDV2.React.createElement(LightcordLogo, {size: "17px", className: "bd-social-logo"})
+                        BDV2.React.createElement(Anchor, {className: "bd-social-link "+socialModule1.link, href: "https://github.com/Lightcord/Lightcord", title: "Lightcord", target: "_blank"},
+                            BDV2.React.createElement(LightcordLogo, {size: "16px", className: "bd-social-logo"})
                         )
                     )
                 );
@@ -345,7 +346,7 @@ Core.prototype.patchMessageHeader = function() {
         if (!children || !author || !author.id)return
         // if (header && header.className) header.className += " "
         if (!Array.isArray(children)) return;
-        if (author.id === "249746236008169473") {
+        if (author.id === "249746236008169473") { // Rauenzi: BandagedBD Developer
             children.push(
                 BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "BandagedBD Developer"},
                     BDV2.React.createElement(Anchor, {className: "bd-chat-badge", href: "https://github.com/rauenzi/BetterDiscordApp", title: "BandagedBD", target: "_blank"},
@@ -353,17 +354,56 @@ Core.prototype.patchMessageHeader = function() {
                     )
                 )
             );
-        } else if (author.id === "696481194443014174" || author.id === "696003456611385396"){
+        } else if (author.id === "696481194443014174" || author.id === "696003456611385396"){ // Not Thomiz: Lightcord Developer, Phorcys: Lightcord Developer
             children.push(
                 BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord Developer"},
-                    BDV2.React.createElement(Anchor, {className: "bd-chat-badge", href: "https://github.com/jeanouina/Lightcord", title: "Lightcord", target: "_blank"},
-                        BDV2.React.createElement(LightcordLogo, {size: "32px", className: "bd-logo"})
+                    BDV2.React.createElement(Anchor, {className: "bd-chat-badge", href: "https://github.com/Lightcord/Lightcord", title: "Lightcord", target: "_blank"},
+                        BDV2.React.createElement(LightcordLogo, {size: "16px", className: "bd-logo"})
                     )
                 )
             );
         }
+        const id = uuidv4()
+        children.push(
+            BDV2.React.createElement("div", {
+                id: "badges-"+id,
+                style: {
+                    display: "inline"
+                }
+            })
+        )
+        applyBadges(id, author, true)
     }});
 };
+
+function applyBadges(id, user, chat){
+    process.nextTick(() => {
+        const div = document.getElementById("badges-"+id)
+        if(!div || div.childNodes.length > 0)return
+
+        const Anchor = WebpackModules.find(m => m.displayName == "Anchor");
+
+        distant.getBadges(user.id)
+        .then(badges => {
+            badges.forEach(badge => {
+                const props = {size: "16px", className: "bd-logo"}
+                badge.scopes.forEach(scope => {
+                    // TODO: implement scope for badges (user, channel, etc)
+                }) 
+                const element = BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: badge.name},
+                    BDV2.React.createElement(Anchor, {className: chat ? "bd-chat-badge" : "bd-member-badge", href: badge.href, title: badge.name, target: "_blank"},
+                        BDV2.React.createElement(badge.component, props)
+                    )
+                )
+                const div2 = document.createElement("div")
+                BDV2.reactDom.render(element, div2)
+                div2.childNodes.forEach(node => {
+                    div.appendChild(node)
+                })
+            })
+        })
+    })
+}
 
 Core.prototype.patchMemberList = function() {
     if (this.memberListPatch) return;
@@ -387,12 +427,17 @@ Core.prototype.patchMemberList = function() {
         } else if (user.id === "696481194443014174" || user.id === "696003456611385396"){
             children.push(
                 BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord Developer"},
-                    BDV2.React.createElement(Anchor, {className: "bd-member-badge", href: "https://github.com/jeanouina/Lightcord", title: "Lightcord", target: "_blank"},
+                    BDV2.React.createElement(Anchor, {className: "bd-member-badge", href: "https://github.com/Lightcord/Lightcord", title: "Lightcord", target: "_blank"},
                         BDV2.React.createElement(LightcordLogo, {size: "32px", className: "bd-logo"})
                     )
                 )
             );
         }
+        const id = uuidv4()
+        children.push(
+            BDV2.React.createElement("div", {id: "badges-"+id})
+        )
+        applyBadges(id, user, false)
     }});
 };
 

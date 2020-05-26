@@ -43,6 +43,20 @@ async function privateInit(){
 
     //disabling sentry
     BDModules.get(e => e.getCurrentHub)[0].getCurrentHub().getClient().getOptions().enabled = false
+
+    // setting react in require cache
+    try{
+        window.React = require("react")
+    }catch(e){
+        const React = ModuleLoader.get(e => !["Component", "PureComponent", "Children", "createElement", "cloneElement"].map(c => !!e[c]).includes(false))[0]
+        window.React = React
+    }
+    try{
+        window.ReactDOM = require("react-dom")
+    }catch(e){
+        const ReactDOM = ModuleLoader.get(e => e.findDOMNode)[0]
+        window.ReactDOM = ReactDOM
+    }
     
     let original = BDModules.get((e) =>  e.createSound)[0].createSound
     BDModules.get((e) =>  e.createSound)[0].createSound = function(sound){
@@ -55,9 +69,9 @@ async function privateInit(){
                 },
                 set(data){
                     console.log("Attempting to set call_ringing value. Canceling "+data)
-                }
+                },
+                configurable: false
             })
-            console.log(returned)
             return returned
         }else{
             return original(...arguments)

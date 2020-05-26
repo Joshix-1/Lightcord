@@ -29,7 +29,11 @@ module.exports = {
     modules: [
       path.resolve("src", "builtins"),
       path.resolve("src", "modules")
-    ]
+    ],
+    alias: {
+      react$: path.resolve(__dirname, "src", "react.js"),
+      "react-dom$": path.resolve(__dirname, "src", "react-dom.js")
+    }
   },
   module: {
     rules: [
@@ -45,6 +49,10 @@ module.exports = {
             }
         }], "@babel/react"]
         }
+      },
+      {
+        test: /\.svg$/,
+        use: ['@svgr/webpack'],
       }
     ]
   },

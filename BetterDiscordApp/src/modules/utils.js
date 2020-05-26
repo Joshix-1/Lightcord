@@ -16,19 +16,19 @@ export default class Utils {
     static getAllWindowPreferences() {
         return {
             transparent: true,
-            frame: settingsCookie.frame
+            frame: false
         };
     }
     
     static getWindowPreference(key) {
         if (key === "transparent") return true;
-        if (key === "frame") return settingsCookie.frame;
+        if (key === "frame") return false;
         return null;
     }
     
     static setWindowPreference(key, value) {
         if (key === "transparent") return true;
-        if (key === "frame") return settingsCookie.frame = value;
+        if (key === "frame") return false;
         return null;
     }
 

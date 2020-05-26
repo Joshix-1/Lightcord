@@ -49,10 +49,6 @@ module.exports = {
             }
         }], "@babel/react"]
         }
-      },
-      {
-        test: /\.svg$/,
-        use: ['@svgr/webpack'],
       }
     ]
   },

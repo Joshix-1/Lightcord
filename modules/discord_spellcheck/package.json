@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "dependencies": {
+    "cld": "2.6.0",
+    "keyboard-layout": "2.0.16",
+    "spellchecker": "3.7.0"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cld": "^2.7.0",
-    "electron": "^8.2.5",
-    "keyboard-layout": "^2.0.16",
-    "spellchecker": "^3.7.0"
-  }
+  "license": "ISC"
 }

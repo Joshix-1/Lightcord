@@ -27,6 +27,24 @@ export default new class DistantServer {
         return this._cache = Object.assign(this._cache, data)
     }
 
+    async delete(){
+        BdApi.showToast("Deleting all infos about you on Lightcord Servers...", {type: "warn"})
+        return handleRequest(Routes.delete, "delete")
+        .then(async res => {
+            if(res.status !== 200){
+                BdApi.showToast("An error occured, couldn't delete informations. See console for more infos", {type: "error"})
+                throw new Error(`Couldn't delete all informations: ${(res.status+" "+res.statusText+" "+await res.text())}`)
+            }
+            console.info(`Succesfully deleted informations.`)
+            BdApi.showToast("Succesfully deleted informations", {type: "success"})
+            window.Lightcord.Api.Authorization = null
+            return res.json()
+        }).catch((err) => {
+            BdApi.showToast("An error occured, couldn't delete informations. See console for more infos", {type: "error"})
+            throw new Error(`Couldn't delete all informations: ${err.stack}`)
+        })
+    }
+
     /**
      * Get custom badges from the user ID.
      * @param {string} user The user ID 
@@ -77,7 +95,8 @@ const handleRequest = function(route, method){
     return fetch(`${Constants.SERVER_URL}/api/v1${route}`, {
         method,
         headers: {
-            "CLIENT": "Lightcord"
+            "CLIENT": "Lightcord",
+            "Authorization": window.Lightcord.Api.Authorization || "None::Anonymous"
         }
     })
 }
@@ -86,11 +105,21 @@ export const Constants = {
     SERVER_URL: "http://127.0.0.1",
     badges: [
         {
-            name: "Bug Hunter",
+            name: "Lightcord User",
+            id: "01cfa7b0-7cdb-4b0e-8258-9c6a78235c93",
+            defaultUsers: [
+                "696481194443014174"
+            ],
+            scopes: [
+                "user"
+            ],
+            component: BugHunterBadge,
+            href: "https://github.com/lightcord/lightcord/wiki/badges/bug_hunter"
+        }, {
+            name: "Lightcord Bug Hunter",
             id: "f04698f5-816b-41e3-bd01-92291193d7a5",
             defaultUsers: [
-                "696481194443014174",
-                "585858920149549067"
+                "696481194443014174"
             ],
             scopes: [],
             component: BugHunterBadge,
@@ -100,7 +129,6 @@ export const Constants = {
 }
 
 export const Routes = {
-    badges(user){
-        return `/${user}/badges`
-    }
+    badges: user => `/${user}/badges`,
+    delete: `/delete`
 }

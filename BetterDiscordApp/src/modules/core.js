@@ -86,7 +86,7 @@ Core.prototype.init = async function() {
         if (settingsCookie["bda-dc-0"]) document.querySelector(".btn.btn-disconnect").click();
     });
 
-    new PluginCertifier().start()
+    PluginCertifier.start()
 
     Utils.log("Startup", "Removing Loading Icon");
     if (document.getElementsByClassName("bd-loaderv2").length) document.getElementsByClassName("bd-loaderv2")[0].remove();
@@ -111,6 +111,7 @@ Core.prototype.init = async function() {
     Utils.suppressErrors(this.patchGuildSeparator.bind(this), "BD Guild Separator Patch")();
     Utils.suppressErrors(this.patchMessageHeader.bind(this), "BD Badge Chat Patch")();
     Utils.suppressErrors(this.patchMemberList.bind(this), "BD Badge Member List Patch")();
+    Utils.suppressErrors(this.patchAttachment.bind(this), "LC Plugin Certifier Patch")();
 
     if(bdConfig.haveInstalledDefault){
         let alert = Utils.alert("First Installation", "As it is the first time you install Lightcord, We added two default themes and one default plugin in your plugin/theme folder. Check it in the Plugin/Theme settings.")
@@ -333,6 +334,26 @@ Core.prototype.patchGuildSeparator = function() {
         data.returnValue.props.children[1].props.children[3].type = GuildSeparator;
     }});
 };
+
+Core.prototype.patchAttachment = function() {
+    if (this.AttachmentPatch) return;
+    const Attachment = BDModules.get(e => e.default && e.default.displayName === "Attachment")[0] // temporary
+    const Anchor = WebpackModules.find(m => m.displayName == "Anchor");
+    if (!Anchor || !Attachment || !Attachment.default) return;
+    this.AttachmentPatch = Utils.monkeyPatch(Attachment, "default", {after: (data) => {
+        const attachment = data.methodArguments[0] || null
+        const children = Utils.getNestedProp(data.returnValue, "props.children");
+
+        if (!children || !attachment || !attachment.url)return
+        if (!Array.isArray(children)) return;
+
+        const id = uuidv4()
+        children.push(BDV2.react.createElement("div", {
+            id: "certified-"+id
+        }))
+        PluginCertifier.patch(attachment, "certified-"+id)
+    }})
+}
 
 Core.prototype.patchMessageHeader = function() {
     if (this.messageHeaderPatch) return;

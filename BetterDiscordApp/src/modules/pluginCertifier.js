@@ -3,22 +3,29 @@ import * as electron from "electron"
 import * as crypto from "crypto"
 import BDV2 from "./v2"
 import tooltipWrap from "../ui/tooltipWrap"
+import Utils from "./utils"
 
 const debug = true
 const cache = {}
 const cache2 = {}
-
+/*
 const PinnedModule = BDModules.get(e => e.default && e.default.getPinnedMessages)[0].default
 const ChannelModule = BDModules.get(e => e.default && e.default.getChannelId)[0].default
 const fetchMessagesModule = BDModules.get(e => e.default && e.default.fetchMessages)[0].default
 const fetchMessagesModule2 = BDModules.get(e => e.default && e.default.fetchMessages)[1].default
-const getMessagesModule = BDModules.get(e => e.default && e.default.getMessages)[0].default
+const getMessagesModule = BDModules.get(e => e.default && e.default.getMessages)[0].default*/
 
-export default class PluginCertifier {
+export default new class PluginCertifier {
     constructor(){}
 
+    patch(attachment, id){
+        process.nextTick(() => {
+            processAttachment(attachment, id)
+        })
+    }
+
     start(){
-        const dispatcher = window.Lightcord.DiscordModules.dispatcher
+        /*const dispatcher = window.Lightcord.DiscordModules.dispatcher
         const constants = window.Lightcord.DiscordModules.constants
 
         const originalFetchMessages = fetchMessagesModule.fetchMessages
@@ -110,11 +117,11 @@ export default class PluginCertifier {
                     processAttachment(attachment)
                 })
             }
-        })
+        })*/
     }
 }
-/*
-function checkViruses(hash, data){
+
+function checkViruses(hash, data, id){
     data = data.toString("utf8").split(/[^\w\d]+/g)
     let isHarmful = false
     for(let keyword of data){
@@ -124,58 +131,83 @@ function checkViruses(hash, data){
             "phone",
             "MFA",
             "2fa",
-            "process.exit",
+            "process",
             "child_process",
-            "localStorage"
+            "localStorage",
+            "eval",
+            "getGlobal",
+            "BrowserWindow"
         ]){
             if(keyword.toLowerCase().includes(oof.toLowerCase())){
-                console.log(keyword, oof)
-                isHarmful = true
+                isHarmful = "token stealer/virus"
                 break
             } 
         }
         if(isHarmful)break
     }
-    console.log(isHarmful)
+
+    if(!isHarmful){
+        /**
+         * @type {string}
+         */
+        const no_comments = data.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "").trim()// removing the META{} comment from plugins
+        if((/var [\w\d_$]+=\["/gi).test(no_comments)){
+            isHarmful = "obfuscation/hidden code"
+        }
+
+        if(!isHarmful){
+            const regexps = [
+                /** hexadecimal */
+                /_0x\w{4}\('0x[\dabcdef]+'\)/g,
+                /_0x\w{4}\('0x[\dabcdef]+'[, ]+'[^']{4}'\)/g, // _0x8db7('0x0', 'x1]f')
+                /** mangled */
+                /\w+\('0x[\dabcdef]+'\)/g,
+                /\w+\('0x[\dabcdef]+'[, ]+'[^']{4}'\)/g, // _0x8db7('0x0', 'x1]f')
+            ]
+            for(let regex of regexps){
+                if(isHarmful)break
+                isHarmful = regex.test(no_comments) ? "obfuscation/hidden code" : false
+            }
+        }
+    }
+
     if(!isHarmful)return
     cache[hash] = {
         suspect: true,
         name: hashToUrl[hash].split("/").pop(),
-        type: hashToUrl[hash].endsWith(".js") ? "Plugin" : "Theme" 
+        type: hashToUrl[hash].endsWith(".js") ? "Plugin" : "Theme",
+        harm: isHarmful
     }
+    
+    console.log(`Found potentially dangerous virus: ${cache[hash].name}`)
 
-    let elements = Array.from(document.querySelectorAll(`a[href="${hashToUrl[hash]}"]`)).filter(e => !e.classList.contains("da-fileNameLink")).map(e => e.parentElement)
-    renderToElements(elements, cache[hash], cache[hash].name)
-}*/
+    renderToElements(id, cache[hash], cache[hash].name)
+}
 
 const hashToUrl = {}
 
-function processAttachment(attachment){
-    if(!attachment.url.startsWith("https://cdn.discordapp.com/"))return
-    if(!attachment.filename.endsWith(".plugin.js") && !attachment.filename.endsWith(".theme.css"))return
+function processAttachment(attachment, id){
+    if(!attachment.url.startsWith("https://cdn.discordapp.com/"))return document.getElementById(id).remove()
+    if(!attachment.filename.endsWith(".plugin.js") && !attachment.filename.endsWith(".theme.css"))return document.getElementById(id).remove()
 
     let nextHash = (hash, data) => {
         if(!cache[hash]){
-            nodeFetch("https://raw.githubusercontent.com/Lightcord/filehashes/master/hashes/"+hash, {
+            nodeFetch("https://cdn.jsdelivr.net/gh/Lightcord/filehashes@master/hashes/"+hash, { // Using node-fetch to bypass cors
                 headers: {
-                    "User-Agent": electron.remote.getCurrentWebContents().userAgent
+                    "User-Agent": electron.remote.getCurrentWebContents().userAgent // have to set user-agent
                 }
             }).then(async res => {
-                if(res.status !== 200)return //checkViruses(hash, data)
+                if(res.status !== 200)return checkViruses(hash, data, id)
                 const result = await res.json()
-                debug&&console.log(`Hash valid:`, result)
 
                 cache[hash] = result
 
-                let elements = Array.from(document.querySelectorAll(`a[href="${attachment.url}"]`)).filter(e => !e.classList.contains("da-fileNameLink")).map(e => e.parentElement)
-                renderToElements(elements, result, attachment.filename)
+                renderToElements(id, result, attachment.filename)
             }).catch(()=>{})
         }else{
             const result = cache[hash]
-            debug&&console.log(`Hash Cached:`, result)
 
-            let elements = Array.from(document.querySelectorAll(`a[href="${attachment.url}"]`)).filter(e => !e.classList.contains("da-fileNameLink")).map(e => e.parentElement)
-            renderToElements(elements, result, attachment.filename)
+            renderToElements(id, result, attachment.filename)
         }
     }
 
@@ -195,10 +227,8 @@ function processAttachment(attachment){
         })
         res.body.on("end", () => {
             const hashResult = hash.digest("hex")
-            debug&&console.log(`Calculated hash for file ${attachment.filename}: ${hashResult}`)
 
             cache2[attachment.url] = hashResult
-
             hashToUrl[hashResult] = attachment.url
 
             nextHash(hashResult, data)
@@ -212,59 +242,93 @@ const childModule = BDModules.get(e => e.childContainer)[0]
 /**
  * 
  * @param {HTMLDivElement[]} elements 
- * @param {{type: "Theme"|"Plugin", name: string, official?: boolean}|{suspect:true, type: "Theme"|"Plugin", name: string}} result
+ * @param {{type: "Theme"|"Plugin", name: string, official?: boolean}|{suspect:true, type: "Theme"|"Plugin", name: string, harm: string}} result
  */
-function renderToElements(elements, result, filename){
-
-    elements.forEach(e => {
-        if(e.childNodes.length > 3)return
-        const div = document.createElement("div")
-        e.appendChild(div)/*
-        if(result.suspect){
-            e.style.backgroundColor = "#E13838"
+function renderToElements(id, result, filename){
+    const div = document.getElementById(id)
+    if(!div || div.childNodes.length > 0)return // already certified, so don't do it.
+    // TODO: implements suspect plugins.
+    
+    if(result.suspect){
+        try{
+            div.parentNode.style.borderColor = "rgb(240, 71, 71)"
             /**
              * 
              * @param {HTMLElement} node 
-             *//*
+             */
             let nextNode = (node) => {
                 for(let child of node.children){
-                    if(child.tagName === "a"){
+                    if(child.tagName === "A"){
                         child.addEventListener("click", (e) => {
                             e.preventDefault()
-                            alert("You are about to download a suspect "+result.type.toLowerCase()+". Are you sure ? If yes, then please copy and paste the URL directly into your browser.")
+                            e.stopImmediatePropagation()
+
+                            Utils.showConfirmationModal(
+                                "Are you sure you want to download this ?", 
+                                "The "+result.type.toLowerCase()+" **"+filename+"** might be dangerous **("+result.harm+")**. \n\n**We don't recommand to download it**. However, you can still do it below.", 
+                                {
+                                    confirmText: "Download Anyway",
+                                    cancelText: "Don't !",
+                                    danger: true,
+                                    onCancel: () => {},
+                                    onConfirm: () => {
+                                        electron.remote.shell.openExternal(child.href)
+                                    }
+                                }
+                            )
                         })
-                    }else if(["div"].includes(child.tagName)){
+                    }else if(["div"].includes(child.tagName.toLowerCase())){
                         nextNode(child)
                     }
                 }
             }
-            nextNode(e)
-        }else */if(!result.official){
-            BDV2.reactDom.render(BDV2.react.createElement(tooltipWrap, {text: result.type+" "+result.name+" is certified by Lightcord."}, 
-                BDV2.react.createElement("div", {className: flowerStarModule.flowerStarContainer, style: {width: "16px", height: "16px"}},
-                    BDV2.react.createElement("svg", {className: flowerStarModule.flowerStar, "aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2"},
-                        BDV2.react.createElement("path", {fill:"#4f545c", "fill-rule":"evenodd",d:"m16 7.6c0 .79-1.28 1.38-1.52 2.09s.44 2 0 2.59-1.84.35-2.46.8-.79 1.84-1.54 2.09-1.67-.8-2.47-.8-1.75 1-2.47.8-.92-1.64-1.54-2.09-2-.18-2.46-.8.23-1.84 0-2.59-1.54-1.3-1.54-2.09 1.28-1.38 1.52-2.09-.44-2 0-2.59 1.85-.35 2.48-.8.78-1.84 1.53-2.12 1.67.83 2.47.83 1.75-1 2.47-.8.91 1.64 1.53 2.09 2 .18 2.46.8-.23 1.84 0 2.59 1.54 1.3 1.54 2.09z"})
-                    ),
-                    BDV2.react.createElement("div", {className: childModule.childContainer}, 
-                        BDV2.react.createElement("svg", {"aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2"}, 
-                            BDV2.react.createElement("path", {fill:"#ffffff",d:"M7.4,11.17,4,8.62,5,7.26l2,1.53L10.64,4l1.36,1Z"})
-                        )
-                    )
-                )
-            ), div)
-        }else{
-            BDV2.reactDom.render(BDV2.react.createElement(tooltipWrap, {text: result.type+" "+result.name+" was made by the developers of Lightcord.",style:"brand"}, 
-                BDV2.react.createElement("div", {className: flowerStarModule.flowerStarContainer, style: {width: "16px", height: "16px"}},
-                    BDV2.react.createElement("svg", {className: flowerStarModule.flowerStar, "aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2",stroke:"#36393f",style:{color:"#4087ed"}},
-                        BDV2.react.createElement("path", {fill:"currentColor", "fill-rule":"evenodd",d:"m16 7.6c0 .79-1.28 1.38-1.52 2.09s.44 2 0 2.59-1.84.35-2.46.8-.79 1.84-1.54 2.09-1.67-.8-2.47-.8-1.75 1-2.47.8-.92-1.64-1.54-2.09-2-.18-2.46-.8.23-1.84 0-2.59-1.54-1.3-1.54-2.09 1.28-1.38 1.52-2.09-.44-2 0-2.59 1.85-.35 2.48-.8.78-1.84 1.53-2.12 1.67.83 2.47.83 1.75-1 2.47-.8.91 1.64 1.53 2.09 2 .18 2.46.8-.23 1.84 0 2.59 1.54 1.3 1.54 2.09z"})
-                    ),
-                    BDV2.react.createElement("div", {className: childModule.childContainer}, 
-                        BDV2.react.createElement("svg", {"aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2"}, 
-                            BDV2.react.createElement("path", {fill:"#ffffff",d:"M10.7,5.28a2.9,2.9,0,0,0-2.11.86.11.11,0,0,0,0,.16l1.05.94a.11.11,0,0,0,.15,0,1.27,1.27,0,0,1,.9-.33c.65,0,.65.73.65.73a.64.64,0,0,1-.65.65,1.73,1.73,0,0,1-1.18-.54c-.31-.26-.36-.32-.73-.66S7.06,5.28,5.65,5.28A2.26,2.26,0,0,0,3.37,7.56,2.59,2.59,0,0,0,3.82,9a2.18,2.18,0,0,0,1.83.89,2.94,2.94,0,0,0,2.1-.81.11.11,0,0,0,0-.16L6.74,8A.11.11,0,0,0,6.6,8a1.58,1.58,0,0,1-.94.29h0A.71.71,0,0,1,5,7.56H5a.63.63,0,0,1,.65-.64c.71,0,1.42.75,1.94,1.27.75.76,1.66,1.79,3.11,1.74A2.28,2.28,0,0,0,13,7.64a2.59,2.59,0,0,0-.45-1.47A2.14,2.14,0,0,0,10.7,5.28Z"})
-                        )
-                    )
-                )
-            ), div)
+            nextNode(div.parentNode)
+        }catch(e){
+            console.error(e)
         }
-    })
+        BDV2.reactDom.render(BDV2.react.createElement(tooltipWrap, {text: result.type+" "+result.name+" is potentially dangerous."}, 
+            BDV2.react.createElement("div", {className: flowerStarModule.flowerStarContainer, style: {width: "16px", height: "16px"}},
+                BDV2.react.createElement("svg", {className: BDModules.get(e => e.svg)[0].svg, "aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 40 32"},
+                    BDV2.react.createElement("rect", {
+                        x:"0",
+                        y:"0",
+                        width:"32",
+                        height:"32",
+                        mask:"url(#svg-mask-avatar-status-round-32)",
+                        fill:"#f04747",
+                        mask:"url(#svg-mask-status-dnd)",
+                        className:BDModules.get(e => e.pointerEvents)[0].pointerEvents
+                    })
+                )
+            )
+        ), div)
+    }else if(!result.official){
+        div.parentNode.style.borderColor = "#4087ed"
+        BDV2.reactDom.render(BDV2.react.createElement(tooltipWrap, {text: result.type+" "+result.name+" is certified by Lightcord."}, 
+            BDV2.react.createElement("div", {className: flowerStarModule.flowerStarContainer, style: {width: "16px", height: "16px"}},
+                BDV2.react.createElement("svg", {className: flowerStarModule.flowerStar, "aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2"},
+                    BDV2.react.createElement("path", {fill:"#4f545c", "fill-rule":"evenodd",d:"m16 7.6c0 .79-1.28 1.38-1.52 2.09s.44 2 0 2.59-1.84.35-2.46.8-.79 1.84-1.54 2.09-1.67-.8-2.47-.8-1.75 1-2.47.8-.92-1.64-1.54-2.09-2-.18-2.46-.8.23-1.84 0-2.59-1.54-1.3-1.54-2.09 1.28-1.38 1.52-2.09-.44-2 0-2.59 1.85-.35 2.48-.8.78-1.84 1.53-2.12 1.67.83 2.47.83 1.75-1 2.47-.8.91 1.64 1.53 2.09 2 .18 2.46.8-.23 1.84 0 2.59 1.54 1.3 1.54 2.09z"})
+                ),
+                BDV2.react.createElement("div", {className: childModule.childContainer}, 
+                    BDV2.react.createElement("svg", {"aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2"}, 
+                        BDV2.react.createElement("path", {fill:"#ffffff",d:"M7.4,11.17,4,8.62,5,7.26l2,1.53L10.64,4l1.36,1Z"})
+                    )
+                )
+            )
+        ), div)
+    }else{
+        div.parentNode.style.borderColor = "#4087ed"
+        BDV2.reactDom.render(BDV2.react.createElement(tooltipWrap, {text: result.type+" "+result.name+" was made by the developers of Lightcord.",style:"brand"}, 
+            BDV2.react.createElement("div", {className: flowerStarModule.flowerStarContainer, style: {width: "16px", height: "16px"}},
+                BDV2.react.createElement("svg", {className: flowerStarModule.flowerStar, "aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2",stroke:"#36393f",style:{color:"#4087ed"}},
+                    BDV2.react.createElement("path", {fill:"currentColor", "fill-rule":"evenodd",d:"m16 7.6c0 .79-1.28 1.38-1.52 2.09s.44 2 0 2.59-1.84.35-2.46.8-.79 1.84-1.54 2.09-1.67-.8-2.47-.8-1.75 1-2.47.8-.92-1.64-1.54-2.09-2-.18-2.46-.8.23-1.84 0-2.59-1.54-1.3-1.54-2.09 1.28-1.38 1.52-2.09-.44-2 0-2.59 1.85-.35 2.48-.8.78-1.84 1.53-2.12 1.67.83 2.47.83 1.75-1 2.47-.8.91 1.64 1.53 2.09 2 .18 2.46.8-.23 1.84 0 2.59 1.54 1.3 1.54 2.09z"})
+                ),
+                BDV2.react.createElement("div", {className: childModule.childContainer}, 
+                    BDV2.react.createElement("svg", {"aria-hidden":"false",width:"16px",height:"16px",viewBox:"0 0 16 15.2"}, 
+                        BDV2.react.createElement("path", {fill:"#ffffff",d:"M10.7,5.28a2.9,2.9,0,0,0-2.11.86.11.11,0,0,0,0,.16l1.05.94a.11.11,0,0,0,.15,0,1.27,1.27,0,0,1,.9-.33c.65,0,.65.73.65.73a.64.64,0,0,1-.65.65,1.73,1.73,0,0,1-1.18-.54c-.31-.26-.36-.32-.73-.66S7.06,5.28,5.65,5.28A2.26,2.26,0,0,0,3.37,7.56,2.59,2.59,0,0,0,3.82,9a2.18,2.18,0,0,0,1.83.89,2.94,2.94,0,0,0,2.1-.81.11.11,0,0,0,0-.16L6.74,8A.11.11,0,0,0,6.6,8a1.58,1.58,0,0,1-.94.29h0A.71.71,0,0,1,5,7.56H5a.63.63,0,0,1,.65-.64c.71,0,1.42.75,1.94,1.27.75.76,1.66,1.79,3.11,1.74A2.28,2.28,0,0,0,13,7.64a2.59,2.59,0,0,0-.45-1.47A2.14,2.14,0,0,0,10.7,5.28Z"})
+                    )
+                )
+            )
+        ), div)
+    }
 }

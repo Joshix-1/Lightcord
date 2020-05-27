@@ -134,3 +134,6 @@
   flex-grow: 1;
   margin: 40px auto;
 }
+.lc-link-disabled-span:hover {
+  cursor: pointer;
+}

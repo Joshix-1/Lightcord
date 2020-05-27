@@ -11,7 +11,7 @@ exports.setMainWindowVisible = setMainWindowVisible;
 
 var glasstron = require("glasstron")
 
-var _electron = require('electron');
+var electron = require('electron');
 
 var _path = require('path');
 
@@ -117,7 +117,7 @@ const DEFAULT_HEIGHT = 720;
 const MIN_VISIBLE_ON_SCREEN = 32;
 
 /**
- * @type {Electron.BrowserWindow}
+ * @type {electron.BrowserWindow}
  */
 let mainWindow = null;
 let mainWindowId = _Constants.DEFAULT_MAIN_WINDOW_ID;
@@ -211,7 +211,7 @@ function applyWindowBoundsToConfig(mainWindowOptions) {
   bounds.height = Math.max(MIN_HEIGHT, bounds.height);
 
   let isVisibleOnAnyScreen = false;
-  const displays = _electron.screen.getAllDisplays();
+  const displays = electron.screen.getAllDisplays();
   displays.forEach(display => {
     if (isVisibleOnAnyScreen) {
       return;
@@ -362,7 +362,7 @@ function launchMainAppWindow(isVisible) {
 
   applyWindowBoundsToConfig(mainWindowOptions);
 
-  mainWindow = new _electron.BrowserWindow(mainWindowOptions);
+  mainWindow = new electron.BrowserWindow(mainWindowOptions);
   mainWindowId = mainWindow.id;
   global.mainWindowId = mainWindowId;
 	glasstron.update(mainWindow, {
@@ -393,7 +393,7 @@ function launchMainAppWindow(isVisible) {
     if (frameName.startsWith(DISCORD_NAMESPACE) && windowURL.startsWith(WEBAPP_ENDPOINT)) {
       popoutWindows.openOrFocusWindow(e, windowURL, frameName, options);
     } else {
-      _electron.shell.openExternal(windowURL);
+      electron.shell.openExternal(windowURL);
     }
   });
 
@@ -433,7 +433,7 @@ function launchMainAppWindow(isVisible) {
 
   mainWindow.webContents.on('crashed', (e, killed) => {
     if (killed) {
-      _electron.app.quit();
+      electron.app.quit();
       return;
     }
 
@@ -441,7 +441,7 @@ function launchMainAppWindow(isVisible) {
     const crashTime = Date.now();
     if (crashTime - lastCrashed < 5 * 1000) {
       console.error('[WebContents] double crashed... RIP =(');
-      _electron.app.quit();
+      electron.app.quit();
       return;
     }
     lastCrashed = crashTime;
@@ -513,7 +513,7 @@ function launchMainAppWindow(isVisible) {
 
       // Quit app if that's the setting
       if (!settings.get('MINIMIZE_TO_TRAY', true)) {
-        _electron.app.quit();
+        electron.app.quit();
         return;
       }
 
@@ -641,8 +641,8 @@ function setupUpdaterIPC() {
     try {
       moduleUpdater.quitAndInstallUpdates();
     } catch (e) {
-      _electron.app.relaunch();
-      _electron.app.quit();
+      electron.app.relaunch();
+      electron.app.quit();
     }
   });
 
@@ -666,26 +666,26 @@ function init() {
   // electron default behavior is to app.quit here, so long as there are no other listeners. we handle quitting
   // or minimizing to system tray ourselves via mainWindow.on('closed') so this is simply to disable the electron
   // default behavior.
-  _electron.app.on('window-all-closed', () => {});
+  electron.app.on('window-all-closed', () => {});
 
-  _electron.app.on('before-quit', () => {
+  electron.app.on('before-quit', () => {
     saveWindowConfig(mainWindow);
     mainWindow = null;
     notificationScreen.close();
   });
 
   // TODO: move this to main startup
-  _electron.app.on('gpu-process-crashed', (e, killed) => {
+  electron.app.on('gpu-process-crashed', (e, killed) => {
     if (killed) {
-      _electron.app.quit();
+      electron.app.quit();
     }
   });
 
-  _electron.app.on('accessibility-support-changed', (_event, accessibilitySupportEnabled) => webContentsSend('ACCESSIBILITY_SUPPORT_CHANGED', accessibilitySupportEnabled));
+  electron.app.on('accessibility-support-changed', (_event, accessibilitySupportEnabled) => webContentsSend('ACCESSIBILITY_SUPPORT_CHANGED', accessibilitySupportEnabled));
 
-  _electron.app.on(_Constants.MenuEvents.OPEN_HELP, () => webContentsSend('HELP_OPEN'));
-  _electron.app.on(_Constants.MenuEvents.OPEN_SETTINGS, () => webContentsSend('USER_SETTINGS_OPEN'));
-  _electron.app.on(_Constants.MenuEvents.CHECK_FOR_UPDATES, () => moduleUpdater.checkForUpdates());
+  electron.app.on(_Constants.MenuEvents.OPEN_HELP, () => webContentsSend('HELP_OPEN'));
+  electron.app.on(_Constants.MenuEvents.OPEN_SETTINGS, () => webContentsSend('USER_SETTINGS_OPEN'));
+  electron.app.on(_Constants.MenuEvents.CHECK_FOR_UPDATES, () => moduleUpdater.checkForUpdates());
 
   _ipcMain2.default.on('SETTINGS_UPDATE_BACKGROUND_COLOR', (_event, backgroundColor) => {
     if (getBackgroundColor() !== backgroundColor) {

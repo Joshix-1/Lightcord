@@ -19,7 +19,7 @@ exports.init = function(){
     }
     hasInit = true
     let readyInterval = setInterval(()=>{
-        events.emit("debug", `[INIT] try ${tries++} loading LightCord`)
+        //events.emit("debug", `[INIT] try ${tries++} loading LightCord`)
         try{
             if(!global.webpackJsonp)return
             if(!ModuleLoader.get(4))return
@@ -148,6 +148,9 @@ async function privateInit(){
         DiscordJS = null
     }
 
+    const appSettings = electron.remote.getGlobal("appSettings")
+    let Authorization = appSettings.get("LIGHTCORD_AUTH", null)
+
     window.Lightcord = {
         DiscordModules: {
             dispatcher,
@@ -156,6 +159,16 @@ async function privateInit(){
         Settings: {
             devMode: false,
             callRingingBeat: true
+        },
+        Api: {
+            get Authorization(){
+                return Authorization
+            },
+            set Authorization(data){
+                if(typeof data !== "string" && data !== null)return Authorization
+                appSettings.set("LIGHTCORD_AUTH", Authorization = data)
+                appSettings.save()
+            }
         }
     }
 
@@ -231,9 +244,6 @@ const BetterDiscordFolder = function() {
             return path.resolve(process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME + "/.config", "BetterDiscord/");
     }
 }()
-
-console.log(`Original BetterDiscord Path: ${BetterDiscordFolder}
-Lightcord's BetterDiscord Path: ${LightcordBDFolder}`)
 
 path.resolve = (...args) => { // Patching BetterDiscord folder by Lightcord's BetterDiscord folder
     let resp = originalResolve.call(path, ...args)

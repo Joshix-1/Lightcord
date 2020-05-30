@@ -2,8 +2,8 @@ import Utils from "./utils"
 
 const dispatcher = window.Lightcord.DiscordModules.dispatcher
 const ChannelModule = BDModules.get(e => e.default && e.default.getChannel && e.default.hasChannel)[0].default
-let relationShipModule = BDModules.get(e => e.default && e.default.addRelationship)[0].default
-let DMModule = BDModules.get(e => e.default && e.default.closePrivateChannel)[0].default
+let relationShipModule = BDModules.get(e => e.default && e.default.addRelationship)[0]
+let DMModule = BDModules.get(e => e.default && e.default.closePrivateChannel)[0]
 
 const blocked = {}
 
@@ -43,12 +43,12 @@ export default new class AntiBotDM {
             Utils.showToast(`[AdBlock]: Blocked ${ev.message.author.username}#${ev.message.author.discriminator}`, {
                 "type": "warning"
             })
-            if(!relationShipModule)relationShipModule = BDModules.get(e => e.default && e.default.addRelationship)[0].default
-            relationShipModule.addRelationship(ev.message.author.id, {
+            if(!relationShipModule)relationShipModule = BDModules.get(e => e.default && e.default.addRelationship)[0]
+            relationShipModule.default.addRelationship(ev.message.author.id, {
                 location: "ContextMenu"
             }, 2)
-            if(!DMModule)DMModule = BDModules.get(e => e.default && e.default.closePrivateChannel)[0].default
-            DMModule.closePrivateChannel(channel.id, false)
+            if(!DMModule)DMModule = BDModules.get(e => e.default && e.default.closePrivateChannel)[0]
+            DMModule.default.closePrivateChannel(channel.id, false)
         }
     }
 }

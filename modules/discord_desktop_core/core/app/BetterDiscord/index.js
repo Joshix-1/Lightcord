@@ -19,7 +19,7 @@ exports.init = function(){
     }
     hasInit = true
     let readyInterval = setInterval(()=>{
-        //events.emit("debug", `[INIT] try ${tries++} loading LightCord`)
+        events.emit("debug", `[INIT] try ${tries++} loading LightCord`)
         try{
             if(!global.webpackJsonp)return
             if(!ModuleLoader.get(4))return
@@ -42,7 +42,7 @@ async function privateInit(){
     hasPrivateInit = true
 
     //disabling sentry
-    BDModules.get(e => e.getCurrentHub)[0].getCurrentHub().getClient().getOptions().enabled = false
+    ModuleLoader.get(e => e.getCurrentHub)[0].getCurrentHub().getClient().getOptions().enabled = false
 
     // setting react in require cache
     try{
@@ -58,8 +58,8 @@ async function privateInit(){
         window.ReactDOM = ReactDOM
     }
     
-    let original = BDModules.get((e) =>  e.createSound)[0].createSound
-    BDModules.get((e) =>  e.createSound)[0].createSound = function(sound){
+    let original = ModuleLoader.get((e) =>  e.createSound)[0].createSound
+    ModuleLoader.get((e) =>  e.createSound)[0].createSound = function(sound){
         let isCalling = sound === "call_ringing_beat" || sound === "call_ringing"
         if(isCalling){
             let returned = original(...arguments)
@@ -178,9 +178,11 @@ async function privateInit(){
 
     const Utils = window.Lightcord.BetterDiscord.Utils
 
+    delete window.Lightcord.BetterDiscord.Utils // security delete
+
     await ensureExported(e => e.default && e.default.displayName == "AuthBox")
 
-    const classs = BDModules.get(e => e.default && e.default.displayName == "AuthBox")
+    const classs = ModuleLoader.get(e => e.default && e.default.displayName == "AuthBox")
     
     Utils.monkeyPatch(classs[0], "default", {after: (data) => {
         const children = Utils.getNestedProp(data.returnValue, "props.children.props.children.props.children")
@@ -238,11 +240,11 @@ function ensureGuildClasses(){
 
 function ensureExported(filter){
     return new Promise((resolve) => {
-        let classs = BDModules.get(filter)[0]
+        let classs = ModuleLoader.get(filter)[0]
         if(classs)return resolve()
 
         let intergay = setInterval(() => {
-            classs = BDModules.get(filter)[0]
+            classs = ModuleLoader.get(filter)[0]
             if(classs){
                 clearInterval(intergay)
                 resolve()
@@ -253,9 +255,9 @@ function ensureExported(filter){
 }
 
 function getGuildClasses() {
-    const guildsWrapper = BDModules.get(e => e.wrapper && e.unreadMentionsBar)[0];
-    const guilds = BDModules.get(e => e.guildsError && e.selected)[0]
-    const pill = BDModules.get(e => e.blobContainer)[0]
+    const guildsWrapper = ModuleLoader.get(e => e.wrapper && e.unreadMentionsBar)[0];
+    const guilds = ModuleLoader.get(e => e.guildsError && e.selected)[0]
+    const pill = ModuleLoader.get(e => e.blobContainer)[0]
     return Object.assign({}, guildsWrapper, guilds, pill);
 }
 

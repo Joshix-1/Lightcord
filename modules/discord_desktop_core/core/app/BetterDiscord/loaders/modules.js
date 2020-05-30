@@ -1,8 +1,18 @@
+let req 
+setReq()
+
 class Modules {
-    /** use this as less as possible */
     static get modules(){
-        let cache = webpackJsonp.push([[],{['']:(_,e,r)=>{e.cache=r.c}},[['']]]).cache
-        return Object.values(cache)
+        if(req){
+            return Object.values(req.c).filter(e => e && e.exports)
+        }else{
+            setReq()
+            if(req){
+                return Object.values(req.c).filter(e => e && e.exports)
+            }else{
+                return []
+            }
+        }
     }
     static get(ids, modules){
         if(typeof ids === "function"){
@@ -29,3 +39,15 @@ module.exports = Modules
 module.exports.default = Modules
 
 global.BDModules = Modules
+
+function setReq(){
+    try{
+        req = webpackJsonp.push([[], {__extra_id__: (module, exports, req) => module.exports = req}, [["__extra_id__"]]]);
+        if(req){
+            delete req.m.__extra_id__;
+            delete req.c.__extra_id__;
+        }
+    }catch(e){
+        req = undefined
+    }
+}

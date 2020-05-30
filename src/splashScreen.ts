@@ -102,12 +102,17 @@ function launchSplashWindow(startMinimized = false) {
     center: true,
     show: false,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      
     },
     icon: path.join(__dirname, "..", "discord.png")
   };
 
   splashWindow = new electron.BrowserWindow(windowConfig);
+
+  splashWindow.webContents.session.protocol.interceptFileProtocol('http', (request, callback) => {
+      callback(path.join(__dirname, '..', "splash", request.url.replace('http://localhost/', '')));
+  });
 
   // prevent users from dropping links to navigate in splash window
   splashWindow.webContents.on('will-navigate', e => e.preventDefault());
@@ -149,13 +154,7 @@ function launchSplashWindow(startMinimized = false) {
     launchMainWindowInternal()
   });
 
-  const splashUrl = url.format({
-    protocol: 'file',
-    slashes: true,
-    pathname: path.join(__dirname, '..', "splash", 'index.html')
-  });
-
-  splashWindow.loadURL(splashUrl);
+  splashWindow.loadURL("http://localhost/index.html");
 }
 
 function launchMainWindowInternal() {

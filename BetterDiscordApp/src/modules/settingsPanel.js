@@ -214,7 +214,15 @@ export default new class V2_SettingsPanel {
             else window.Lightcord.Settings.callRingingBeat = false
         }
         if (id === "lightcord-presence-1") {
-            if (enabled) CustomRichPresence.enable()
+            if (enabled) {
+                CustomRichPresence.enable()
+                const settingsStore = BDModules.get(e => e.default && typeof e.default === "object" && "showCurrentGame" in e.default)[0]
+                if(settingsStore && !settingsStore.default.showCurrentGame){
+                    BDModules.get(e => e.default && e.default.updateRemoteSettings)[0].default.updateRemoteSettings({
+                        showCurrentGame: true
+                    })
+                }
+            }
             else CustomRichPresence.disable()
         }
         if (id === "lightcord-3") {

@@ -26,12 +26,20 @@ import WebpackModules from "../modules/webpackModules";
 //		Changelog
 //	</div>
 //</div>
-const TooltipClasses = WebpackModules.findByProps("tooltip", "tooltipBlack");
-const TooltipLayers = WebpackModules.findByProps("layer", "layerContainer");
+let TooltipClasses
+function getTooltipClasses(){
+	if(TooltipClasses)return TooltipClasses
+	return TooltipClasses = WebpackModules.findByProps("tooltip", "tooltipBlack");
+}
+let TooltipLayers
+function getTooltipLayers(){
+	if(TooltipLayers)return TooltipLayers
+	return TooltipLayers = WebpackModules.findByProps("layer", "layerContainer");
+}
 
 const getClass = function(sideOrColor) {
     const upperCase = sideOrColor[0].toUpperCase() + sideOrColor.slice(1);
-    const tooltipClass = TooltipClasses[`tooltip${upperCase}`];
+    const tooltipClass = getTooltipClasses()[`tooltip${upperCase}`];
     if (tooltipClass) return tooltipClass;
     return null;
 };
@@ -76,16 +84,16 @@ export default class EmulatedTooltip {
 		if (!classExists(this.style)) return Utils.err("EmulatedTooltip", `Style ${this.style} does not exist.`);
 		
 		this.element = document.createElement("div");
-		this.element.className = TooltipLayers.layer + " " + TooltipLayers.disabledPointerEvents;
+		this.element.className = getTooltipLayers().layer + " " + getTooltipLayers().disabledPointerEvents;
 
 		this.tooltipElement = document.createElement("div");
-		this.tooltipElement.className = `${TooltipClasses.tooltip} ${getClass(this.style)}`;
+		this.tooltipElement.className = `${getTooltipClasses().tooltip} ${getClass(this.style)}`;
 
 		this.labelElement = document.createElement("div");
-		this.labelElement.className = TooltipClasses.tooltipContent
+		this.labelElement.className = getTooltipClasses().tooltipContent
 
 		const pointerElement = document.createElement("div");
-		pointerElement.className = TooltipClasses.tooltipPointer;
+		pointerElement.className = getTooltipClasses().tooltipPointer;
 
 		this.tooltipElement.append(pointerElement);
 		this.tooltipElement.append(this.labelElement);
@@ -134,7 +142,7 @@ export default class EmulatedTooltip {
 
     /** Shows the tooltip. Automatically called on mouseenter. Will attempt to flip if position was wrong. */
 	show() {
-        this.tooltipElement.className = `${TooltipClasses.tooltip} ${getClass(this.style)}`;
+        this.tooltipElement.className = `${getTooltipClasses().tooltip} ${getClass(this.style)}`;
 		this.labelElement.textContent = this.label;
 		this.container.append(this.element);
 

@@ -54,12 +54,12 @@ export default new class ContentManager {
             if (this.timeCache[filename] == stats.mtime.getTime()) return;
             this.timeCache[filename] = stats.mtime.getTime();
             if (eventType == "rename") {
-                if (isPlugin) pluginModule.loadPlugin(filename);
-                else themeModule.loadTheme(filename);
+                if (isPlugin) await pluginModule.loadPlugin(filename);
+                else await themeModule.loadTheme(filename);
             }
             if (eventType == "change") {
-                if (isPlugin) pluginModule.reloadPlugin(filename);
-                else themeModule.reloadTheme(filename);
+                if (isPlugin) await pluginModule.reloadPlugin(filename);
+                else await themeModule.reloadTheme(filename);
             }
         });
     }
@@ -167,7 +167,7 @@ export default new class ContentManager {
         };
     }
 
-    loadContent(filename, type) {
+    async loadContent(filename, type) {
         if (typeof(filename) === "undefined" || typeof(type) === "undefined") return;
         const isPlugin = type === "plugin";
         const baseFolder = isPlugin ? this.pluginsFolder : this.themesFolder;
@@ -209,10 +209,10 @@ export default new class ContentManager {
         return true;
     }
 
-    reloadContent(filename, type) {
+    async reloadContent(filename, type) {
         const cantUnload = this.unloadContent(filename, type);
         if (cantUnload) return cantUnload;
-        return this.loadContent(filename, type);
+        return await this.loadContent(filename, type);
     }
 
     loadNewContent(type) {
@@ -226,7 +226,7 @@ export default new class ContentManager {
         return {added, removed};
     }
 
-    loadAllContent(type) {
+    async loadAllContent(type) {
         const isPlugin = type === "plugin";
         const fileEnding = isPlugin ? ".plugin.js" : ".theme.css";
         const basedir = isPlugin ? this.pluginsFolder : this.themesFolder;
@@ -235,7 +235,7 @@ export default new class ContentManager {
 
         for (const filename of files) {
             if (!fs.statSync(path.resolve(basedir, filename)).isFile() || !filename.endsWith(fileEnding)) continue;
-            const error = this.loadContent(filename, type);
+            const error = await this.loadContent(filename, type);
             if (error) errors.push(error);
         }
 

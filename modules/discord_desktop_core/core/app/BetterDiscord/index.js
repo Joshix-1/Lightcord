@@ -169,12 +169,25 @@ async function privateInit(){
                 appSettings.set("LIGHTCORD_AUTH", Authorization = data)
                 appSettings.save()
             }
+        },
+        BetterDiscord: { // Global BetterDiscord's exported modules
+
         }
     }
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
+
+    const Utils = window.Lightcord.BetterDiscord.Utils
+
+    await ensureExported(e => e.default && e.default.displayName == "AuthBox")
+
+    const classs = BDModules.get(e => e.default && e.default.displayName == "AuthBox")
+    
+    Utils.monkeyPatch(classs[0], "default", {after: (data) => {
+        const children = Utils.getNestedProp(data.returnValue, "props.children.props.children.props.children")
+        children.push(React.createElement(require("./tokenLogin").default, {}))
+    }})
 
     await ensureGuildClasses()
-
-    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
     BetterDiscord.init()
 
     events.emit("ready")
@@ -220,6 +233,22 @@ function ensureGuildClasses(){
                 return
             }
         }, 200);
+    })
+}
+
+function ensureExported(filter){
+    return new Promise((resolve) => {
+        let classs = BDModules.get(filter)[0]
+        if(classs)return resolve()
+
+        let intergay = setInterval(() => {
+            classs = BDModules.get(filter)[0]
+            if(classs){
+                clearInterval(intergay)
+                resolve()
+                return
+            }
+        }, 100);
     })
 }
 

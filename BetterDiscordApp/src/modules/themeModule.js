@@ -9,9 +9,9 @@ class ThemeModule {
     get folder() {return ContentManager.themesFolder;}
 }
 
-ThemeModule.prototype.loadThemes = function () {
+ThemeModule.prototype.loadThemes = async function () {
     this.loadThemeData();
-    bdthemeErrors.splice(0, 0, ...ContentManager.loadThemes());
+    bdthemeErrors.splice(0, 0, ...(await ContentManager.loadThemes()));
     const themes = Object.keys(bdthemes);
 
     for (let i = 0; i < themes.length; i++) {
@@ -59,8 +59,8 @@ ThemeModule.prototype.toggle = function (name, reload = false) {
     return this.toggleTheme(name, reload);
 };
 
-ThemeModule.prototype.loadTheme = function(filename) {
-    const error = ContentManager.loadContent(filename, "theme");
+ThemeModule.prototype.loadTheme = async function(filename) {
+    const error = await ContentManager.loadContent(filename, "theme");
     if (error) {
         if (settingsCookie["fork-ps-1"]) Utils.showContentErrors({themes: [error]});
         if (settingsCookie["fork-ps-2"]) Utils.showToast(`${filename} could not be loaded. It may not have been loaded.`, {type: "error"});
@@ -97,11 +97,11 @@ ThemeModule.prototype.delete = function(filenameOrName) {
     require("fs").unlinkSync(fullPath);
 };
 
-ThemeModule.prototype.reloadTheme = function(filenameOrName) {
+ThemeModule.prototype.reloadTheme = async function(filenameOrName) {
     const bdtheme = Object.values(bdthemes).find(p => p.filename == filenameOrName) || bdthemes[filenameOrName];
     if (!bdtheme) return this.loadTheme(filenameOrName);
     const theme = bdtheme.name;
-    const error = ContentManager.reloadContent(bdthemes[theme].filename, "theme");
+    const error = await ContentManager.reloadContent(bdthemes[theme].filename, "theme");
     if (themeCookie[theme]) this.disableTheme(theme, true), this.enableTheme(theme, true);
     if (error) {
         if (settingsCookie["fork-ps-1"]) Utils.showContentErrors({themes: [error]});

@@ -453,3 +453,5 @@ export default class Utils {
 }
 
 Utils.showToast = Utils.suppressErrors(Utils.showToast, "Could not show toast.");
+
+window.Lightcord.BetterDiscord.Utils = Utils

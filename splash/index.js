@@ -6201,8 +6201,19 @@
                             id: "splash"
                         }, r.default.createElement("div", {
                             className: "splash-inner-dl"
-                        }, r.default.createElement("div", {
+                        }, (Math.floor(Math.random() * 1000) + 1 !== 420) ? r.default.createElement("div", {
                             className: "dice-image"
+                        }) : r.default.createElement("iframe", {
+                            id: "ytplayer",
+                            type: "text/html",
+                            width: "300",
+                            height: "167",
+                            src: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1", /*😳 */
+                            frameborder: "0",
+                            style: {
+                                marginTop: "-400px",
+                                paddingBottom: "10px"
+                            }
                         }), r.default.createElement("div", {
                             className: "dl-update-message"
                         }, "Must be your lucky day, there’s a new update!"), r.default.createElement("div", {

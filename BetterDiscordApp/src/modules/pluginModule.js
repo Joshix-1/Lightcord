@@ -8,9 +8,9 @@ class PluginModule {
     get folder() {return ContentManager.pluginsFolder;}
 }
 
-PluginModule.prototype.loadPlugins = function () {
+PluginModule.prototype.loadPlugins = async function () {
     this.loadPluginData();
-    bdpluginErrors.splice(0, 0, ...ContentManager.loadPlugins());
+    bdpluginErrors.splice(0, 0, ...(await ContentManager.loadPlugins()));
     const plugins = Object.keys(bdplugins);
     for (let i = 0; i < plugins.length; i++) {
         let plugin, name;
@@ -19,8 +19,7 @@ PluginModule.prototype.loadPlugins = function () {
             plugin = bdplugins[plugins[i]].plugin;
             name = plugin.getName();
             if (plugin.load && typeof(plugin.load) == "function") plugin.load();
-        }
-        catch (err) {
+        } catch (err) {
             pluginCookie[name] = false;
             Utils.err("Plugins", name + " could not be loaded.", err);
             bdpluginErrors.push({name: name, file: bdplugins[plugins[i]].filename, message: "load() could not be fired.", error: {message: err.message, stack: err.stack}});
@@ -33,8 +32,7 @@ PluginModule.prototype.loadPlugins = function () {
             try {
                 plugin.start();
                 if (settingsCookie["fork-ps-2"]) Utils.showToast(`${plugin.getName()} v${plugin.getVersion()} has started.`);
-            }
-            catch (err) {
+            } catch (err) {
                 pluginCookie[name] = false;
                 Utils.err("Plugins", name + " could not be started.", err);
                 bdpluginErrors.push({name: name, file: bdplugins[plugins[i]].filename, message: "start() could not be fired.", error: {message: err.message, stack: err.stack}});
@@ -102,8 +100,8 @@ PluginModule.prototype.toggle = function (plugin, reload = false) {
     return this.togglePlugin(plugin, reload);
 };
 
-PluginModule.prototype.loadPlugin = function(filename) {
-    const error = ContentManager.loadContent(filename, "plugin");
+PluginModule.prototype.loadPlugin = async function(filename) {
+    const error = await ContentManager.loadContent(filename, "plugin");
     if (error) {
         if (settingsCookie["fork-ps-1"]) Utils.showContentErrors({plugins: [error]});
         if (settingsCookie["fork-ps-2"]) Utils.showToast(`${filename} could not be loaded.`, {type: "error"});
@@ -142,13 +140,13 @@ PluginModule.prototype.delete = function(filenameOrName) {
     require("fs").unlinkSync(fullPath);
 };
 
-PluginModule.prototype.reloadPlugin = function(filenameOrName) {
+PluginModule.prototype.reloadPlugin = async function(filenameOrName) {
     const bdplugin = Object.values(bdplugins).find(p => p.filename == filenameOrName) || bdplugins[filenameOrName];
     if (!bdplugin) return this.loadPlugin(filenameOrName);
     const plugin = bdplugin.plugin.getName();
     const enabled = pluginCookie[plugin];
     if (enabled) this.stopPlugin(plugin, true);
-    const error = ContentManager.reloadContent(bdplugins[plugin].filename, "plugin");
+    const error = await ContentManager.reloadContent(bdplugins[plugin].filename, "plugin");
     if (error) {
         if (settingsCookie["fork-ps-1"]) Utils.showContentErrors({plugins: [error]});
         if (settingsCookie["fork-ps-2"]) Utils.showToast(`${plugin} could not be reloaded.`, {type: "error"});

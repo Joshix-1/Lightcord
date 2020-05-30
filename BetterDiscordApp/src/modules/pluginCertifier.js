@@ -187,6 +187,7 @@ function checkViruses(hash, data, id){
 const hashToUrl = {}
 
 function processAttachment(attachment, id){
+    if(!document.getElementById(id))return
     if(!attachment.url.startsWith("https://cdn.discordapp.com/"))return document.getElementById(id).remove()
     if(!attachment.filename.endsWith(".plugin.js") && !attachment.filename.endsWith(".theme.css"))return document.getElementById(id).remove()
 
@@ -236,8 +237,8 @@ function processAttachment(attachment, id){
     }).catch(()=>{})
 }
 
-const flowerStarModule = BDModules.get(e => e.flowerStarContainer)[0]
-const childModule = BDModules.get(e => e.childContainer)[0]
+let flowerStarModule = BDModules.get(e => e.flowerStarContainer)[0]
+let childModule = BDModules.get(e => e.childContainer)[0]
 
 /**
  * 
@@ -246,8 +247,11 @@ const childModule = BDModules.get(e => e.childContainer)[0]
  */
 function renderToElements(id, result, filename){
     const div = document.getElementById(id)
-    if(!div || div.childNodes.length > 0)return // already certified, so don't do it.
+    if(!div || div.childNodes.length > 0)return // already certified/div does not exist anymore.
     // TODO: implements suspect plugins.
+
+    if(!flowerStarModule)flowerStarModule = BDModules.get(e => e.flowerStarContainer)[0]
+    if(!childModule)childModule = BDModules.get(e => e.childContainer)[0]
     
     if(result.suspect){
         try{

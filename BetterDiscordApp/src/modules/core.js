@@ -14,6 +14,7 @@ import TooltipWrap from "../ui/tooltipWrap";
 import LightcordLogo from "../svg/lightcord";
 import PluginCertifier from "./pluginCertifier";
 import distant, { uuidv4 } from "./distant";
+import EmojiModule from "./emojiModule"
 
 function Core() {
     // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
@@ -75,10 +76,10 @@ Core.prototype.init = async function() {
     settingsPanel.initializeSettings();
 
     Utils.log("Startup", "Loading Plugins");
-    pluginModule.loadPlugins();
+    await pluginModule.loadPlugins();
 
     Utils.log("Startup", "Loading Themes");
-    themeModule.loadThemes();
+    await themeModule.loadThemes();
 
     DOM.addStyle("customcss", atob(DataStore.getBDData("bdcustomcss")));
 
@@ -105,6 +106,8 @@ Core.prototype.init = async function() {
         DataStore.setBDData("version", bbdVersion);
     }
 
+    await EmojiModule.init()
+
     Utils.suppressErrors(this.patchSocial.bind(this), "BD Social Patch")();
     Utils.suppressErrors(this.patchGuildPills.bind(this), "BD Guild Pills Patch")();
     Utils.suppressErrors(this.patchGuildListItems.bind(this), "BD Guild List Items Patch")();
@@ -118,7 +121,15 @@ Core.prototype.init = async function() {
         await new Promise((resolve) => {
             alert.onClose(resolve)
         })
-    }   
+    }
+    const logo = document.querySelector("#app-mount > div.typeWindows-1za-n7.withFrame-haYltI.titleBar-AC4pGV.horizontalReverse-3tRjY7.flex-1O1GKY.directionRowReverse-m8IjIq.justifyStart-2NDFzi.alignStretch-DpGPf3.da-typeWindows.da-withFrame.da-titleBar.da-horizontalReverse.da-flex.da-directionRowReverse.da-justifyStart.da-alignStretch > div.wordmarkWindows-1v0lYD.wordmark-2iDDfm.da-wordmarkWindows.da-wordmark")
+    if(logo){
+        logo.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="10" width="70" viewBox="0 0 72.54 10" style="margin-left: -5px, margin-top: 10px">
+    <path fill="currentColor" d="M44.81,9.67V6.33c0-1.21,2.13-1.49,2.78-.28l2-.81A3.53,3.53,0,0,0,46.2,3c-1.92,0-3.81,1.13-3.81,3.33V9.67c0,2.21,1.89,3.33,3.77,3.33a3.87,3.87,0,0,0,3.45-2.18l-2.12-1C47,11.17,44.81,10.85,44.81,9.67ZM10.68,12.89h2.41V3.17H10.68ZM71.76,3.14H68.19V7.23L70.57,9.4v-4h1.27c.81,0,1.21.41,1.21,1v3c0,.63-.38,1.05-1.21,1.05H68.18v2.31h3.57c1.92,0,3.72-1,3.72-3.2V6.39C75.48,4.13,73.68,3.14,71.76,3.14ZM54.22,3c-2,0-4,1.1-4,3.34V9.66c0,2.23,2,3.34,4,3.34s3.95-1.11,3.95-3.34V6.34C58.19,4.11,56.2,3,54.22,3Zm1.55,6.66c0,.7-.78,1.06-1.54,1.06s-1.55-.35-1.55-1.06V6.34c0-.72.75-1.1,1.5-1.1s1.59.35,1.59,1.1ZM66.84,6.34c0-2.29-1.58-3.2-3.55-3.2H59.46v9.73h2.45V9.77h.43l2.22,3.09h3L65,9.52C66.13,9.15,66.84,8.14,66.84,6.34ZM63.33,7.65H61.91V5.43h1.42A1.11,1.11,0,1,1,63.33,7.65ZM29.83,13h2.42V3.06H29.83V6.73l-3,0V3.09H24.7v9.78h2.14V8.68l3,0ZM17.16,9.76V6.42c0-1.21,2.13-1.49,2.78-.28l2-.81a3.55,3.55,0,0,0-3.36-2.24c-1.92,0-3.81,1.13-3.81,3.33V9.76c0,2.21,2,3.15,3.9,3.15s3.58-1,3.58-3V7.58H18.79l0,1.36H20.3v.77C20.3,10.92,17.16,10.94,17.16,9.76Z" transform="translate(-2.93 -3)"/>
+    <polygon fill="currentColor" points="35.91 0.06 38.43 0.06 38.43 1.84 35.92 1.81 35.97 10 33.55 10 33.49 1.75 30.98 1.74 30.98 0.06 33.49 0.06 35.91 0.06"/>
+    <polygon fill="currentColor" points="0 9.97 6.5 10 6.5 7.63 2.41 7.63 2.41 0.26 0 2.26 0 9.97"/>
+</svg>`
+    }
 };
 
 Core.prototype.checkForGuilds = function() {

@@ -1,4 +1,6 @@
 import BugHunterBadge from "../svg/bug_hunter"
+import LightcordUserBadge from "../svg/LightcordUser";
+import nodeFetch from "node-fetch"
 
 export function uuidv4() { // Generate UUID (No crypto rng)
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -8,6 +10,7 @@ export function uuidv4() { // Generate UUID (No crypto rng)
 }  
 
 const awaitingBadgesPromises = {}
+let badgesToFetch = []
 
 export default new class DistantServer {
     constructor(){
@@ -63,14 +66,30 @@ export default new class DistantServer {
             if(badge.defaultUsers.includes(user))badges.push(badge)
         }
         const fetchedBadges = await new Promise((resolve) => {
-            handleRequest(Routes.badges(user), "GET")
-            .then(async res => {
-                if(res.status !== 200){// Couldn't fetch badges: server error
-                    return resolve([]) // no badge fetched
-                }
-                return resolve(await res.json())
-            }).catch(() => {// Couldn't fetch badges: error
-                return resolve([]) // no badge fetched
+            badgesToFetch.push([user, resolve])
+            setImmediate(() => {
+                let users = badgesToFetch
+                if(users.length === 0)return
+                badgesToFetch = []
+                handleRequest(Routes.badges, "POST", JSON.stringify(users.map(e => e[0])))
+                .then(async res => {
+                    if(res.status !== 200){// Couldn't fetch badges: server error
+                        users.forEach(data => {
+                            data[1]([])// resolve no badge fetched
+                        })
+                    }
+                    const responseBody = await res.json()
+                    console.log(responseBody)
+                    for(let user of responseBody){
+                        let promise = users.find(promise => promise[0] === user.user_id)
+                        promise[1](user.badges)
+                    }
+                }).catch((err) => {// Couldn't fetch badges: error
+                    console.error(err)
+                    users.forEach(data => {
+                        data[1]([])// resolve no badge fetched
+                    })
+                })
             })
         })
         for(let badge of fetchedBadges){
@@ -91,13 +110,17 @@ export default new class DistantServer {
     }
 }
 
-const handleRequest = function(route, method){
-    return fetch(`${Constants.SERVER_URL}/api/v1${route}`, {
+const handleRequest = function(route, method, data){
+    console.log(`Sending request on ${route} with method ${method} and body`, data)
+    return nodeFetch(`${Constants.SERVER_URL}/api/v1${route}`, {
         method,
         headers: {
             "CLIENT": "Lightcord",
             "Authorization": window.Lightcord.Api.Authorization || "None::Anonymous"
-        }
+        },
+        ...(data ? {
+            body: data
+        } : {})
     })
 }
 
@@ -107,20 +130,15 @@ export const Constants = {
         {
             name: "Lightcord User",
             id: "01cfa7b0-7cdb-4b0e-8258-9c6a78235c93",
-            defaultUsers: [
-                "696481194443014174"
-            ],
+            defaultUsers: [],
             scopes: [
                 "user"
             ],
-            component: BugHunterBadge,
-            href: "https://github.com/lightcord/lightcord/wiki/badges/bug_hunter"
+            component: LightcordUserBadge
         }, {
             name: "Lightcord Bug Hunter",
             id: "f04698f5-816b-41e3-bd01-92291193d7a5",
-            defaultUsers: [
-                "696481194443014174"
-            ],
+            defaultUsers: [],
             scopes: [],
             component: BugHunterBadge,
             href: "https://github.com/lightcord/lightcord/wiki/badges/bug_hunter"
@@ -129,6 +147,6 @@ export const Constants = {
 }
 
 export const Routes = {
-    badges: user => `/${user}/badges`,
+    badges: `/users/badges`,
     delete: `/delete`
 }

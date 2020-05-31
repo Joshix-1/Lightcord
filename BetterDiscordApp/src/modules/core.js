@@ -418,14 +418,33 @@ function applyBadges(id, user, chat){
         distant.getBadges(user.id)
         .then(badges => {
             badges.forEach(badge => {
-                const props = {size: "16px", className: "bd-logo"}
+                const props = {
+                    svg: {
+                        size: "16px", 
+                        className: "bd-logo",
+                        width: "16px", 
+                    }
+                }
                 badge.scopes.forEach(scope => {
-                    // TODO: implement scope for badges (user, channel, etc)
+                    if(scope === "user"){// require user
+                        props.user = user
+                    }
                 }) 
+                if(!badge.href){
+                    props.Anchor = Anchor
+                    props.href = {
+                        className: chat ? "bd-chat-badge" : "bd-member-badge", 
+                        title: badge.name, 
+                        target: "_blank"
+                    }
+                }
                 const element = BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: badge.name},
-                    BDV2.React.createElement(Anchor, {className: chat ? "bd-chat-badge" : "bd-member-badge", href: badge.href, title: badge.name, target: "_blank"},
-                        BDV2.React.createElement(badge.component, props)
-                    )
+                    badge.href ? BDV2.react.createElement(Anchor, {
+                        href: badge.href,
+                        className: chat ? "bd-chat-badge" : "bd-member-badge", 
+                        title: badge.name, 
+                        target: "_blank"
+                    }, BDV2.React.createElement(badge.component, props)) : BDV2.React.createElement(badge.component, props)
                 )
                 const div2 = document.createElement("div")
                 BDV2.reactDom.render(element, div2)

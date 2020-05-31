@@ -50,12 +50,14 @@ async function privateInit(){
     }catch(e){
         const React = ModuleLoader.get(e => !["Component", "PureComponent", "Children", "createElement", "cloneElement"].map(c => !!e[c]).includes(false))[0]
         window.React = React
+        require.cache["react"] = React
     }
     try{
         window.ReactDOM = require("react-dom")
     }catch(e){
         const ReactDOM = ModuleLoader.get(e => e.findDOMNode)[0]
         window.ReactDOM = ReactDOM
+        require.cache["react-dom"] = ReactDOM
     }
     
     let original = ModuleLoader.get((e) =>  e.createSound)[0].createSound

@@ -4,9 +4,6 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "cld": "2.6.0",
-    "keyboard-layout": "2.0.16",
-    "spellchecker": "3.7.0"
   },
   "devDependencies": {},
   "scripts": {

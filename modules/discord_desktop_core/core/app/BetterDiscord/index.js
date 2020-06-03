@@ -258,7 +258,7 @@ async function privateInit(){
         dispatcher.subscribe(constants.ActionTypes.CONNECTION_OPEN || "CONNECTION_OPEN", onConn)
     }
 
-    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.min.jsbr").default)(BetterDiscordConfig)
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.js").default)(BetterDiscordConfig)
 
     const Utils = window.Lightcord.BetterDiscord.Utils
     // security delete

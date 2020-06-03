@@ -150,7 +150,7 @@ function checkViruses(hash, data, id){
         /**
          * @type {string}
          */
-        const no_comments = data.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "").trim()// removing the META{} comment from plugins
+        const no_comments = data.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "").trim()// removing the META comment from plugins
         if((/var [\w\d_$]+=\["/gi).test(no_comments)){
             isHarmful = "obfuscation/hidden code"
         }
@@ -179,7 +179,7 @@ function checkViruses(hash, data, id){
         harm: isHarmful
     }
     
-    console.log(`Found potentially dangerous virus: ${cache[hash].name}`)
+    console.log(`Found potentially dangerous ${cache[hash].type.toLowerCase()}: ${cache[hash].name}`)
 
     renderToElements(id, cache[hash], cache[hash].name)
 }
@@ -201,6 +201,7 @@ function processAttachment(attachment, id){
                 if(res.status !== 200)return checkViruses(hash, data, id)
                 const result = await res.json()
 
+                result.official = true
                 cache[hash] = result
 
                 renderToElements(id, result, attachment.filename)
@@ -253,6 +254,8 @@ function renderToElements(id, result, filename){
     if(!flowerStarModule)flowerStarModule = BDModules.get(e => e.flowerStarContainer)[0]
     if(!childModule)childModule = BDModules.get(e => e.childContainer)[0]
     
+
+    console.log(result)
     if(result.suspect){
         try{
             div.parentNode.style.borderColor = "rgb(240, 71, 71)"

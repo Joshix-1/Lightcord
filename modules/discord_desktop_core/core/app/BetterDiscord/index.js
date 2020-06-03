@@ -1,3 +1,7 @@
+const options = {
+    loadCompressed: true
+}
+
 const ModuleLoader = require("./loaders/modules")
 const { EventEmitter } = require("events")
 const Logger = require("./Logger")
@@ -151,7 +155,14 @@ async function privateInit(){
     }
 
     const appSettings = electron.remote.getGlobal("appSettings")
-    let Authorization = appSettings.get("LIGHTCORD_AUTH", null)
+    let Authorization = appSettings.get("LIGHTCORD_AUTH", false)
+    let shouldShowPrompt = Authorization === false
+
+    if(typeof Authorization !== "string"){
+        Authorization = null
+        appSettings.set("LIGHTCORD_AUTH", null)
+        appSettings.save()
+    }
 
     window.Lightcord = {
         DiscordModules: {
@@ -176,11 +187,83 @@ async function privateInit(){
 
         }
     }
-    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main").default)(BetterDiscordConfig)
+
+    if(shouldShowPrompt){
+        let onConn = (ev) => {
+            console.log(`Showing auth window.`, ev)
+            shouldShowPrompt = false
+            dispatcher.unsubscribe(constants.ActionTypes.CONNECTION_OPEN || "CONNECTION_OPEN", onConn)
+
+            const options = {
+                width: 500,
+                height: 550,
+                backgroundColor: "#202225",
+                show: true,
+                resizable: false,
+                maximizable: false,
+                minimizable: false,
+                frame: false,
+                center: false,
+                webPreferences: {
+                    nodeIntegration: false,
+                    preload: path.join(__dirname, "auth", "preload.js"),
+                    webviewTag: true
+                },
+                parent: electron.remote.getCurrentWindow()
+            };
+            options.x = Math.round(window.screenX + window.innerWidth / 2 - options.width / 2);
+            options.y = Math.round(window.screenY + window.innerHeight / 2 - options.height / 2);
+
+            const authWindow = new electron.remote.BrowserWindow(options)
+            
+            authWindow.webContents.session.protocol.registerFileProtocol("lightcord", (req, callback) => {
+                const parsedURL = new URL("http://lightcord.xyz/"+req.url.split("://")[1])
+
+                let file
+                if(req.method !== "GET"){
+                    file = "404.html"
+                }else{
+                    if(parsedURL.pathname === "/index.html"){
+                        file = "index.html"
+                    }else if(parsedURL.pathname === "/index.css"){
+                        file = "index.css"
+                    }else if(parsedURL.pathname === "/login/callback"){
+                        authWindow.close()
+                        console.log(parsedURL.searchParams)
+                        Authorization = parsedURL.searchParams.get("auth")
+                        authWindow = null
+                        return
+                    }
+                }
+
+                if(!file){
+                    file = "404.html"
+                }
+
+                callback(path.join(__dirname, "auth", file))
+            }, (err) => {
+                if(err)console.error(err)
+            })
+
+            electron.remote.getCurrentWindow().webContents.on("devtools-reload-page", () => {
+                electron.remote.protocol.unregisterProtocol("lightcord")
+            })
+
+            authWindow.on("close", () => {
+                electron.remote.protocol.unregisterProtocol("lightcord")
+            })
+
+            authWindow.loadURL("lightcord://index.html")
+        }
+        dispatcher.subscribe(constants.ActionTypes.CONNECTION_OPEN || "CONNECTION_OPEN", onConn)
+    }
+
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.min.jsbr").default)(BetterDiscordConfig)
 
     const Utils = window.Lightcord.BetterDiscord.Utils
-
-    delete window.Lightcord.BetterDiscord.Utils // security delete
+    // security delete
+    delete window.Lightcord.BetterDiscord.Utils 
+    delete window.Lightcord.BetterDiscord.Utils 
 
     await ensureExported(e => e.default && e.default.displayName == "AuthBox")
 
@@ -212,6 +295,18 @@ require.extensions[".css"] = (m, filename) => {
         }
     }
     return m.exports
+}
+
+let zlib = require("zlib")
+let tmp = require("tmp")
+
+require.extensions[".jsbr"] = (m, filename) => {
+    if(!zlib)zlib = require("zlib")
+    if(!tmp)tmp = require("tmp")
+    let tmpFile = tmp.fileSync()
+
+    fs.writeFileSync(tmpFile.name+".js", zlib.brotliDecompressSync(fs.readFileSync(filename)))
+    return require.extensions[".js"](m, tmpFile.name+".js")
 }
 
 const LightcordBDFolder = path.join(electron.remote.app.getPath("appData"), "Lightcord_BD")

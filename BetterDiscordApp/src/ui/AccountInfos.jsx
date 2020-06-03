@@ -17,7 +17,7 @@ let contentModule = BDModules.get(e => e.contentColumn)[0]
 let marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
 let colorModule = BDModules.get(e => e.colorStandard)[0]
 let sizeModule = BDModules.get(e => e.size32)[0]
-const scrollbarModule1 = BDModules.get(e => e.scrollbarGhostHairline)[0]
+let scrollbarModule1 = BDModules.get(e => e.scrollbarGhostHairline)[0]
 const GuildModule = BDModules.get(e => e.default && e.default.getGuilds)[0].default
 const relationShipModule = BDModules.get(e => e.default && e.default.getRelationships)[0].default
 const sessionModule = BDModules.get(e => e.default && e.default.getSessions)[0].default
@@ -29,7 +29,10 @@ export default class V2C_AccountInfos extends React.Component {
     }
 
     render() {
-
+        if(!contentModule)contentModule = BDModules.get(e => e.contentColumn)[0]
+        if(!marginModule2)marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
+        if(!colorModule)colorModule = BDModules.get(e => e.colorStandard)[0]
+        if(!sizeModule)sizeModule = BDModules.get(e => e.size32)[0]
         return (<div className={contentModule.contentColumn+" "+contentModule.contentColumnDefault+" content-column default"}
             style={{padding: "60px 40px 0px"}}>
                 <V2C_SettingsTitle text="Account Infos"/>
@@ -105,13 +108,16 @@ export default class V2C_AccountInfos extends React.Component {
 }
 
 
-const hightlightJS = BDModules.get(e => e.highlight)[0]
-const messageModule1 = BDModules.get(e => e.markup)[0]
-const messageModule2 = BDModules.get(e => e.messageContent)[0]
+let hightlightJS = BDModules.get(e => e.highlight)[0]
+let messageModule1 = BDModules.get(e => e.markup)[0]
+let messageModule2 = BDModules.get(e => e.messageContent)[0]
 
 class CodeContent extends React.Component {
     render(){
-        
+        if(!messageModule1)messageModule1 = BDModules.get(e => e.markup)[0]
+        if(!messageModule2)messageModule2 = BDModules.get(e => e.messageContent)[0]
+        if(!scrollbarModule1)scrollbarModule1 = BDModules.get(e => e.scrollbarGhostHairline)[0]
+        if(!hightlightJS)hightlightJS = BDModules.get(e => e.highlight)[0]
         return (<div class={`${messageModule1.markup} ${messageModule2.messageContent}`}>
             <pre>
                 <code class={`${scrollbarModule1.scrollbarGhostHairline} hljs`} dangerouslySetInnerHTML={{__html: hightlightJS.highlight(this.props.language, this.props.content).value}}>

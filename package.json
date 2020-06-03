@@ -13,11 +13,13 @@
   "license": "ISC",
   "dependencies": {
     "bytenode": "^1.1.6",
+    "custom-electron-titlebar": "^3.2.2-hotfix62",
     "glasstron": "0.0.3",
     "mkdirp": "^1.0.4",
     "node-fetch": "^2.6.0",
     "request": "^2.88.2",
     "rimraf": "^3.0.2",
+    "tmp": "^0.2.1",
     "yauzl": "^2.10.0"
   },
   "private": true,

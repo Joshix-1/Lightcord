@@ -38,7 +38,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /.jsx?$/,
+        test: /\.jsx?$/,
         loader: "babel-loader",
         exclude: /node_modules/,
         query: {
@@ -71,5 +71,4 @@ module.exports = {
       })
     ]
   }
-
 };

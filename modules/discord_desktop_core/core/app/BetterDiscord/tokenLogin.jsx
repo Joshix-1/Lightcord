@@ -10,7 +10,7 @@ const verticalSeparatorModule = BDModules.get(e => e.verticalSeparator)[0]
 
 const loginModule = BDModules.get(e => e.default && e.default.loginToken)[0].default
 
-export default class TokenLogin extends React.Component {
+export default class TokenLogin extends React.PureComponent {
     constructor(props){
         super(props)
 
@@ -41,6 +41,7 @@ export default class TokenLogin extends React.Component {
                         <div className={inputModule.inputWrapper}>
                             <input className={`${inputModule.inputDefault}${this.state.error ? " "+inputModule.inputError : ""}`} name="token" type="token" placeholder aria-label="Token" autoComplete="off" maxLength={999} spellCheck="false" value={this.state.value} onChange={(ev) => {
                                 this.state.value = ev.target.value
+                                this.forceUpdate()
                             }}/>
                         </div>
                     </div>
@@ -49,6 +50,7 @@ export default class TokenLogin extends React.Component {
                             this.setState({
                                 error: "This field is necessary"
                             })
+                            this.forceUpdate()
                             return
                         }
 

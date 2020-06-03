@@ -15,7 +15,7 @@ const contentModule = BDModules.get(e => e.contents)[0];
 const verticalSeparatorModule = BDModules.get(e => e.verticalSeparator)[0];
 const loginModule = BDModules.get(e => e.default && e.default.loginToken)[0].default;
 
-class TokenLogin extends React.Component {
+class TokenLogin extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -66,6 +66,7 @@ class TokenLogin extends React.Component {
           this.setState({
             error: "This field is necessary"
           });
+          this.forceUpdate();
           return;
         }
 

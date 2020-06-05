@@ -1,6 +1,5 @@
 const child_process = require("child_process")
 const path = require("path")
-const bytenode = require("bytenode")
 const terser = require("terser")
 const util = require("util")
 var rimraf = require("rimraf");
@@ -54,9 +53,9 @@ async function main(){
     await processNextDir(startDir, {
         startDir,
         newDir
-    }, ((filepath) => filepath.endsWith(".js") && !filepath.endsWith("launcher.js")), (filepath, newpath) => {
-        console.info(`Compiling ${filepath} to ${newpath}c`)
-        bytenode.compileFile(filepath, newpath+"c")
+    }, ((filepath) => filepath.endsWith(".js")), async (filepath, newpath) => {
+        console.info(`Minifying ${filepath} to ${newpath}`)
+        await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {
         console.info(`Copied files and minified them from ${startDir}.`)
     }).catch(console.error)
@@ -65,44 +64,20 @@ async function main(){
         startDir: path.join(__dirname, "modules"),
         newDir: path.join(__dirname, "distApp", "modules")
     }, (filepath) => {
-        if(filepath.includes("node_modules"))return false
-        if(filepath.endsWith(".node"))return false
-        if(filepath.endsWith(".json"))return false
-        if(filepath.endsWith(".js")){
-            if(filepath.endsWith("mainScreenPreload.js"))return false
-            for(let file of [
-                "discord_cloudsync\\index.js", 
-                "discord_desktop_core\\index.js", 
-                "discord_dispatch\\index.js",
-                "discord_erlpack\\index.js",
-                "discord_game_utils\\index.js",
-                "discord_krisp\\index.js",
-                "discord_media\\index.js",
-                "discord_modules\\index.js",
-                "discord_overlay2\\index.js",
-                "discord_rpc\\index.js",
-                "discord_spellcheck\\index.js",
-                "discord_utils\\index.js",
-                "discord_voice\\index.js",
-                "discord_desktop_core\\core\\app\\index.js"
-            ]){
-                    if(filepath.endsWith(file))return false
-                }
-            return true
-        }
+        if(filepath.endsWith(".js"))return true
         return false
-    }, (filepath, newpath) => {
-        console.info(`Compiling ${filepath} to ${newpath}c`)
-        bytenode.compileFile(filepath, newpath+"c")
+    }, async (filepath, newpath) => {
+        console.info(`Minifying ${filepath} to ${newpath}`)
+        await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {
         console.info(`Copied files and minified them from ${path.join(__dirname, "modules")}.`)
-    })
+    })/*
     await processNextDir(startDir, {
         startDir,
         newDir
     }, ((filepath) => false), ()=>{}).then(() => {
         console.info(`Copied files and minified them from ${startDir}.`)
-    }).catch(console.error)
+    }).catch(console.error)*/
     
     let packageJSON = require("./package.json")
     packageJSON.scripts.build = packageJSON.scripts.build.replace("./distApp", ".")

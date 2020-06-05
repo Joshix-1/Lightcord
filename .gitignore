@@ -109,3 +109,4 @@ builds
 # must build typescript itself
 dist
 
+distApp

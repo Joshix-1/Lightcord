@@ -1,3 +1,0 @@
-require("bytenode")
-
-require("./index")

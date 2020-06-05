@@ -29,6 +29,7 @@ if (process.platform === 'linux') {
 
 paths.init(buildInfo)
 electron.app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+electron.app.commandLine.appendSwitch("no-force-async-hooks-checks");
 
 function setupHardwareAcceleration() {
   const settings = appSettings();

@@ -4,7 +4,6 @@
 // we turned off node integration.
 
 process.on("uncaughtException", console.error)
-const bytenode = require("bytenode")// enable .jsc files
 
 const ipcRenderer = require('./discord_native/ipc');
 const electron = require("electron")

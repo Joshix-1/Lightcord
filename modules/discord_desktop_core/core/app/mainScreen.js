@@ -349,7 +349,8 @@ function launchMainAppWindow(isVisible) {
       blinkFeatures: 'EnumerateDevices,AudioOutputDevices',
       nodeIntegration: false,
       preload: _path2.default.join(__dirname, 'mainScreenPreload.js'),
-      nativeWindowOpen: true
+      nativeWindowOpen: true,
+      enableRemoteModule: true // canary shit, just enable it
     },
     icon: _path2.default.join(__dirname, 'discord.png')
   };

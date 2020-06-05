@@ -1,7 +1,3 @@
-const options = {
-    loadCompressed: true
-}
-
 const ModuleLoader = require("./loaders/modules")
 const { EventEmitter } = require("events")
 const Logger = require("./Logger")
@@ -9,6 +5,7 @@ const fs = require("fs")
 const path = require("path")
 const electron = require("electron")
 const fetch = require("node-fetch").default
+const uuid = require("uuid/v4")
 
 const events = exports.events = new EventEmitter()
 const logger = exports.logger = new Logger("LightCord")
@@ -265,11 +262,514 @@ async function privateInit(){
     delete window.Lightcord.BetterDiscord.Utils 
     delete window.Lightcord.BetterDiscord.Utils 
 
-    await ensureExported(e => e.default && e.default.displayName == "AuthBox")
+    let isBot = false
+    ;(async function(){
+        const gatewayModule = await ensureExported(e => e.default && e.default.prototype && e.default.prototype._handleDispatch)
+        if(!gatewayModule)return
+        let _handleDispatch = gatewayModule.default.prototype._handleDispatch
+        gatewayModule.default.prototype._handleDispatch = function(data, event, props){
+            if(event === "READY"){
+                console.log(...arguments)
+                isBot = data.user.bot
+                if(data.user.bot){
+                    logger.log(`Logged in as a bot, spoofing user...`)
+                    data.user.bot = false
+                    data.user.premium = true
+                    data.user.premium_type = 1
+                    data.user.email = uuid()+"@lightcord.xyz" // filler email, not a real one
+                    data.experiments = []
+                    data.guild_experiments = [];
+                    data.connected_accounts = [];
+                    data.user_guild_settings = [];
+                    data.read_state = [];
+                    data.relationships = [];
+                    data.notes = {};
+                    data.user_feed_settings = [];
+                    data.analytics_tokens = [];
+                    data.consents = [];
+                    data.private_channels = data.private_channels || [];
+                    data.private_channels.forEach(chan => {
+                        chan.readState = {
+                            entries: []
+                        }
+                    })
+                    data.read_state = {
+                        entries: [],
+                        partial: false,
+                        version: 19438
+                    }
+                    data.consents = {
+                        personalization: false
+                    }
+                    data.tutorial = null
+                    data.user_settings = Object.assign(data.user_settings || {}, {
+                        afk_timeout: 600,
+                        allow_accessibility_detection: false,
+                        animate_emoji: true,
+                        contact_sync_enabled: false,
+                        convert_emoticons: true,
+                        custom_status: null,
+                        default_guilds_restricted: false,
+                        detect_platform_accounts: false,
+                        developer_mode: true,
+                        disable_games_tab: true,
+                        enable_tts_command: true,
+                        explicit_content_filter: 0,
+                        friend_source_flags: {
+                            all: false, 
+                            mutual_friends: false, 
+                            mutual_guilds: false
+                        },
+                        gif_auto_play: true,
+                        guild_folders: [],
+                        guild_positions: [],
+                        inline_attachment_media: true,
+                        inline_embed_media: true,
+                        message_display_compact: false,
+                        native_phone_integration_enabled: false,
+                        render_embeds: true,
+                        render_reactions: true,
+                        restricted_guilds: [],
+                        show_current_game: false,
+                        stream_notifications_enabled: false
+                    }, data.user_settings || {})
+                    data.user_guild_settings = data.user_guild_settings || []
+                }else{
+                    logger.log(`Logged in as an user. Skipping`)
+                }
+            }
+            return _handleDispatch.call(this, ...arguments)
+        }
+        function cancelPrototype(methodName){
+            if(gatewayModule.default.prototype[methodName]){
+                const original = gatewayModule.default.prototype[methodName]
+                gatewayModule.default.prototype[methodName] = function(){
+                    if(!isBot)return original.call(this, ...arguments)
+                }
+            }
+        }
+        cancelPrototype("updateGuildSubscriptions")
+        cancelPrototype("callConnect")
+        cancelPrototype("lobbyConnect")
+        cancelPrototype("lobbyDisconnect")
+        cancelPrototype("lobbyVoiceStatesUpdate")
+        cancelPrototype("guildStreamCreate")
+        cancelPrototype("streamWatch")
+        cancelPrototype("streamPing")
+        cancelPrototype("streamDelete")
+        cancelPrototype("streamSetPaused")
+        const hasUnreadModules = BDModules.get(e => e.default && e.default.hasUnread)
+        hasUnreadModules.forEach((mod) => {
+            const original = mod.default.hasUnread
+            mod.default.hasUnread = function(){
+                if(isBot)return false
+                return original.call(this, ...arguments)
+            }
+            for (const fName of ['ack']) {
+                console.log(fName, mod[fName])
+                if(!mod || !mod[fName])continue
+                let original = mod[fName]
+                mod[fName] = function(){
+                    if(!isBot)return original.call(this, ...arguments)
+                }
+            }
+            if(mod.getAckTimestamp){
+                let getAckTimestamp = mod.getAckTimestamp
+                mod.getAckTimestamp = function(){
+                    if(!isBot)return getAckTimestamp.call(this, ...arguments)
+                    return NaN
+                }
+            }
+        })
+        const ackModule = BDModules.get(e => e.ackCategory)[0]
+        if(ackModule){
+            for (const fName of ['ack', 'ackCategory', 'localAck', 'ackGuild']) {
+                console.log(fName, ackModule[fName])
+                if(!ackModule || !ackModule[fName])continue
+                let original = ackModule[fName]
+                ackModule[fName] = function(){
+                    if(!isBot)return original.call(this, ...arguments)
+                }
+            }
+        }
+        const getTokenModule = BDModules.get(e => e.default && e.default.getToken)[0]
+        if(getTokenModule){
+            const getToken = getTokenModule.default.getToken
+            getTokenModule.default.getToken = function(){
+                const token = getToken.call(this)
+                if(!token)return token
+                if(isBot)return token.startsWith("Bot ") ? token : "Bot " + token
+                return token
+            }
+        }
+        const relationshipsModule = BDModules.get(e => e.default && e.default.fetchRelationships)[0]
+        if(relationshipsModule){
+            const fetchRelationships = relationshipsModule.default.fetchRelationships
+            relationshipsModule.default.fetchRelationships = function(){
+                if(!isBot)return fetchRelationships.call(this, ...arguments)
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.LOAD_RELATIONSHIPS_SUCCESS,
+                        relationships: []
+                    })
+                })
+            }
+        }
+        const consentModule = BDModules.get(e => e.fetchConsents)[0]
+        if(consentModule){
+            const fetchConsents = consentModule.fetchConsents
+            consentModule.fetchConsents = function(){
+                if(!isBot)return fetchConsents.call(this, ...arguments)
+                setImmediate(()=>{
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.UPDATE_CONSENTS,
+                        consents: {
+                            personalization: false,
+                            usage_statistics: false
+                        }
+                    })
+                })
+            }
+            const setConsents = consentModule.setConsents
+            consentModule.setConsents = function(){
+                if(!isBot)return setConsents.call(this, ...arguments)
+                return Promise.reject(new Error("Lightcord bot emulation cannot change this setting."))
+            }
+        }
+        const harvestModule = BDModules.get(e => e.getHarvestStatus)[0]
+        if(harvestModule){
+            const getHarvestStatus = harvestModule.getHarvestStatus
+            harvestModule.getHarvestStatus = function(){
+                if(!isBot)return getHarvestStatus.call(this, ...arguments)
+                return Promise.resolve({
+                    requestingHarvest: false,
+                    currentHarvestRequest: null
+                })
+            }
+            const requestHarvest = harvestModule.requestHarvest
+            harvestModule.requestHarvest = function(){
+                if(!isBot)return requestHarvest.call(this, ...arguments)
+                return Promise.reject()
+            }
+        }
+        const harvestDisabledModule = BDModules.get(e => e.getSanitizedRestrictedGuilds)[0]
+        if(harvestDisabledModule){
+            const harvestDisabled = harvestDisabledModule.harvestDisabled
+            harvestDisabledModule.harvestDisabled = function(){
+                if(!isBot)return harvestDisabled.call(this, ...arguments)
+            }
+        }
+        const settingModule = BDModules.get(e => e.default && e.default.updateRemoteSettings)[0]
+        if(settingModule){
+            const updateRemoteSettings = settingModule.default.updateRemoteSettings
+            settingModule.default.updateRemoteSettings = function(){
+                if(isBot)return Promise.resolve()
+                return updateRemoteSettings.call(this, ...arguments)
+            }
+        }
+        const oauth2Module = BDModules.get(e => e.default && Object.keys(e.default).length === 2 && e.default.fetch && e.default.delete)[0]
+        if(oauth2Module){
+            const fetch = oauth2Module.default.fetch
+            oauth2Module.default.fetch = function(){
+                if(!isBot)return fetch.call(this, ...arguments)
+                setImmediate(()=>{
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.USER_AUTHORIZED_APPS_UPDATE,
+                        apps: []
+                    })
+                })
+            }
+            const deleteFunc = oauth2Module.delete
+            oauth2Module.delete = function(){
+                if(!isBot)return deleteFunc.call(this, ...arguments)
+                oauth2Module.fetch()
+            }
+        }
+        const paymentModule = BDModules.get(e => e.fetchPaymentSources)[0]
+        if(paymentModule){
+            const fetchPaymentSources = paymentModule.fetchPaymentSources
+            paymentModule.fetchPaymentSources = function(){
+                if(!isBot)return fetchPaymentSources.call(this, ...arguments)
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.BILLING_PAYMENT_SOURCES_FETCH_START
+                    })
+                    setImmediate(() => {
+                        dispatcher.dispatch({
+                            type: constants.ActionTypes.BILLING_PAYMENT_SOURCES_FETCH_SUCCESS,
+                            paymentSources: []
+                        })
+                    })
+                })
+            }
+            const fetchPayments = paymentModule.fetchPayments
+            paymentModule.fetchPayments = function(){
+                if(!isBot)return fetchPayments.call(this, ...arguments)
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.BILLING_PAYMENTS_FETCH_START
+                    })
+                    setImmediate(() => {
+                        dispatcher.dispatch({
+                            type: constants.ActionTypes.BILLING_PAYMENTS_FETCH_SUCCESS,
+                            payments: []
+                        })
+                    })
+                })
+            }
+            const fetchSubscriptions = paymentModule.fetchSubscriptions
+            paymentModule.fetchSubscriptions = function(){
+                if(!isBot)return fetchSubscriptions.call(this, ...arguments)
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.BILLING_SUBSCRIPTION_FETCH_START
+                    })
+                    setImmediate(() => {
+                        const subs = [
+                            {
+                                "id": "123456789",
+                                "type": 1,
+                                "created_at": "2020-06-00T00:00:00.000000",
+                                "canceled_at": null,
+                                "current_period_start": "2020-06-00:00:00.000000",
+                                "current_period_end": "2100-06-00:00:00.000000",
+                                "status": 1,
+                                "payment_source_id": null,
+                                "payment_gateway": null,
+                                "payment_gateway_plan_id": "premium_year",
+                                "plan_id": "511651860671627264",
+                                "items": [
+                                    {
+                                        "id": "123456789",
+                                        "plan_id": "511651860671627264",
+                                        "quantity": 1
+                                    }
+                                ],
+                                "currency": "usd"
+                            }
+                        ]
+                        resolve({
+                            body: subs
+                        })
+                        dispatcher.dispatch({
+                            type: constants.ActionTypes.BILLING_SUBSCRIPTION_FETCH_SUCCESS,
+                            subscriptions: subs
+                        })
+                    })
+                })
+                let resolve
+                return new Promise((res) => (resolve = res))
+            }
+        }
+        const markServerReadShortcut = BDModules.get(e => e.MARK_SERVER_READ)[0]
+        if(markServerReadShortcut){
+            let action = markServerReadShortcut.MARK_SERVER_READ.action
+            markServerReadShortcut.MARK_SERVER_READ.action = function(){
+                if(isBot)return
+                return action.call(this, ...arguments)
+            }
+            markServerReadShortcut.default && markServerReadShortcut.default.MARK_SERVER_READ && (markServerReadShortcut.default.MARK_SERVER_READ.action = markServerReadShortcut.MARK_SERVER_READ.action)
+        }
+        const applicationStatisticModule = BDModules.get(e => e.fetchActivityStatistics)[0]
+        if(applicationStatisticModule){
+            const fetchActivityStatistics = applicationStatisticModule.fetchActivityStatistics
+            applicationStatisticModule.fetchActivityStatistics = function(){
+                if(!isBot)return fetchActivityStatistics.call(this, ...arguments)
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.USER_ACTIVITY_STATISTICS_FETCH_SUCCESS,
+                        statistics: []
+                    })
+                })
+            }
+        }
+        const subsInvoiceModule = BDModules.get(e => e.fetchSubscriptionInvoicePreview)[0]
+        if(subsInvoiceModule){
+            function adapt(data){
+                return {
+                    id: data.id,
+                    invoiceItems: data.invoice_items.map(function(e) {
+                        return {
+                            id: e.id,
+                            subscriptionPlanId: e.subscription_plan_id,
+                            subscriptionPlanPrice: e.subscription_plan_price,
+                            amount: e.amount,
+                            quantity: e.quantity,
+                            discounts: e.discounts
+                        }
+                    }),
+                    total: data.total,
+                    subtotal: data.subtotal,
+                    currency: data.currency,
+                    tax: data.tax,
+                    taxInclusive: data.tax_inclusive,
+                    subscriptionPeriodStart: new Date(data.subscription_period_start),
+                    subscriptionPeriodEnd: new Date(data.subscription_period_end)
+                }
+            }
+            const fetchSubscriptionInvoicePreview = subsInvoiceModule.fetchSubscriptionInvoicePreview
+            subsInvoiceModule.fetchSubscriptionInvoicePreview = function(){
+                if(!isBot)return fetchSubscriptionInvoicePreview.call(this, ...arguments)
+                const arg1 = arguments[0]
+                if(!arg1 || !arg1.subscriptionId || arg1.subscriptionId === "123456789"){
+                    return new Promise((resolve, reject) => {
+                        let data = adapt({
+                            "id": "123456789", 
+                            "invoice_items": [{
+                                "id": "123456789", 
+                                "amount": 0, 
+                                "discounts": [], 
+                                "subscription_plan_id": "511651860671627264", 
+                                "subscription_plan_price": 0, 
+                                "quantity": 1, 
+                                "proration": false
+                            }], 
+                            "total": 100,
+                            "subtotal": 100, 
+                            "currency": "usd", 
+                            "tax": 0, 
+                            "tax_inclusive": true, 
+                            "subscription_period_start": "2020-06-00:00:00.000000", 
+                            "subscription_period_end": "2100-06-00:00:00.000000"
+                        })
+                        console.log(data)
+                        resolve(data)
+                    })
+                }
+                return fetchSubscriptionInvoicePreview.call(this, ...arguments)
+            }
+            const useSubscriptionInvoice = subsInvoiceModule.useSubscriptionInvoice
+            subsInvoiceModule.useSubscriptionInvoice = function(){
+                if(!isBot)return useSubscriptionInvoice.call(this, ...arguments)
+                return useSubscriptionInvoice.call(this, Object.assign(arguments[0], {preventFetch: true}), ...Array.from(arguments).slice(1))
+            }
+        }
+        const subsModule = BDModules.get(e => e.fetchUserPremiumGuildSubscriptionSlots)[0]
+        if(subsModule){
+            const fetchUserPremiumGuildSubscriptionSlots = subsModule.fetchUserPremiumGuildSubscriptionSlots
+            subsModule.fetchUserPremiumGuildSubscriptionSlots = function(){
+                if(!isBot)return fetchUserPremiumGuildSubscriptionSlots.call(this, ...arguments)
+                setImmediate(()=>{
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.USER_PREMIUM_GUILD_SUBSCRIPTION_SLOTS_FETCH_SUCCESS,
+                        userPremiumGuildSubscriptionSlots: []
+                    })
+                })
+            }
+            const fetchPremiumSubscriptionCooldown = subsModule.fetchPremiumSubscriptionCooldown
+            subsModule.fetchPremiumSubscriptionCooldown = function(){
+                if(!isBot)return fetchPremiumSubscriptionCooldown.call(this, ...arguments)
+                return new Promise((resolve, reject) => {
+                    reject(new Error("Lightcord bot emulation cannot use Server Boosts"))
+                })
+            }
+            const fetchPremiumSubscriptions = subsModule.fetchPremiumSubscriptions
+            subsModule.fetchPremiumSubscriptions = function(){
+                if(!isBot)return fetchPremiumSubscriptions.call(this, ...arguments)
+                return new Promise((resolve, reject) => {
+                    reject(new Error("Lightcord bot emulation cannot use Server Boosts"))
+                })
+            }
+        }
+        const entitlementsModule = BDModules.get(e => e.fetchUserEntitlementsForApplication)[0]
+        if(entitlementsModule){
+            const fetchUserEntitlementsForApplication = entitlementsModule.fetchUserEntitlementsForApplication
+            entitlementsModule.fetchUserEntitlementsForApplication = function(){
+                if(!isBot)return fetchUserEntitlementsForApplication.call(this, ...arguments)
+                let resolve
+                setImmediate(()=>{
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.ENTITLEMENT_FETCH_APPLICATION_START,
+                        applicationId: arguments[0]
+                    })
+                    setImmediate(()=>{
+                        resolve([])
+                        dispatcher.dispatch({
+                            type: constants.ActionTypes.ENTITLEMENT_FETCH_APPLICATION_SUCCESS,
+                            applicationId: arguments[0],
+                            entitlements: []
+                        })
+                    })
+                })
+                return new Promise((res) => (resolve = res))
+            }
+        }
+        const giftModule1 = BDModules.get(e => e.fetchGiftableEntitlements)[0]
+        if(giftModule1){
+            const fetchGiftableEntitlements = giftModule1.fetchGiftableEntitlements
+            giftModule1.fetchGiftableEntitlements = function(){
+                if(!isBot)return fetchGiftableEntitlements.call(this, ...arguments)
+                dispatcher.dispatch({
+                    type: constants.ActionTypes.ENTITLEMENTS_GIFTABLE_FETCH
+                })
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.ENTITLEMENTS_GIFTABLE_FETCH_SUCCESS,
+                        entitlements: []
+                    })
+                })
+            }
+        }
+        const libraryModule = BDModules.get(e => e.fetchLibrary)[0]
+        if(libraryModule){
+            const fetchLibrary = libraryModule.fetchLibrary
+            libraryModule.fetchLibrary = function(){
+                if(!isBot)return fetchLibrary.call(this, ...arguments)
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.LIBRARY_FETCH_SUCCESS,
+                        libraryApplications: []
+                    })
+                })
+            }
+        }
+        const hypesquadModule = BDModules.get(e => e.default && e.default.joinHypeSquadOnline)[0]
+        if(hypesquadModule){
+            const joinHypeSquadOnline = hypesquadModule.default.joinHypeSquadOnline
+            hypesquadModule.default.joinHypeSquadOnline = function(){
+                if(!isBot)return joinHypeSquadOnline.call(this, ...arguments)
+                return Promise.reject(new Error("Lightcord bot emulation cannot join hypesquad."))
+            }
+        }
+        const mentionModule = BDModules.get(e => e.default && e.default.fetchRecentMentions)[0]
+        if(mentionModule){
+            const fetchRecentMentions = mentionModule.default.fetchRecentMentions
+            mentionModule.default.fetchRecentMentions = function(e, t, n, i, s){
+                if(!isBot)return fetchRecentMentions.call(this, ...arguments)
+                if(!n)n = null
+                dispatcher.dirtyDispatch({
+                    type: constants.ActionTypes.LOAD_RECENT_MENTIONS,
+                    guildId: n
+                })
+                setImmediate(() => {
+                    dispatcher.dispatch({
+                        type: constants.ActionTypes.LOAD_RECENT_MENTIONS_SUCCESS,
+                        messages: [],
+                        isAfter: null != e,
+                        hasMoreAfter: false
+                    })
+                })
+            }
+        }
+        const templateModule = BDModules.get(e => e.default && e.default.loadTemplatesForGuild)[0]
+        if(templateModule){
+            const loadTemplatesForGuild = templateModule.default.loadTemplatesForGuild
+            templateModule.default.loadTemplatesForGuild = function(){
+                if(!isBot)return loadTemplatesForGuild.call(this, ...arguments)
+                return Promise.reject(new Error("Lightcord bot emulation cannot use Guild Templates"))
+            }
+        }
+        const searchModule = BDModules.get(e => e.default && e.default.prototype && e.default.prototype.retryLater)[0]
+        if(searchModule){
+            const fetch = searchModule.default.prototype.fetch
+            searchModule.default.prototype.fetch = function(e, t, n){
+                if(!isBot)return fetch.call(this, ...arguments)
+                n(new Error("Lightcord bot emulation cannot search in guild."))
+            }
+        }
+    })().catch(() => {})
 
-    const classs = ModuleLoader.get(e => e.default && e.default.displayName == "AuthBox")
-    
-    Utils.monkeyPatch(classs[0], "default", {after: (data) => {
+    Utils.monkeyPatch(await ensureExported(e => e.default && e.default.displayName == "AuthBox"), "default", {after: (data) => {
         const children = Utils.getNestedProp(data.returnValue, "props.children.props.children.props.children")
         children.push(React.createElement(require("./tokenLogin").default, {}))
     }})
@@ -337,14 +837,14 @@ function ensureGuildClasses(){
 
 function ensureExported(filter){
     return new Promise((resolve) => {
-        let classs = ModuleLoader.get(filter)[0]
-        if(classs)return resolve()
+        let mod = ModuleLoader.get(filter)[0]
+        if(mod)return resolve(mod)
 
         let intergay = setInterval(() => {
-            classs = ModuleLoader.get(filter)[0]
-            if(classs){
+            mod = ModuleLoader.get(filter)[0]
+            if(mod){
                 clearInterval(intergay)
-                resolve()
+                resolve(mod)
                 return
             }
         }, 100);

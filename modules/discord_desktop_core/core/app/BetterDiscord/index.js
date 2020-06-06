@@ -276,32 +276,26 @@ async function privateInit(){
                     data.user.bot = false
                     data.user.premium = true
                     data.user.premium_type = 1
-                    data.user.email = uuid()+"@lightcord.xyz" // filler email, not a real one
-                    data.experiments = []
-                    data.guild_experiments = [];
-                    data.connected_accounts = [];
-                    data.user_guild_settings = [];
-                    data.read_state = [];
-                    data.relationships = [];
-                    data.notes = {};
-                    data.user_feed_settings = [];
-                    data.analytics_tokens = [];
-                    data.consents = [];
+                    data.user.email = data.user.email || uuid()+"@lightcord.xyz" // filler email, not a real one
+                    data.experiments = data.experiments ||[]
+                    data.guild_experiments = data.guild_experiments || [];
+                    data.connected_accounts = data.connected_accounts || [];
+                    data.user_guild_settings = data.user_guild_settings || [];
+                    data.relationships = data.relationships || [];
+                    data.notes = data.notes || {};
+                    data.user_feed_settings = data.user_feed_settings || [];
+                    data.analytics_tokens = data.analytics_tokens || [];
+                    data.analytics_token = data.analytics_token || ""
                     data.private_channels = data.private_channels || [];
-                    data.private_channels.forEach(chan => {
-                        chan.readState = {
-                            entries: []
-                        }
-                    })
-                    data.read_state = {
+                    data.read_state = data.read_state || {
                         entries: [],
                         partial: false,
                         version: 19438
                     }
-                    data.consents = {
+                    data.consents = data.consents || {
                         personalization: false
                     }
-                    data.tutorial = null
+                    data.tutorial = data.tutorial || null
                     data.user_settings = Object.assign(data.user_settings || {}, {
                         afk_timeout: 600,
                         allow_accessibility_detection: false,
@@ -333,7 +327,14 @@ async function privateInit(){
                         show_current_game: false,
                         stream_notifications_enabled: false
                     }, data.user_settings || {})
-                    data.user_guild_settings = data.user_guild_settings || []
+                    data.user_guild_settings = data.user_guild_settings || {
+                        entries: [],
+                        version: 0,
+                        partial: false
+                    }
+                    data.friend_suggestion_count = data.friend_suggestion_count || 0
+                    data.presences = data.presences || []
+                    console.log(data)
                 }else{
                     logger.log(`Logged in as an user. Skipping`)
                 }

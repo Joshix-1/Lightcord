@@ -19,6 +19,7 @@ ipcRenderer.on(TRACK_ANALYTICS_EVENT, e => {
 
 const DiscordNative = {
   isRenderer: process.type === 'renderer',
+
   nativeModules: require('./discord_native/nativeModules'),
   globals: require('./discord_native/globals'),
   process: require('./discord_native/process'),
@@ -36,7 +37,8 @@ const DiscordNative = {
   processUtils: require('./discord_native/processUtils'),
   powerSaveBlocker: require('./discord_native/powerSaveBlocker'),
   http: require('./discord_native/http'),
-  accessibility: require('./discord_native/accessibility')
+  accessibility: require('./discord_native/accessibility'),
+  app: require("./discord_native/renderer/app")
 };
 
 const BetterDiscord = require("./BetterDiscord")

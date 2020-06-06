@@ -27,9 +27,6 @@ function startup(bootstrapModules) {
   const Constants = require('./Constants');
   Constants.init(bootstrapModules.Constants);
 
-  const errorReporting = require('./errorReporting');
-  errorReporting.init();
-
   const appFeatures = require('./appFeatures');
   appFeatures.init();
 
@@ -39,9 +36,24 @@ function startup(bootstrapModules) {
   const rootCertificates = require('./rootCertificates');
   rootCertificates.init();
 
+  require('./discord_native/browser/accessibility');
+  require('./discord_native/browser/app');
+  require('./discord_native/browser/clipboard');
+  const crashReporter = require('./discord_native/browser/crashReporter');
+  require('./discord_native/browser/features');
+  require('./discord_native/browser/fileManager');
+  require('./discord_native/browser/gpuSettings');
+  require('./discord_native/browser/nativeModules');
+  require('./discord_native/browser/powerMonitor');
+  require('./discord_native/browser/powerSaveBlocker');
+  require('./discord_native/browser/processUtils');
+  require('./discord_native/browser/settings');
+  require('./discord_native/browser/spellCheck');
+  require('./discord_native/browser/window');
+
   // expose globals that will be imported by the webapp
   // global.releaseChannel is set in bootstrap
-  global.crashReporterMetadata = errorReporting.metadata;
+  global.crashReporterMetadata = crashReporter.metadata;
   global.mainAppDirname = Constants.MAIN_APP_DIRNAME;
   global.features = appFeatures.getFeatures();
   global.appSettings = appSettings();

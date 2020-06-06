@@ -5,6 +5,7 @@
 import { releaseChannel } from './buildInfo';
 import appSettings from './appSettings';
 const pak = require("../package.json")
+import * as path from "path"
 
 const settings = appSettings();
 
@@ -18,5 +19,6 @@ export const APP_ID = `${APP_ID_BASE}.${APP_NAME}.${APP_NAME}`;
 
 export const API_ENDPOINT = settings.get('API_ENDPOINT') || 'https://discord.com/api';
 export const UPDATE_ENDPOINT = settings.get('UPDATE_ENDPOINT') || API_ENDPOINT;
+export const mainAppDirname = path.join(__dirname, "..")
 
 export const version:string = pak.version

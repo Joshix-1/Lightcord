@@ -53,7 +53,7 @@ async function main(){
     await processNextDir(startDir, {
         startDir,
         newDir
-    }, ((filepath) => filepath.endsWith(".js")), async (filepath, newpath) => {
+    }, ((filepath) => filepath.endsWith(".js") && !filepath.includes("node_modules")), async (filepath, newpath) => {
         console.info(`Minifying ${filepath} to ${newpath}`)
         await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {
@@ -63,6 +63,26 @@ async function main(){
     await processNextDir(path.join(__dirname, "modules"), {
         startDir: path.join(__dirname, "modules"),
         newDir: path.join(__dirname, "distApp", "modules")
+    }, ((filepath) => filepath.endsWith(".js") && !filepath.includes("node_modules")), async (filepath, newpath) => {
+        console.info(`Minifying ${filepath} to ${newpath}`)
+        await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
+    }).then(() => {
+        console.info(`Copied files and minified them from ${path.join(__dirname, "modules")}.`)
+    })
+    
+    fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "js"), {recursive: true})
+    fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "css"), {recursive: true})
+    const BDPackageJSON = require("./BetterDiscordApp/package.json")
+    fs.writeFileSync(path.join(__dirname, "distApp", "BetterDiscordApp", "package.json"), JSON.stringify(BDPackageJSON), "utf8")
+    fs.writeFileSync(path.join(__dirname, "distApp", "BetterDiscordApp", "css", "main.css"), fs.readFileSync(path.join(__dirname, "BetterDiscordApp", "css", "main.css")))
+    fs.writeFileSync(path.join(__dirname, "distApp", "BetterDiscordApp", "css", "main.min.css"), fs.readFileSync(path.join(__dirname, "BetterDiscordApp", "css", "main.min.css")))
+    fs.writeFileSync(path.join(__dirname, "distApp", "BetterDiscordApp", "js", "main.js"), fs.readFileSync(path.join(__dirname, "BetterDiscordApp", "js", "main.js")))
+    fs.writeFileSync(path.join(__dirname, "distApp", "BetterDiscordApp", "js", "main.min.js"), fs.readFileSync(path.join(__dirname, "BetterDiscordApp", "js", "main.min.js")))
+
+    await fs.promises.mkdir(path.join(__dirname, "distApp", "splash", "videos"), {recursive: true})
+    await processNextDir(path.join(__dirname, "splash"), {
+        startDir: path.join(__dirname, "splash"),
+        newDir: path.join(__dirname, "distApp", "splash")
     }, (filepath) => {
         if(filepath.endsWith(".js"))return true
         return false
@@ -70,8 +90,10 @@ async function main(){
         console.info(`Minifying ${filepath} to ${newpath}`)
         await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {
-        console.info(`Copied files and minified them from ${path.join(__dirname, "modules")}.`)
-    })/*
+        console.info(`Copied files and minified them from ${path.join(__dirname, "splash")}.`)
+    })
+
+    /*
     await processNextDir(startDir, {
         startDir,
         newDir

@@ -26,6 +26,7 @@ import CustomRichPresence from "./CustomRichPresence";
 import V2C_AccountInfos from "../ui/AccountInfos";
 import { remote } from "electron";
 import AntiAdDM from "./AntiAdDM";
+import blurPrivate from "./blurPrivate";
 
 export default new class V2_SettingsPanel {
 
@@ -236,6 +237,13 @@ export default new class V2_SettingsPanel {
                 AntiAdDM.disable()
             }
         }
+        if (id === "lightcord-6") {
+            if(enabled){
+                blurPrivate.enable()
+            }else{
+                blurPrivate.disable()
+            }
+        }
 
         this.saveSettings();
     }
@@ -255,6 +263,7 @@ export default new class V2_SettingsPanel {
         if (settingsCookie["lightcord-presence-1"]) CustomRichPresence.enable()
         if (settingsCookie["lightcord-3"]) remote.getCurrentWindow().setAlwaysOnTop(true)
         if (settingsCookie["lightcord-4"]) AntiAdDM.enable()
+        if (settingsCookie["lightcord-6"]) blurPrivate.enable()
 
         if (settingsCookie["fork-ps-5"]) {
             ContentManager.watchContent("plugin");

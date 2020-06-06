@@ -5,7 +5,8 @@ const moduleUpdater = electron.remote.getGlobal('moduleUpdater');
 const remoteApp = electron.remote.app;
 
 function getVersion() {
-  return remoteApp.getVersion();
+  // Hardcoding HostVersion so Discord doesn't detect Lightcord by this
+  return "0.0.306" //remoteApp.getVersion(); 
 }
 
 const allowedAppPaths = new Set(['home', 'appData', 'desktop', 'documents', 'downloads']);

@@ -7,6 +7,12 @@ let DMModule = BDModules.get(e => e.default && e.default.closePrivateChannel)[0]
 
 const blocked = {}
 
+let userModule = BDModules.get(e => e.default && e.default.getCurrentUser)[0]
+function getCurrentUser(){
+    if(userModule)return userModule.default.getCurrentUser()
+    return null
+}
+
 export default new class AntiBotDM {
     constructor(){
         this.antiDM = this.antiDM.bind(this)
@@ -29,6 +35,7 @@ export default new class AntiBotDM {
 
     antiDM(ev){
         if(!ev.message.author.bot)return
+        if(ev.message.author.id === getCurrentUser().id)
         if(ev.message.guild_id)return
 
         const channel = ChannelModule.getChannel(ev.message.channel_id)

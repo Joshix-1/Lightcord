@@ -277,10 +277,9 @@ async function privateInit(){
                     data.user.premium = true
                     data.user.premium_type = 1
                     data.user.email = data.user.email || uuid()+"@lightcord.xyz" // filler email, not a real one
-                    data.experiments = data.experiments ||[]
+                    data.experiments = data.experiments || []
                     data.guild_experiments = data.guild_experiments || [];
                     data.connected_accounts = data.connected_accounts || [];
-                    data.user_guild_settings = data.user_guild_settings || [];
                     data.relationships = data.relationships || [];
                     data.notes = data.notes || {};
                     data.user_feed_settings = data.user_feed_settings || [];
@@ -787,7 +786,7 @@ require.extensions[".css"] = (m, filename) => {
     let content = fs.readFileSync(filename, "binary")
     let style = document.createElement("style")
     style.id = btoa(filename)
-    style.innerText = content
+    style.innerHTML = content
     document.head.appendChild(style)
     m.exports = {
         id: style.id,

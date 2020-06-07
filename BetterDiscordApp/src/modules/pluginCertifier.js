@@ -201,7 +201,6 @@ function processAttachment(attachment, id){
                 if(res.status !== 200)return checkViruses(hash, data, id)
                 const result = await res.json()
 
-                result.official = true
                 cache[hash] = result
 
                 renderToElements(id, result, attachment.filename)

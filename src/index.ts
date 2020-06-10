@@ -52,7 +52,7 @@ function hasArgvFlag(flag) {
 //Transform main thread into async
 (async function Main(){
     await electron.app.whenReady()
-    console.log(`LightCord Init...`)
+    console.log(`Lightcord Init...`)
     if(!electron.app.commandLine.hasSwitch('enable-transparent-visuals'))electron.app.commandLine.appendSwitch('enable-transparent-visuals');
     electron.app.setAppUserModelId(Constants.APP_ID);
     let coreModule

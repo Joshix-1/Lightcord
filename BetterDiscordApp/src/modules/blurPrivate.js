@@ -3,8 +3,10 @@
  */
 
 import DOMTools from "./domtools"
+import Utils from "./utils"
 
 let selectors
+const removeDa = Utils.removeDa
 function getSelectors(){
     let standardSidebarView = BDModules.get(e => e.standardSidebarView)[0]
     if(!standardSidebarView)return null
@@ -14,10 +16,6 @@ function getSelectors(){
     selects.push(`#app-mount .${defaultClassName} .${removeDa(BDModules.get(e => e.paymentSourceRow)[0].paymentSourceRow)} .${removeDa(BDModules.get(e => e.subText && e.descriptionWrapper)[0].subText)}`)
     selects.push(`#app-mount .${defaultClassName} .${removeDa(BDModules.get(e => e.userSettingsAccount)[0].userSettingsAccount)} div:nth-child(2)>div:nth-child(2)>.${removeDa(BDModules.get(e => e.viewBody)[0].viewBody)}`)
     return selects
-}
-function removeDa(className){
-    if(!className)return className
-    return className.split(" ").filter(e => !e.startsWith("da-")).join(" ")
 }
 
 export default new class BlurPrivate {

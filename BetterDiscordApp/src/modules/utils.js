@@ -450,6 +450,11 @@ export default class Utils {
             onCancel: onCancel
         }, key);
     }
+
+    static removeDa(className){
+        if(!className)return className
+        return className.split(" ").filter(e => !e.startsWith("da-")).join(" ")
+    }
 }
 
 Utils.showToast = Utils.suppressErrors(Utils.showToast, "Could not show toast.");

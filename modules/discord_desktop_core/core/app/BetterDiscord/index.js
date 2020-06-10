@@ -8,19 +8,20 @@ const fetch = require("node-fetch").default
 const uuid = require("uuid/v4")
 
 const events = exports.events = new EventEmitter()
-const logger = exports.logger = new Logger("LightCord")
+const logger = exports.logger = new Logger("Lightcord")
 
 let hasInit = false
 let tries = 0
 
 exports.init = function(){
     if(hasInit == true){
-        console.warn(new Error("LightCord has already inited."))
+        console.warn(new Error("Lightcord has already inited."))
         return
     }
+    require("./patchNotifications")
     hasInit = true
     let readyInterval = setInterval(()=>{
-        events.emit("debug", `[INIT] try ${tries++} loading LightCord`)
+        events.emit("debug", `[INIT] try ${tries++} loading Lightcord`)
         try{
             if(!global.webpackJsonp)return
             if(!ModuleLoader.get(4))return
@@ -71,7 +72,7 @@ async function privateInit(){
                     return window.Lightcord.Settings.callRingingBeat ? "call_ringing_beat" : "call_ringing"
                 },
                 set(data){
-                    console.log("Attempting to set call_ringing value. Canceling "+data)
+                    console.log("Attempting to set call_ringing value. Canceling", data)
                 },
                 configurable: false
             })
@@ -145,7 +146,7 @@ async function privateInit(){
      */
     let DiscordJS
     try{
-        DiscordJS = require("../../../../../DiscordJS").default
+        //DiscordJS = require("../../../../../DiscordJS").default
     }catch(err){
         console.error(err)
         DiscordJS = null
@@ -178,12 +179,15 @@ async function privateInit(){
                 if(typeof data !== "string" && data !== null)return Authorization
                 appSettings.set("LIGHTCORD_AUTH", Authorization = data)
                 appSettings.save()
-            }
+            },
+            ensureExported
         },
-        BetterDiscord: { // Global BetterDiscord's exported modules
+        BetterDiscord: { // Global BetterDiscord's exported modules / only for exporting to Lightcord's main script, not for using in plugins
 
         }
     }
+
+    require("../../../../../LightcordApi/js/main")
 
     if(shouldShowPrompt){
         let onConn = (ev) => {
@@ -258,6 +262,7 @@ async function privateInit(){
     const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.js").default)(BetterDiscordConfig)
 
     const Utils = window.Lightcord.BetterDiscord.Utils
+
     // security delete
     delete window.Lightcord.BetterDiscord.Utils 
     delete window.Lightcord.BetterDiscord.Utils 
@@ -338,9 +343,11 @@ async function privateInit(){
                     logger.log(`Logged in as an user. Skipping`)
                 }
             }
-            return _handleDispatch.call(this, ...arguments)
+            let returnValue = _handleDispatch.call(this, ...arguments)
+            if(event === "READY" && DiscordJS)DiscordJS.client.emit("ready")
+            return returnValue
         }
-        function cancelPrototype(methodName){
+        function cancelGatewayPrototype(methodName){
             if(gatewayModule.default.prototype[methodName]){
                 const original = gatewayModule.default.prototype[methodName]
                 gatewayModule.default.prototype[methodName] = function(){
@@ -348,16 +355,16 @@ async function privateInit(){
                 }
             }
         }
-        cancelPrototype("updateGuildSubscriptions")
-        cancelPrototype("callConnect")
-        cancelPrototype("lobbyConnect")
-        cancelPrototype("lobbyDisconnect")
-        cancelPrototype("lobbyVoiceStatesUpdate")
-        cancelPrototype("guildStreamCreate")
-        cancelPrototype("streamWatch")
-        cancelPrototype("streamPing")
-        cancelPrototype("streamDelete")
-        cancelPrototype("streamSetPaused")
+        cancelGatewayPrototype("updateGuildSubscriptions")
+        cancelGatewayPrototype("callConnect")
+        cancelGatewayPrototype("lobbyConnect")
+        cancelGatewayPrototype("lobbyDisconnect")
+        cancelGatewayPrototype("lobbyVoiceStatesUpdate")
+        cancelGatewayPrototype("guildStreamCreate")
+        cancelGatewayPrototype("streamWatch")
+        cancelGatewayPrototype("streamPing")
+        cancelGatewayPrototype("streamDelete")
+        cancelGatewayPrototype("streamSetPaused")
         const hasUnreadModules = BDModules.get(e => e.default && e.default.hasUnread)
         hasUnreadModules.forEach((mod) => {
             const original = mod.default.hasUnread
@@ -778,8 +785,6 @@ async function privateInit(){
     BetterDiscord.init()
 
     events.emit("ready")
-    
-    if(DiscordJS)DiscordJS.client.emit("ready")
 }
 
 require.extensions[".css"] = (m, filename) => {

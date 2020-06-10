@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "module": "CommonJS",
+        "target": "ES2017",
+        "jsx": "react",
+        "outDir": "./dist",
+        "resolveJsonModule": true,
+        "rootDir": "./src",
+        "sourceMap": true,
+        "declaration": true
+    }
+}

@@ -2,6 +2,7 @@ import {bdConfig, settingsCookie} from "../0globals";
 import DataStore from "./dataStore";
 import BDV2 from "./v2";
 import Utils from "./utils";
+//import DiscordCrypt from "./DiscordCrypt";
 
 const Constants = {
     EmojiRegex: /<a?\.(\w+)\.(\d+)>/g
@@ -9,218 +10,222 @@ const Constants = {
 
 let CustomEmojiModule = BDModules.get(e => e.CustomEmoji)[0]
 let EmojiModuleApi = BDModules.get(e => e.default && e.default.getCustomEmojiById)[0]
-let AutocompleteModule = BDModules.get(e => e.default && e.default.displayName === "Autocomplete")
+let AutocompleteModule = BDModules.get(e => e.default && e.default.displayName === "Autocomplete")[0]
+let AutoCompletionTemplates = BDModules.get(e => e.getAutocompleteOptions)[0]
+let EmojiModuleQuery = BDModules.get(e => e.default && e.default.queryEmojiResults)[0]
+let Messages = BDModules.get(e => e.default && e.default.Messages && e.default.Messages.EMOJI_MATCHING)[0]
+let guildModule = BDModules.get(e => e.default && e.default.getGuild && e.default.getGuilds && !e.default.isFetching)[0]
+let emojiSearch = BDModules.get(e => e.default && e.default.getDisambiguatedEmojiContext)
 
 export default new class EmojiModule {
-    constructor(){}
+    constructor(){
+        this.init()
+    }
 
     async init(){
+        if(!AutocompleteModule)AutocompleteModule = await window.Lightcord.Api.ensureExported(e => e.default && e.default.displayName === "Autocomplete")
+        if(!AutoCompletionTemplates)AutoCompletionTemplates = await window.Lightcord.Api.ensureExported(e => e.getAutocompleteOptions)
+        if(!EmojiModuleQuery)EmojiModuleQuery = await window.Lightcord.Api.ensureExported(e => e.default && e.default.queryEmojiResults)
+        if(!Messages)Messages = await window.Lightcord.Api.ensureExported(e => e.default && e.default.Messages && e.default.Messages.EMOJI_MATCHING)
+        if(!guildModule)guildModule = await window.Lightcord.Api.ensureExported(e => e.default && e.default.getGuild && e.default.getGuilds && !e.default.isFetching)
+        if(!emojiSearch)emojiSearch = await window.Lightcord.Api.ensureExported(e => e.default && e.default.getDisambiguatedEmojiContext)
+        if(true /** AutocompleteModule && AutoCompletionTemplates && EmojiModuleQuery && Messages && guildModule && emojiSearch */){/*
+            if(!this.cancelAutocompleteRender){
+                this.cancelAutocompleteRender = Utils.monkeyPatch(AutocompleteModule, "default", {
+                    
+                })
+            }*/
+            console.log(`Patching getAutocompleteOptions of AutoCompletionTemplates`, AutoCompletionTemplates)
+            const getAutocompleteOptions = AutoCompletionTemplates.getAutocompleteOptions
+            AutoCompletionTemplates.getAutocompleteOptions = function(e, t, n, r, a){
+                const value = getAutocompleteOptions.call(this, ...arguments)
+                value.LIGHTCORD_EMOJIS = {
+                    matches(arg1, arg2){
+                        let condition = arg2.length > 1 && "." === arg1
+                        setEmojiUsable(condition)
+                        return condition
+                    },
+                    queryResults(t){
+                        let results = EmojiModuleQuery.default.queryEmojiResults(t, e)
+                        return results
+                    },
+                    renderResults(e, t, n, r, a){
+                        return D(e, t, a.emojis, n, r, Messages.default.Messages.EMOJI_MATCHING, Messages.default.Messages.EMOJI, AutocompleteModule.default.Emoji, (function(e) {
+                            return {
+                                emoji: e,
+                                key: e.id || e.uniqueName || e.name,
+                                sentinel: ".",
+                                guild: null != e.guildId ? guildModule.default.getGuild(e.guildId) : null
+                            }
+                        }), (function(e) {
+                            return "." + e + "."
+                        }))
+                    },
+                    getPlainText(id, emojis){
+                        var emojis = emojis.emojis;
+                        return null == emojis || null == emojis[id] ? "" : "." + emojis[id].name + "."
+                    },
+                    getRawText(id, guild){
+                        var emojis = guild.emojis;
+                        if (null == emojis || null == emojis[id]) return "";
+                        var emoji = emojis[id],
+                            isAnimated = emoji.animated ? "a" : "";
+                        return emoji.managed || null == emoji.id ? "." + emoji.name + "." : "<" + isAnimated + "." + (emoji.originalName || emoji.name) + "." + emoji.id + ">"
+                    }
+                }
+                return value
+            }
+        }else{
+            console.error(new Error("Couldn't start autocompletion of Lightcord's emojis."))
+        }
+
         while (!BDV2.MessageComponent) await new Promise(resolve => setTimeout(resolve, 100));
 
-        if (this.cancelEmojiRender) return;
-        this.cancelEmoteRender = Utils.monkeyPatch(BDV2.MessageComponent, "default", {before: (data) => {
-            const message = Utils.getNestedProp(data.methodArguments[0], "childrenMessageContent.props.message")
-            if(!message)return
-            const content = Utils.getNestedProp(data.methodArguments[0], "childrenMessageContent.props.content")
-            if(!content || !content.length)return
-
-            /**
-             * @type {{
-             *  raw: string,
-             *  name: string,
-             *  id: string,
-             *  animated: boolean
-             * }[]}
-             */
-            let emojis = []
-            
-            const newContent = []
-            for(let node of content){
-                if (typeof(node) !== "string") {
-                    newContent.push(node)
-                    continue
-                };
-                let parsed;
-                let hasParsed = false
+        if (!this.cancelEmojiRender){
+            this.cancelEmoteRender = Utils.monkeyPatch(BDV2.MessageComponent, "default", {before: (data) => {
+                const message = Utils.getNestedProp(data.methodArguments[0], "childrenMessageContent.props.message")
+                if(!message)return
+                const content = Utils.getNestedProp(data.methodArguments[0], "childrenMessageContent.props.content")
+                if(!content || !content.length)return
     
-                do {
-                    parsed = Constants.EmojiRegex.exec(node);
-                    if (parsed) {
-                        hasParsed = true
-                        if(!EmojiModuleApi)EmojiModuleApi = BDModules.get(e => e.default && e.default.getCustomEmojiById)[0]
-                        const emoji = EmojiModuleApi.default.getCustomEmojiById(parsed[2])
-                        if(emoji){
-                            emojis.push({
-                                animated: emoji.animated,
-                                name: emoji.name,
-                                id: emoji.id,
-                                raw: parsed[0]
-                            })
-                        }else{
-                            emojis.push({
-                                animated: parsed[0].startsWith("<a"),
-                                name: parsed[1],
-                                id: parsed[2],
-                                raw: parsed[0]
-                            })
-                        }
-                    }
-                } while (parsed);
-
-                if(hasParsed){
-                    const words = node.split(" ").map((word, index, arr) => {
-                        if(!word)return ""
-                        const emoji = emojis.find(e => e.raw == word)
-                        if(!emoji)return word
-                        if(!CustomEmojiModule)CustomEmojiModule = BDModules.get(e => e.CustomEmoji)[0]
-                        return React.createElement(CustomEmojiModule.CustomEmoji, {
-                            emoji: {
-                                name: `.${emoji.name}.`,
-                                emojiId: emoji.id,
-                                animated: emoji.animated,
-                                jumboable: arr.length === 1 && content.length === 1
+                // content = DiscordCrypt.decryptContent(content)
+    
+                /**
+                 * @type {{
+                 *  raw: string,
+                 *  name: string,
+                 *  id: string,
+                 *  animated: boolean
+                 * }[]}
+                 */
+                let emojis = []
+                
+                const newContent = []
+                for(let node of content){
+                    if (typeof(node) !== "string") {
+                        newContent.push(node)
+                        continue
+                    };
+                    let parsed;
+                    let hasParsed = false
+        
+                    do {
+                        parsed = Constants.EmojiRegex.exec(node);
+                        if (parsed) {
+                            hasParsed = true
+                            if(!EmojiModuleApi)EmojiModuleApi = BDModules.get(e => e.default && e.default.getCustomEmojiById)[0]
+                            const emoji = EmojiModuleApi.default.getCustomEmojiById(parsed[2])
+                            if(emoji){
+                                emojis.push({
+                                    animated: emoji.animated,
+                                    name: emoji.name,
+                                    id: emoji.id,
+                                    raw: parsed[0]
+                                })
+                            }else{
+                                emojis.push({
+                                    animated: parsed[0].startsWith("<a"),
+                                    name: parsed[1],
+                                    id: parsed[2],
+                                    raw: parsed[0]
+                                })
                             }
-                        })
-                    }).reduce((previous, current) => {
-                        if(previous.length === 0)return [current]
-                        if(typeof current === "string"){
-                            if(typeof previous[previous.length - 1] === "string"){
-                                previous[previous.length - 1] += ` ${current}`
+                        }
+                    } while (parsed);
+    
+                    if(hasParsed){
+                        const words = node.split(" ").map((word, index, arr) => {
+                            if(!word)return ""
+                            const emoji = emojis.find(e => e.raw == word)
+                            if(!emoji)return word
+                            if(!CustomEmojiModule)CustomEmojiModule = BDModules.get(e => e.CustomEmoji)[0]
+                            return React.createElement(CustomEmojiModule.CustomEmoji, {
+                                emoji: {
+                                    name: `.${emoji.name}.`,
+                                    emojiId: emoji.id,
+                                    animated: emoji.animated,
+                                    jumboable: arr.length === 1 && content.length === 1
+                                }
+                            })
+                        }).reduce((previous, current) => {
+                            if(previous.length === 0)return [current]
+                            if(typeof current === "string"){
+                                if(typeof previous[previous.length - 1] === "string"){
+                                    previous[previous.length - 1] += ` ${current}`
+                                    return previous
+                                }
+                                previous.push(" "+current)
                                 return previous
                             }
-                            previous.push(" "+current)
+                            previous.push(" ", current)
                             return previous
-                        }
-                        previous.push(" ", current)
-                        return previous
-                    }, [])
-                    newContent.push(...words)
-                }else{
-                    newContent.push(node)
+                        }, [])
+                        newContent.push(...words)
+                    }else{
+                        newContent.push(node)
+                    }
                 }
-            }
-            while(data.methodArguments[0].childrenMessageContent.props.content[0]){
-                data.methodArguments[0].childrenMessageContent.props.content.shift()
-            }
-            while(newContent[0]){
-                data.methodArguments[0].childrenMessageContent.props.content.push(newContent.shift())
-            }
-        }});
-
-        if(!AutocompleteModule)AutocompleteModule = BDModules.get(e => e.default && e.default.displayName === "Autocomplete")
+                while(data.methodArguments[0].childrenMessageContent.props.content[0]){
+                    data.methodArguments[0].childrenMessageContent.props.content.shift()
+                }
+                while(newContent[0]){
+                    data.methodArguments[0].childrenMessageContent.props.content.push(newContent.shift())
+                }
+            }});
+        }
 
     }
 
     disable(){
-        if (this.cancelEmoteRender) return;
+        if (!this.cancelEmoteRender) return;
         this.cancelEmoteRender();
         this.cancelEmoteRender = null;
     }
 }
-/*
-let loadImageModule = BDModules.get(e => e.loadImage)[0]
-let getEmojiModule = BDModules.get(e => e.default && e.default.getEmojiURL)[0]
 
-class Emoji extends React.PureComponent {
-    constructor(props){
-        super(props)
-        this.state = {
-            hover: false
-        }
-        this.key = undefined
-        this.cancelLoadImage = null
-        this.onError = function() {
-        }
+function D(e, t, n, r, o, i, s, u, l, c) {
+    if (null == n || 0 === n.length) return null;
+    var d = n.map((function(e, n) {
+        return React.createElement(u, Object.assign({
+            onClick: o,
+            onHover: r,
+            selected: t === n,
+            index: n
+        }, l(e, n)))
+    }));
+    return [R(i, s, e, c), d]
+}
+
+function R(e, t, n, r) {
+    var a = (n.length > 0 ? e.format({
+        prefix: r(n)
+    }) : t)
+    if(Array.isArray(a)){
+        a.unshift(React.createElement("strong", {}, "[Lightcord] "))
+    }else{
+        a = "[LIGHTCORD] "+a
     }
+    return React.createElement(AutocompleteModule.default.Title, {
+        title: a
+    }, a)
+}
+R.displayName = "renderHeader";
 
-    onError() {
-        var src = this.getSrc();
-        if(src !== null){
-            if(!loadImageModule)loadImageModule = BDModules.get(e => e.loadImage)[0] // lazy load
-            this.cancelLoadImage = loadImageModule.loadImage(src, (e) => {
-                if(!e){
-                    this.key = Date.now()
-                    this.forceUpdate()
-                }
-            })
-        }
-    }
+let EmojiFilterModule = BDModules.get(e => e.default && e.default.isEmojiDisabled)[0]
+let isEmojiDisabled = EmojiFilterModule && EmojiFilterModule.default.isEmojiDisabled
+let isUsable = false
+let hasPatched = false
 
-    onMouseEnter(ev) {
-        this.setState({
-            hover: true
-        });
-        var onMouseEnter = this.props.onMouseEnter;
-        if(onMouseEnter)onMouseEnter(ev)
-    }
+function setEmojiUsable(usable){
+    isUsable = usable
+    if(hasPatched)return
+    if(!EmojiFilterModule)EmojiFilterModule = BDModules.get(e => e.default && e.default.isEmojiDisabled)[0]
+    if(!EmojiFilterModule)return
+    if(!isEmojiDisabled)isEmojiDisabled = EmojiFilterModule.default.isEmojiDisabled
 
-    onMouseLeave(ev) {
-        this.setState({
-            hover: false
-        });
-        var onMouseLeave = t.props.onMouseLeave;
-        if(onMouseLeave)onMouseLeave(ev)
-    }
-
-
-    componentWillUnmount() {
-        if(this.cancelLoadImage)this.cancelLoadImage()
-    }
-
-    getSrc(defaultProps) {
-        if(!defaultProps)defaultProps = this.props
-        const props = defaultProps
-        const src = props.src
-        const emojiId = props.emojiId
-        const emojiName = props.emojiName
-        const animated = props.animated
-        const shouldAnimate = props.shouldAnimate
-        const isFocused = props.isFocused
-        const hover = this.state.hover
-
-        if(src)return src
-        if(emojiId){
-            if(!getEmojiModule)getEmojiModule = BDModules.get(e => e.default && e.default.getEmojiURL)[0]
-            return getEmojiModule.default.getEmojiURL({
-                id: emojiId,
-                animated: isFocused && animated && (shouldAnimate || hover)
-            })
-        }
-        return undefined
-    }
-
-    render() {
-        var props = this.props,
-            emojiName = props.emojiName,
-            animated = props.animated,
-            jumboable = props.jumboable,
-            imgProps = {
-
-            }(props.shouldAnimate, props.isFocused, props.emojiId, props.autoplay, y(props, ["emojiName", "animated", "className", "jumboable", "shouldAnimate", "isFocused", "emojiId", "autoplay"])),
-            src = this.getSrc();
-        if(src){
-            return React.createElement("img", Object.assign({}, imgProps, {
-                key: this.key,
-                src,
-                alt: emojiName || undefined,
-                draggable: false
-            }, animated ? {
-                onMouseEnter: this.onMouseEnter,
-                onMouseLeave: this.onMouseLeave
-            } : {}, {
-                className: `emoji${jumboable ? " jumboable" : ""}`,
-                onError: this.onError
-            }))
-        }
-        return React.createElement("span", {
-            className: "emoji emoji-text"
-        }, undefined, emojiName)
+    hasPatched = true
+    EmojiFilterModule.default.isEmojiDisabled = function(){
+        if(isUsable)return false
+        return isEmojiDisabled.call(this, ...arguments)
     }
 }
-Emoji.displayName = "Emoji";
-
-function createEmojiComponent(){
-    return React.createElement(Emoji, Object.assign({}, t, {
-        shouldAnimate: t.animated
-    }))
-}*/

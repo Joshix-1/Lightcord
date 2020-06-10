@@ -144,7 +144,7 @@ export default class V2C_PresenceSettings extends React.Component {
                 </button>
                 <button style={{opacity: 0.01}} onclick={() => {
                     remote.shell.openExternal("https://www.youtube.com/watch?v=LkYa7rps_g4", {
-                        activate: false
+                        activate: true
                     })
                 }}>
                     See ? I pulled a litle sneaky on ya
@@ -293,17 +293,10 @@ class InputChoice extends React.Component {
 
 class DiscordButton extends React.Component {
     render(){
-        let setting = this.props.setting
-
         let rowModule = BDModules.get(e => e.removeKeybind)[0]
         let marginModule = BDModules.get(e => e.marginBottom20)[0]
-        let marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
-        let colorModule = BDModules.get(e => e.colorStandard)[0]
-        let sizeModule = BDModules.get(e => e.size32)[0]
         let flexModule = BDModules.get(e => e._horizontal)[0]
         let euhModule1 = BDModules.get(e => e.colorTransparent)[0]
-        
-        let options = this.props.choices
 
         return (<div className={rowModule.row+" "+marginModule.marginBottom20}>
             <div className={`${rowModule.item} ${flexModule.flexChild}`}>

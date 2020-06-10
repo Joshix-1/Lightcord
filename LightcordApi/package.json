@@ -1,0 +1,26 @@
+{
+  "name": "lightcordapi",
+  "version": "1.0.0",
+  "description": "Lightcord's scripting API",
+  "main": "js/main.js",
+  "scripts": {
+    "build": "webpack --progress --colors",
+    "watch": "webpack --progress --colors --watch",
+    "build-prod": "webpack --progress --colors --mode production -o js/main.min.js --devtool none",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "@types/react": "^16.9.36",
+    "@types/react-dom": "^16.9.8",
+    "babel-loader": "^8.0.6",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.5"
+  },
+  "types": "./types/index.ts"
+}

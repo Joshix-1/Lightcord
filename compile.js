@@ -2,7 +2,9 @@ const child_process = require("child_process")
 const path = require("path")
 const terser = require("terser")
 const util = require("util")
-var rimraf = require("rimraf");
+
+const production = true
+
 let electron
 try{
     electron = require("electron")
@@ -53,7 +55,7 @@ async function main(){
     await processNextDir(startDir, {
         startDir,
         newDir
-    }, ((filepath) => filepath.endsWith(".js") && !filepath.includes("node_modules")), async (filepath, newpath) => {
+    }, ((filepath) => filepath.endsWith(".js") && (!production ? !filepath.includes("node_modules") : true)), async (filepath, newpath) => {
         console.info(`Minifying ${filepath} to ${newpath}`)
         await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {
@@ -63,7 +65,7 @@ async function main(){
     await processNextDir(path.join(__dirname, "modules"), {
         startDir: path.join(__dirname, "modules"),
         newDir: path.join(__dirname, "distApp", "modules")
-    }, ((filepath) => filepath.endsWith(".js") && !filepath.includes("node_modules")), async (filepath, newpath) => {
+    }, ((filepath) => filepath.endsWith(".js") && (!production ? !filepath.includes("node_modules") : true)), async (filepath, newpath) => {
         console.info(`Minifying ${filepath} to ${newpath}`)
         await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {

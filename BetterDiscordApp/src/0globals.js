@@ -4,12 +4,12 @@ export const currentDiscordVersion = (window.DiscordNative && window.DiscordNati
 export const minSupportedVersion = "0.3.0";
 export const bbdVersion = "0.3.4";
 export const bbdChangelog = {
-    description: "LightCord Edition.",
+    description: "Lightcord Edition.",
     changes: [
         {
             title: "What's New?",
             items: [
-                "**LightCord** is now using BandagedBD. That means all plugins you were using can be used too !",
+                "**Lightcord** is now using BandagedBD. That means all plugins you were using can be used too !",
                 "**Window Transparency** changes were made to more compatible with external window managers and addons like Glasscord.",
                 "Initialization sequence has once again been changed slightly to hopefully improve loading times.",
                 "We removed emotes. That's sad for people who were actually using it, but it was leading to more loading time and some basic words were emote."
@@ -53,7 +53,7 @@ export const settings = {
     "Copy Selector":			  {id: "fork-dm-1", info: "Adds a \"Copy Selector\" option to context menus when developer mode is active", implemented: true, hidden: false, cat: "core", category: "developer settings"},
     "React DevTools":			  {id: "reactDevTools", info: "Adds react developer tools to the devtools. Must be installed in Google Chrome on your pc.", implemented: true,  hidden: true, cat: "core", category: "developer settings"},
 
-    /** LightCord */
+    /** Lightcord */
     "Disable BetterDiscord":      {id: "bd-disable",  info: "Disable Betterdiscord (plugins, themes, etc).", implemented: false, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Blur Personnal Informations":{id: "lightcord-6", info: "Blur sensitive informations like email, payment infos and more.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Calling Ring Beat":          {id: "lightcord-2", info: "Enable Discord's special calling beat.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},

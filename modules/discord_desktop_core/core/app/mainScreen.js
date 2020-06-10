@@ -169,6 +169,7 @@ function setWindowVisible(isVisible, andUnminimize) {
   if (isVisible) {
     if (andUnminimize || !mainWindow.isMinimized()) {
       mainWindow.show();
+      mainWindow.focus()
       webContentsSend('MAIN_WINDOW_FOCUS');
     }
   } else {

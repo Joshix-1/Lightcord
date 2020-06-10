@@ -31,5 +31,5 @@ Only the freeze at the launch because of the downloading is pretty annoying. So 
 ## Plugins & Themes
 Plugins and themes are not in the standard BetterDiscord folder. They have been moved because betterdiscord supports only stable, ptb and canary release. Using the same directory could cause problems with settings.
 
-They are located in `%AppData%/LightCord_BD`. This is the main folder for BetterDiscord.
+They are located in `%AppData%/Lightcord_BD`. This is the main folder for BetterDiscord.
 

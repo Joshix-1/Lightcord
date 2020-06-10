@@ -106,7 +106,7 @@ Core.prototype.init = async function() {
         DataStore.setBDData("version", bbdVersion);
     }
 
-    await EmojiModule.init()
+    const emojiModule = EmojiModule
 
     Utils.suppressErrors(this.patchSocial.bind(this), "BD Social Patch")();
     Utils.suppressErrors(this.patchGuildPills.bind(this), "BD Guild Pills Patch")();

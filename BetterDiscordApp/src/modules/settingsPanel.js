@@ -117,7 +117,7 @@ export default new class V2_SettingsPanel {
                 this.renderAddonPane(id);
                 break;
             case "lightcord":
-                this.renderLightCordSettings()
+                this.renderLightcordSettings()
                 break
             case "status":
                 this.renderPresenceSettings()

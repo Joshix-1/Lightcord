@@ -248,7 +248,6 @@ let childModule = BDModules.get(e => e.childContainer)[0]
 function renderToElements(id, result, filename){
     const div = document.getElementById(id)
     if(!div || div.childNodes.length > 0)return // already certified/div does not exist anymore.
-    // TODO: implements suspect plugins.
 
     if(!flowerStarModule)flowerStarModule = BDModules.get(e => e.flowerStarContainer)[0]
     if(!childModule)childModule = BDModules.get(e => e.childContainer)[0]

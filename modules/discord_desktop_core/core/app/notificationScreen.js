@@ -123,6 +123,10 @@ function handleNotificationsClear() {
 function handleNotificationShow(e, notification) {
   notifications.push(notification);
   updateNotifications();
+  setTimeout(() => {
+    if(!notifications.find(e => e.id === notification.id))return
+    handleNotificationClose(null, notification.id)
+  }, 3000)
 }
 
 function handleNotificationClick(e, notificationId) {
@@ -130,12 +134,16 @@ function handleNotificationClick(e, notificationId) {
   events.emit(NOTIFICATION_CLICK);
 }
 
+let isClosing = []
 function handleNotificationClose(e, notificationId) {
+  if(isClosing.includes(notificationId))return
   if (notificationWindow) {
     webContentsSend(notificationWindow, 'FADE_OUT', notificationId);
   }
+  isClosing.push(notificationId)
   setTimeout(() => {
     notifications = notifications.filter(notification => notification.id !== notificationId);
+    isClosing = isClosing.filter(e => e.id !== notificationId)
     updateNotifications();
   }, VARIABLES.outDuration);
 }

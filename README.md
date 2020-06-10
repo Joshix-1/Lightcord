@@ -18,7 +18,7 @@ Lightcord is a simple and customizable client for Discord.
 It includes [BandagedBD](https://github.com/rauenzi/BetterDiscordApp), [Glasscord](https://github.com/AryToNeX/Glasscord) and a discord.js like api.
 
 ## Informations
-Lightcord doesn't *patch* Discord with it's content. If it would, Discord will update itself and break the patch. That's why Lightcord is a standalone Discord client. Just grab the latest release version you need, and launch it !
+Lightcord doesn't *patch* Discord with it's content. If it was, Discord would update itself and break the patch. That's why Lightcord is a standalone Discord client. Just grab the latest release version you need, and launch it !
 
 ## Installing 
 You can download a release from the [releases tab](https://github.com/Lightcord/Lightcord/releases).

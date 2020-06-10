@@ -126,7 +126,7 @@ function handleNotificationShow(e, notification) {
   setTimeout(() => {
     if(!notifications.find(e => e.id === notification.id))return
     handleNotificationClose(null, notification.id)
-  }, 3000)
+  }, 5000)
 }
 
 function handleNotificationClick(e, notificationId) {

@@ -5,13 +5,7 @@ const util = require("util")
 
 const production = true
 
-let electron
-try{
-    electron = require("electron")
-}catch(e){
-    electron = null
-}
-let fs = electron ? require("original-fs") : require("fs")
+let fs = require("fs")
 
 console.log = (...args) => {
     process.stdout.write(Buffer.from(util.formatWithOptions({colors: true}, ...args)+"\n", "binary").toString("utf8"))
@@ -21,12 +15,10 @@ console.info = (...args) => {
 }
 
 async function main(){
-    if(electron)await electron.app.whenReady()
-
     console.log(__dirname, process.cwd())
     
     console.info("Reseting existent directory...")
-    child_process.execSync("node remove.js") // why can't electron remove directory ? it just doesn't work and I am required to use electron for the .jsc compilation.
+    await fs.promises.rmdir("./distApp", {"recursive": true})
     await fs.promises.mkdir(__dirname+"/distApp/dist", {"recursive": true})
     
     console.info("Executing command `tsc`")
@@ -115,8 +107,3 @@ async function main(){
     }))
 }
 main()
-.then(() => {
-    if(electron){
-        electron.app.exit()
-    }
-})

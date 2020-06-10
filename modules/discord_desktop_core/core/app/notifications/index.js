@@ -113,7 +113,23 @@
     r.locals && (e.exports = r.locals)
 }, function(e, t, n) {
     var r = n(5);
-    (e.exports = n(6)(!1)).push([e.i, "@font-face {\n  font-family: Whitney;\n  font-style: light;\n  font-weight: 300;\n  src: url(" + r(n(7)) + ") format('woff');\n}\n@font-face {\n  font-family: Whitney;\n  font-style: normal;\n  font-weight: 500;\n  src: url(" + r(n(8)) + ") format('woff');\n}\n@font-face {\n  font-family: Whitney;\n  font-style: medium;\n  font-weight: 600;\n  src: url(" + r(n(9)) + ") format('woff');\n}\n@font-face {\n  font-family: Whitney;\n  font-style: bold;\n  font-weight: 700;\n  src: url(" + r(n(10)) + ') format(\'woff\');\n}\n@-webkit-keyframes flipIn {\n  0% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    transition-timing-function: ease-in;\n    opacity: 0;\n  }\n  40% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    transition-timing-function: ease-in;\n  }\n  60% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);\n    opacity: 1;\n  }\n  80% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);\n  }\n  100% {\n    transform: perspective(400px);\n  }\n}\n@-webkit-keyframes flipOut {\n  0% {\n    transform: perspective(400px);\n  }\n  30% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    opacity: 1;\n  }\n  100% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    opacity: 0;\n  }\n}\n* {\n  box-sizing: border-box;\n  -webkit-user-select: none;\n  cursor: default;\n}\nbody {\n  margin: 0;\n  overflow: hidden;\n}\n#notifications {\n  position: absolute;\n  bottom: 0;\n  right: 0;\n  width: 400;\n  height: 530;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n}\n.notification {\n  height: 96px;\n  width: 390px;\n  font-family: Whitney, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;\n  line-height: 18px;\n  font-size: 12px;\n  background-color: #fff;\n  background-clip: padding-box;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: 0.2s background-color;\n  -webkit-animation-fill-mode: both;\n  margin-bottom: 10px;\n  margin-right: 10px;\n  position: relative;\n}\n.notification.in {\n  backface-visibility: visible !important;\n  -webkit-animation-name: flipIn;\n  -webkit-animation-duration: 700ms;\n}\n.notification.out {\n  backface-visibility: visible !important;\n  -webkit-animation-name: flipOut;\n  -webkit-animation-duration: 333ms;\n}\n.notification:hover .notification-dismiss {\n  opacity: 0.5;\n}\n.notification .notification-dismiss {\n  position: absolute;\n  opacity: 0;\n  width: 10px;\n  height: 10px;\n  right: 6px;\n  top: 6px;\n  background: url(' + r(n(11)) + ") no-repeat;\n  background-size: 10px;\n  transition: 0.2s opacity;\n  z-index: 1;\n  cursor: pointer;\n  padding: 0;\n  margin: 0;\n  border: none;\n  outline: none;\n}\n.notification .notification-dismiss:hover {\n  opacity: 1;\n}\n.notification .notification-logo {\n  position: absolute;\n  bottom: 10px;\n  right: 12px;\n  width: 22px;\n  height: 24px;\n  background: url(" + r(n(12)) + ") center center no-repeat;\n  background-size: 22px 24px;\n}\n.notification .notification-contents {\n  height: 96px;\n  width: 390px;\n  display: flex;\n  flex-direction: row;\n}\n.notification .notification-contents .notification-icon {\n  height: 96px;\n  width: 96px;\n  background: #1e2124;\n  background-size: 96px 96px;\n}\n.notification .notification-contents .notification-body {\n  flex: 1;\n  padding: 10px;\n}\n.notification .notification-contents .notification-body header {\n  margin: 0;\n  font-size: 16px;\n  line-height: 1.8em;\n  font-weight: 600;\n  color: #7289da;\n  letter-spacing: 0.02em;\n}\n.notification .notification-contents .notification-body p {\n  margin: 0;\n  color: #737f8d;\n  font-size: 12px;\n  line-height: 1.25em;\n  overflow: hidden;\n  width: 90%;\n  flex: 1;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n}\n.notification .notification-contents .notification-body p + p {\n  margin-top: 5px;\n}\n", ""])
+    (e.exports = n(6)(!1)).push([e.i,
+        "@font-face {\n  font-family: Whitney;\n  font-style: light;\n  font-weight: 300;\n  src: url(" +
+        r(n(7)) +
+        ") format('woff');\n}\n@font-face {\n  font-family: Whitney;\n  font-style: normal;\n  font-weight: 500;\n  src: url(" +
+        r(n(8)) +
+        ") format('woff');\n}\n@font-face {\n  font-family: Whitney;\n  font-style: medium;\n  font-weight: 600;\n  src: url(" +
+        r(n(9)) +
+        ") format('woff');\n}\n@font-face {\n  font-family: Whitney;\n  font-style: bold;\n  font-weight: 700;\n  src: url(" +
+        r(n(10)) +
+        ') format(\'woff\');\n}\n@-webkit-keyframes flipIn {\n  0% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    transition-timing-function: ease-in;\n    opacity: 0;\n  }\n  40% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    transition-timing-function: ease-in;\n  }\n  60% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);\n    opacity: 1;\n  }\n  80% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);\n  }\n  100% {\n    transform: perspective(400px);\n  }\n}\n@-webkit-keyframes flipOut {\n  0% {\n    transform: perspective(400px);\n  }\n  30% {\n    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);\n    opacity: 1;\n  }\n  100% {\n    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);\n    opacity: 0;\n  }\n}\n* {\n  box-sizing: border-box;\n  -webkit-user-select: none;\n  cursor: default;\n}\nbody {\n  margin: 0;\n  overflow: hidden;\n}\n#notifications {\n  position: absolute;\n  bottom: 0;\n  right: 0;\n  width: 400;\n  height: 530;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n}\n.notification {\n  height: 96px;\n  width: 390px;\n  font-family: Whitney, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;\n  line-height: 18px;\n  font-size: 12px;\n  background-color: #fff;\n  background-clip: padding-box;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: 0.2s background-color;\n  -webkit-animation-fill-mode: both;\n  margin-bottom: 10px;\n  margin-right: 10px;\n  position: relative;\n}\n.notification.in {\n  backface-visibility: visible !important;\n  -webkit-animation-name: flipIn;\n  -webkit-animation-duration: 700ms;\n}\n.notification.out {\n  backface-visibility: visible !important;\n  -webkit-animation-name: flipOut;\n  -webkit-animation-duration: 333ms;\n}\n.notification:hover .notification-dismiss {\n  opacity: 0.5;\n}\n.notification .notification-dismiss {\n  position: absolute;\n  opacity: 0;\n  width: 10px;\n  height: 10px;\n  right: 6px;\n  top: 6px;\n  background: url(' +
+        r(n(11)) +
+        ") no-repeat;\n  background-size: 10px;\n  transition: 0.2s opacity;\n  z-index: 1;\n  cursor: pointer;\n  padding: 0;\n  margin: 0;\n  border: none;\n  outline: none;\n}\n.notification .notification-dismiss:hover {\n  opacity: 1;\n}\n.notification .notification-logo {\n  position: absolute;\n  bottom: 10px;\n  right: 12px;\n  width: 22px;\n  height: 24px;\n  background: url(" +
+        r(n(12)) +
+        ") center center no-repeat;\n  background-size: 22px 24px;\n}\n.notification .notification-contents {\n  height: 96px;\n  width: 390px;\n  display: flex;\n  flex-direction: row;\n}\n.notification .notification-contents .notification-icon {\n  height: 96px;\n  width: 96px;\n  background: #1e2124;\n  background-size: 96px 96px;\n}\n.notification .notification-contents .notification-body {\n  flex: 1;\n  padding: 10px;\n}\n.notification .notification-contents .notification-body header {\n  margin: 0;\n  font-size: 16px;\n  line-height: 1.8em;\n  font-weight: 600;\n  color: #7289da;\n  letter-spacing: 0.02em;\n}\n.notification .notification-contents .notification-body p {\n  margin: 0;\n  color: #737f8d;\n  font-size: 12px;\n  line-height: 1.25em;\n  overflow: hidden;\n  width: 90%;\n  flex: 1;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n}\n.notification .notification-contents .notification-body p + p {\n  margin-top: 5px;\n}\n" +
+        ".notification.theme-dark {background-color: #202225}\n.notif-text.theme-dark {color: #dcddde !important}\n.notif-text.theme-light {background-color: #fff}\n.notification.notification-contents.notification-body.theme-light {color: #2e3338 !important}",
+        ""
+    ])
 }, function(e, t) {
     e.exports = function(e) {
         return "string" != typeof e ? e : (/^['"].*['"]$/.test(e) && (e = e.slice(1, -1)), /["'() \t\n]/.test(e) ? '"' + e.replace(/"/g, '\\"').replace(/\n/g, "\\n") + '"' : e)
@@ -5712,7 +5728,7 @@
             },
             render() {
                 return i.default.createElement("div", {
-                    className: "notification " + this.state.className,
+                    className: "notification " + this.state.className + " theme-"+this.props.theme,
                     onClick: this.handeClick
                 }, i.default.createElement("button", {
                     type: "button",
@@ -5727,7 +5743,7 @@
                     }
                 }), i.default.createElement("div", {
                     className: "notification-body"
-                }, i.default.createElement("header", null, this.props.title), i.default.createElement("p", null, this.props.body))), i.default.createElement("div", {
+                }, i.default.createElement("header", null, this.props.title), i.default.createElement("p", {className: "notif-text theme-"+this.props.theme}, this.props.body))), i.default.createElement("div", {
                     className: "notification-logo"
                 }))
             }
@@ -5735,7 +5751,8 @@
         f = (0, o.default)({
             displayName: "Notifications",
             getInitialState: () => ({
-                notifications: []
+                notifications: [],
+                theme: "dark"
             }),
             handleUpdateEvent(e, t) {
                 this.setState({
@@ -5754,11 +5771,16 @@
                     notifications: n
                 })
             },
+            handleUpdateTheme(e, theme){
+                this.setState({
+                    theme: theme
+                })
+            },
             componentDidMount() {
-                a.default.on("UPDATE", this.handleUpdateEvent), a.default.on("FADE_OUT", this.handleFadeOut)
+                a.default.on("UPDATE_THEME", this.handleUpdateTheme), a.default.on("UPDATE", this.handleUpdateEvent), a.default.on("FADE_OUT", this.handleFadeOut)
             },
             componentWillUnmount() {
-                a.default.removeListener("UPDATE", this.handleUpdateEvent), a.default.removeListener("FADE_OUT", this.handleFadeOut)
+                a.default.removeListener("UPDATE_THEME", this.handleUpdateTheme), a.default.removeListener("UPDATE", this.handleUpdateEvent), a.default.removeListener("FADE_OUT", this.handleFadeOut)
             },
             handleNotificationClick(e) {
                 a.default.send(u, e)
@@ -5770,7 +5792,8 @@
                 const e = this.state.notifications.map(e => i.default.createElement(s, r({}, e, {
                     key: e.id,
                     onClick: this.handleNotificationClick,
-                    onDismiss: this.handleNotificationDismiss
+                    onDismiss: this.handleNotificationDismiss,
+                    theme: this.state.theme
                 })));
                 return i.default.createElement("div", {
                     id: "notifications"

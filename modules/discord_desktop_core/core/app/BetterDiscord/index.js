@@ -62,11 +62,11 @@ async function privateInit(){
         require.cache["react-dom"] = ReactDOM
     }
     
-    let original = ModuleLoader.get((e) =>  e.createSound)[0].createSound
+    let createSoundOriginal = ModuleLoader.get((e) =>  e.createSound)[0].createSound
     ModuleLoader.get((e) =>  e.createSound)[0].createSound = function(sound){
         let isCalling = sound === "call_ringing_beat" || sound === "call_ringing"
         if(isCalling){
-            let returned = original(...arguments)
+            let returned = createSoundOriginal.call(this, ...arguments)
             Object.defineProperty(returned, "name", {
                 get(){
                     return window.Lightcord.Settings.callRingingBeat ? "call_ringing_beat" : "call_ringing"
@@ -78,7 +78,7 @@ async function privateInit(){
             })
             return returned
         }else{
-            return original(...arguments)
+            return createSoundOriginal(...arguments)
         }
     }
 
@@ -109,7 +109,7 @@ async function privateInit(){
             fs.writeFileSync(ZeresPluginLibraryPath, content)
         })
 
-        // Should we download 1XenoLib and BDFDB too ?
+        // Should we download 1XenoLib and BDFDB too ? response: No
 
         BetterDiscordConfig.haveInstalledDefault = true // Inform User about what we just did
     }
@@ -186,6 +186,11 @@ async function privateInit(){
 
         }
     }
+
+    dispatcher.subscribe("USER_SETTINGS_UPDATE", (data) => {
+        console.log(data)
+        DiscordNative.ipc.send("UPDATE_THEME", data.settings.theme)
+    })
 
     require("../../../../../LightcordApi/js/main")
 
@@ -840,18 +845,26 @@ function ensureGuildClasses(){
     })
 }
 
-function ensureExported(filter){
-    return new Promise((resolve) => {
+global.ensureExported = function ensureExported(filter, maxTime = 500){
+    let tried = 0
+    return new Promise((resolve, reject) => {
         let mod = ModuleLoader.get(filter)[0]
         if(mod)return resolve(mod)
+        tried++
 
-        let intergay = setInterval(() => {
+        let interval = setInterval(() => {
+            if(tried > maxTime){
+                clearInterval(interval)
+                reject(new Error("Could not find the module with the given filter."))
+                return
+            }
             mod = ModuleLoader.get(filter)[0]
             if(mod){
-                clearInterval(intergay)
+                clearInterval(interval)
                 resolve(mod)
                 return
             }
+            tried++
         }, 100);
     })
 }

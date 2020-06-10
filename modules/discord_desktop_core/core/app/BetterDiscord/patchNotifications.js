@@ -51,3 +51,8 @@ if(process.platform === "win32"){
         }
     }
 }
+
+ensureExported((e => e.default && e.default.theme))
+.then(themeStore => {
+    ipcRenderer.send("UPDATE_THEME", themeStore.default.theme)
+}).catch(console.error)

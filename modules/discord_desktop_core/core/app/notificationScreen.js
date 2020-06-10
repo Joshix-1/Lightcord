@@ -38,6 +38,7 @@ const IPC_NOTIFICATIONS_CLEAR = 'NOTIFICATIONS_CLEAR';
 const IPC_NOTIFICATION_SHOW = 'NOTIFICATION_SHOW';
 const IPC_NOTIFICATION_CLICK = 'NOTIFICATION_CLICK';
 const IPC_NOTIFICATION_CLOSE = 'NOTIFICATION_CLOSE';
+const IPC_THEME_UPDATE = "UPDATE_THEME"
 
 // events
 const events = exports.events = new _events.EventEmitter();
@@ -87,6 +88,7 @@ function init({
   _ipcMain2.default.on(IPC_NOTIFICATION_SHOW, handleNotificationShow);
   _ipcMain2.default.on(IPC_NOTIFICATION_CLICK, handleNotificationClick);
   _ipcMain2.default.on(IPC_NOTIFICATION_CLOSE, handleNotificationClose);
+  _ipcMain2.default.on(IPC_THEME_UPDATE, handleThemeUpdate)
 }
 
 function destroyWindow() {
@@ -106,6 +108,7 @@ function close() {
   _ipcMain2.default.removeListener(IPC_NOTIFICATION_SHOW, handleNotificationShow);
   _ipcMain2.default.removeListener(IPC_NOTIFICATION_CLICK, handleNotificationClick);
   _ipcMain2.default.removeListener(IPC_NOTIFICATION_CLOSE, handleNotificationClose);
+  _ipcMain2.default.removeListener(IPC_THEME_UPDATE, handleThemeUpdate)
 }
 
 function setMainWindow(_mainWindow) {
@@ -137,6 +140,10 @@ function handleNotificationClose(e, notificationId) {
   }, VARIABLES.outDuration);
 }
 
+function handleThemeUpdate(e, theme){
+  updateTheme(theme)
+}
+
 function updateNotifications() {
   if (notifications.length > 0) {
     clearTimeout(hideTimeout);
@@ -160,6 +167,14 @@ function updateNotifications() {
 
   if (notificationWindow != null) {
     webContentsSend(notificationWindow, 'UPDATE', notifications.slice(0, maxVisible));
+  }
+}
+
+let lastUsedTheme = "dark"
+function updateTheme(theme){
+  lastUsedTheme = theme
+  if (notificationWindow != null) {
+    webContentsSend(notificationWindow, 'UPDATE_THEME', theme);
   }
 }
 
@@ -215,5 +230,8 @@ function createWindow() {
     pathname: _path2.default.join(__dirname, 'notifications', 'index.html')
   });
   notificationWindow.loadURL(notificationUrl);
-  notificationWindow.webContents.on('did-finish-load', () => updateNotifications());
+  notificationWindow.webContents.on('did-finish-load', () => {
+    updateTheme(lastUsedTheme)
+    updateNotifications()
+  });
 }

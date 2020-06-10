@@ -10,6 +10,7 @@
         "rootDir": "./src"
     },
     "exclude": [
-        "./DiscordJS"
+        "./DiscordJS",
+        "./LightcordApi"
     ]
 }

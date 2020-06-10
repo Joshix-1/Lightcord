@@ -348,7 +348,7 @@ export default new class V2_SettingsPanel {
         BDV2.reactDom.render(this.coreComponent, root);
     }
 
-    renderLightordSettings() {
+    renderLightcordSettings() {
         const root = this.root;
         if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
         BDV2.reactDom.render(this.lightcordComponent, root);

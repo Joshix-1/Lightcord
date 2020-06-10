@@ -4,8 +4,6 @@ glasstron.init()
 
 /** Modules */
 import * as electron from "electron"
-import * as fs from "fs"
-import * as path from "path"
 import requireNativeDiscordModule from "./requireNative";
 import appSettings from "./appSettings"
 import autoStart from "./autoStart"
@@ -52,7 +50,10 @@ function hasArgvFlag(flag) {
 //Transform main thread into async
 (async function Main(){
     await electron.app.whenReady()
-    console.log(`Lightcord Init...`)
+    console.log(`Initializing Lightcord.`)
+    console.log(`Version: ${buildInfo.version}
+releaseChannel: ${buildInfo.releaseChannel}
+commit: ${buildInfo.commit}`)
     if(!electron.app.commandLine.hasSwitch('enable-transparent-visuals'))electron.app.commandLine.appendSwitch('enable-transparent-visuals');
     electron.app.setAppUserModelId(Constants.APP_ID);
     let coreModule

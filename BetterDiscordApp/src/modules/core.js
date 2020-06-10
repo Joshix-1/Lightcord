@@ -15,6 +15,7 @@ import LightcordLogo from "../svg/lightcord";
 import PluginCertifier from "./pluginCertifier";
 import distant, { uuidv4 } from "./distant";
 import EmojiModule from "./emojiModule"
+import {remote as electron} from "electron"
 
 function Core() {
     // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
@@ -272,15 +273,16 @@ Core.prototype.patchSocial = function() {
             BDModules.get(e => e.versionHash)[0].versionHash
         ]
 
-        const injector = BDV2.react.createElement("div", {className: `${classNameColorMuted} ${sizes.size12}`}, `Injector ${bdConfig.version}`);
         const versionHash = `(${bdConfig.hash ? bdConfig.hash.substring(0, 7) : bdConfig.branch})`;
-        const additional = BDV2.react.createElement("div", {className: `${classNameColorMuted} ${sizes.size12}`}, `BBD ${bbdVersion} `, BDV2.react.createElement("span", {className: classNameVersionHash+" da-versionHash"}, versionHash));
+        const additional = [
+            BDV2.react.createElement("div", {className: `${classNameColorMuted} ${sizes.size12}`}, `Lightcord ${electron.getGlobal("BuildInfo").version} `, BDV2.react.createElement("span", {className: classNameVersionHash+" da-versionHash"}, `(${(electron.getGlobal("BuildInfo").commit || "Unknown").slice(0, 7)})`)),
+            BDV2.react.createElement("div", {className: `${classNameColorMuted} ${sizes.size12}`}, `BBD ${bbdVersion} `, BDV2.react.createElement("span", {className: classNameVersionHash+" da-versionHash"}, versionHash))
+        ]
         
 
         const originalVersions = children[children.length - 1].type;
         children[children.length - 1].type = function() {
             const returnVal = originalVersions(...arguments);
-            returnVal.props.children.splice(returnVal.props.children.length - 1, 0, injector);
             returnVal.props.children.splice(1, 0, additional);
             return returnVal;
         };

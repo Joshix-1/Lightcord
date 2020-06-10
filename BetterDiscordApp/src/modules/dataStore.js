@@ -33,6 +33,7 @@ export default new class DataStore {
     }
 
     get injectionPath() {
+        return this._injectionPath = null;
         if (this._injectionPath) return this._injectionPath;
         const electron = require("electron").remote.app;
         const base = electron.getAppPath();

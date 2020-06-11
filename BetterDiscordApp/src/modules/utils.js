@@ -370,7 +370,14 @@ export default class Utils {
         const MarkdownParser = WebpackModules.findByProps("defaultRules", "parse");
         if (!Changelog || !ModalStack || !ChangelogClasses || !TextElement || !FlexChild || !Titles || !MarkdownParser) return;
     
-        const {image = "https://repository-images.githubusercontent.com/105473537/957b5480-7c26-11e9-8401-50fa820cbae5", description = "", changes = [], title = "BandagedBD", subtitle = `v${bbdVersion}`, footer} = options;
+        const {
+            image = "https://repository-images.githubusercontent.com/105473537/957b5480-7c26-11e9-8401-50fa820cbae5", 
+            description = "", 
+            changes = [], 
+            title = "BandagedBD", 
+            subtitle = `v${bbdVersion}`, 
+            footer
+        } = options;
         const ce = BDV2.React.createElement;
         const changelogItems = [ce("img", {src: image})];
         if (description) changelogItems.push(ce("p", null, MarkdownParser.parse(description)));

@@ -2,7 +2,7 @@
 BandagedBD from Lightcord is a fork from the original BandagedBD (https://github.com/rauenzi/BetterDiscordApp). 
 If a bug happens on the lightcord version, please report on Lightcord repo. If it applies as well on BandagedBD, please report it too on https://github.com/rauenzi/BetterDiscordApp/issues.
 
-Lightcord does not own the code at https://github.com/rauenzi/BetterDiscordApp. It only owns the modifications here.
+Lightcord does not own the code at https://github.com/rauenzi/BetterDiscordApp. It only owns the modifications that were added here.
 
 # BandagedBD [![Patreon][patreon-badge]][patreon-link] [![Paypal][paypal-badge]][paypal-link]
 [patreon-badge]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2FZerebos&style=flat-square

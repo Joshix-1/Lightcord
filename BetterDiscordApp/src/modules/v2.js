@@ -82,6 +82,9 @@ export default new class V2 {
     joinBD2() {this.InviteActions.acceptInviteAndTransitionToInviteChannel("2HScm8j");}
     leaveBD2() {this.GuildActions.leaveGuild("280806472928198656");}
 
+    joinLC() {this.InviteActions.acceptInviteAndTransitionToInviteChannel("cxfA2dT");}
+    leaveLC() {this.GuildActions.leaveGuild("705908350218666117");}
+
     /**
      * @type {typeof React}
      */

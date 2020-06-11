@@ -1,18 +1,52 @@
+import { remote } from "electron";
+import BDV2 from "./modules/v2";
+import WebpackModules from "./modules/webpackModules";
+
 // var settingsPanel, voiceMode, pluginModule, themeModule, dMode, publicServersModule, mainCore, BDV2;
 export const minimumDiscordVersion = "0.0.306";
 export const currentDiscordVersion = (window.DiscordNative && window.DiscordNative.remoteApp && window.DiscordNative.remoteApp.getVersion && window.DiscordNative.remoteApp.getVersion()) || "0.0.306";
 export const minSupportedVersion = "0.3.0";
 export const bbdVersion = "0.3.4";
+export const LCChanelog = {
+    description: "Lightcord's changelog",
+    changes: [
+        {
+            title: "What's New?",
+            items: [
+                "Lightcord is now available !",
+                "We removed emotes. That's sad for people who were actually using it, but it was leading to more loading time and some basic words were emote."
+            ]
+        }
+    ],
+    image: "https://i.imgur.com/sfNhqwP.png",
+    title: "Lightcord",
+    subtitle: "v"+remote.getGlobal("BuildInfo").version,
+    footer: (function(){
+        const TextElement = WebpackModules.findByDisplayName("Text");
+        const ModalStack = WebpackModules.findByProps("push", "update", "pop", "popWithKey");
+        if(!TextElement || !ModalStack)return null
+
+        const Anchor = WebpackModules.find(m => m.displayName == "Anchor");
+        const AnchorClasses = WebpackModules.findByProps("anchorUnderlineOnHover") || {anchor: "anchor-3Z-8Bb", anchorUnderlineOnHover: "anchorUnderlineOnHover-2ESHQB"};
+        const joinSupportServer = (click) => {
+            click.preventDefault();
+            click.stopPropagation();
+            ModalStack.pop();
+            BDV2.joinLC();
+        };
+        const supportLink = Anchor ? BDV2.React.createElement(Anchor, {onClick: joinSupportServer}, "Join our Discord Server.") : BDV2.React.createElement("a", {className: `${AnchorClasses.anchor} ${AnchorClasses.anchorUnderlineOnHover}`, onClick: joinSupportServer}, "Join our Discord Server.");
+        return BDV2.React.createElement(TextElement, {size: TextElement.Sizes.SMALL, color: TextElement.Colors.STANDARD}, "Need support? ", supportLink);
+    })()
+}
 export const bbdChangelog = {
-    description: "Lightcord Edition.",
+    description: "BBD's changelog.",
     changes: [
         {
             title: "What's New?",
             items: [
                 "**Lightcord** is now using BandagedBD. That means all plugins you were using can be used too !",
                 "**Window Transparency** changes were made to more compatible with external window managers and addons like Glasscord.",
-                "Initialization sequence has once again been changed slightly to hopefully improve loading times.",
-                "We removed emotes. That's sad for people who were actually using it, but it was leading to more loading time and some basic words were emote."
+                "Initialization sequence has once again been changed slightly to hopefully improve loading times."
             ]
         },
         {

@@ -1,6 +1,7 @@
 import BugHunterBadge from "../svg/bug_hunter"
 import LightcordUserBadge from "../svg/LightcordUser";
 import nodeFetch from "node-fetch"
+import { settingsCookie } from "../0globals";
 
 export function uuidv4() { // Generate UUID (No crypto rng)
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -67,7 +68,7 @@ export default new class DistantServer {
         }
         const fetchedBadges = await new Promise((resolve) => {
             badgesToFetch.push([user, resolve])
-            setImmediate(() => {
+            setTimeout(() => {
                 let users = badgesToFetch
                 if(users.length === 0)return
                 badgesToFetch = []
@@ -90,7 +91,7 @@ export default new class DistantServer {
                         data[1]([])// resolve no badge fetched
                     })
                 })
-            })
+            }, 0)
         })
         for(let badge of fetchedBadges){
             if(!Constants.badges.find(e => e.id === badge))continue // We do not have the Component, skip it.
@@ -111,6 +112,10 @@ export default new class DistantServer {
 }
 
 const handleRequest = function(route, method, data){
+    if(!settingsCookie["lightcord-5"]){
+        console.warn(`Canceling request on ${route} with method ${method} and body`, data, "because of settings.")
+        return Promise.reject(new LightcordError("The current settings blocked the request."))
+    }
     console.log(`Sending request on ${route} with method ${method} and body`, data)
     return nodeFetch(`${Constants.SERVER_URL}/api/v1${route}`, {
         method,
@@ -122,6 +127,14 @@ const handleRequest = function(route, method, data){
             body: data
         } : {})
     })
+}
+
+class LightcordError extends Error {
+    constructor(){
+        super(...arguments)
+        this.name = "LightcordError"
+        
+    }
 }
 
 export const Constants = {

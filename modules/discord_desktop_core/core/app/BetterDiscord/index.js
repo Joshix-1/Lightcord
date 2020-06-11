@@ -194,6 +194,7 @@ async function privateInit(){
 
     require("../../../../../LightcordApi/js/main")
 
+    /*
     if(shouldShowPrompt){
         let onConn = (ev) => {
             console.log(`Showing auth window.`, ev)
@@ -262,7 +263,7 @@ async function privateInit(){
             authWindow.loadURL("lightcord://index.html")
         }
         dispatcher.subscribe(constants.ActionTypes.CONNECTION_OPEN || "CONNECTION_OPEN", onConn)
-    }
+    }*/
 
     const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.js").default)(BetterDiscordConfig)
 

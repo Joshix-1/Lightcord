@@ -1,6 +1,4 @@
-import {settingsCookie, settingsRPC, defaultRPC} from "../0globals";
-import BDV2 from "./v2";
-import Utils from "./utils";
+import {settingsRPC, defaultRPC} from "../0globals";
 
 const dispatcher = BDModules.get(m=>m.Dispatcher&&m.default&&m.default.dispatch)[0].default
 const ActionTypes = BDModules.get(m=>m.ActionTypes)[0].ActionTypes

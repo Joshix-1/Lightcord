@@ -5,7 +5,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 module.exports = {
   mode: "development",
   target: "node",
-  devtool: "eval-cheap-source-map",
+  devtool: "inline-source-map",
   entry: "./src/index.js",
   output: {
     filename: "main.js",

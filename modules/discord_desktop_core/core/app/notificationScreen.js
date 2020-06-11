@@ -137,13 +137,13 @@ function handleNotificationClick(e, notificationId) {
 let isClosing = []
 function handleNotificationClose(e, notificationId) {
   if(isClosing.includes(notificationId))return
+  isClosing.push(notificationId)
   if (notificationWindow) {
     webContentsSend(notificationWindow, 'FADE_OUT', notificationId);
   }
-  isClosing.push(notificationId)
   setTimeout(() => {
     notifications = notifications.filter(notification => notification.id !== notificationId);
-    isClosing = isClosing.filter(e => e.id !== notificationId)
+    isClosing = isClosing.filter(e => e!== notificationId)
     updateNotifications();
   }, VARIABLES.outDuration);
 }

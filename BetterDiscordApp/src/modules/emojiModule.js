@@ -23,18 +23,14 @@ export default new class EmojiModule {
     }
 
     async init(){
+        /** Emoji AutoComplete */
         if(!AutocompleteModule)AutocompleteModule = await window.Lightcord.Api.ensureExported(e => e.default && e.default.displayName === "Autocomplete")
         if(!AutoCompletionTemplates)AutoCompletionTemplates = await window.Lightcord.Api.ensureExported(e => e.getAutocompleteOptions)
         if(!EmojiModuleQuery)EmojiModuleQuery = await window.Lightcord.Api.ensureExported(e => e.default && e.default.queryEmojiResults)
         if(!Messages)Messages = await window.Lightcord.Api.ensureExported(e => e.default && e.default.Messages && e.default.Messages.EMOJI_MATCHING)
         if(!guildModule)guildModule = await window.Lightcord.Api.ensureExported(e => e.default && e.default.getGuild && e.default.getGuilds && !e.default.isFetching)
         if(!emojiSearch)emojiSearch = await window.Lightcord.Api.ensureExported(e => e.default && e.default.getDisambiguatedEmojiContext)
-        if(true /** AutocompleteModule && AutoCompletionTemplates && EmojiModuleQuery && Messages && guildModule && emojiSearch */){/*
-            if(!this.cancelAutocompleteRender){
-                this.cancelAutocompleteRender = Utils.monkeyPatch(AutocompleteModule, "default", {
-                    
-                })
-            }*/
+        if(AutocompleteModule && AutoCompletionTemplates && EmojiModuleQuery && Messages && guildModule && emojiSearch){
             console.log(`Patching getAutocompleteOptions of AutoCompletionTemplates`, AutoCompletionTemplates)
             const getAutocompleteOptions = AutoCompletionTemplates.getAutocompleteOptions
             AutoCompletionTemplates.getAutocompleteOptions = function(e, t, n, r, a){
@@ -61,9 +57,12 @@ export default new class EmojiModule {
                             return "." + e + "."
                         }))
                     },
-                    getPlainText(id, emojis){
-                        var emojis = emojis.emojis;
-                        return null == emojis || null == emojis[id] ? "" : "." + emojis[id].name + "."
+                    getPlainText(id, guild){
+                        var emojis = guild.emojis;
+                        if (null == emojis || null == emojis[id]) return "";
+                        var emoji = emojis[id],
+                            isAnimated = emoji.animated ? "a" : "";
+                        return emoji.managed || null == emoji.id ? "." + emoji.name + "." : "<" + isAnimated + "." + (emoji.originalName || emoji.name) + "." + emoji.id + ">"
                     },
                     getRawText(id, guild){
                         var emojis = guild.emojis;
@@ -79,8 +78,8 @@ export default new class EmojiModule {
             console.error(new Error("Couldn't start autocompletion of Lightcord's emojis."))
         }
 
+        /** Emoji display */
         while (!BDV2.MessageComponent) await new Promise(resolve => setTimeout(resolve, 100));
-
         if (!this.cancelEmojiRender){
             this.cancelEmoteRender = Utils.monkeyPatch(BDV2.MessageComponent, "default", {before: (data) => {
                 const message = Utils.getNestedProp(data.methodArguments[0], "childrenMessageContent.props.message")
@@ -224,8 +223,11 @@ function setEmojiUsable(usable){
     if(!isEmojiDisabled)isEmojiDisabled = EmojiFilterModule.default.isEmojiDisabled
 
     hasPatched = true
-    EmojiFilterModule.default.isEmojiDisabled = function(){
-        if(isUsable)return false
+    EmojiFilterModule.default.isEmojiDisabled = function(emoji){
+        if(isUsable){
+            if(emoji.surrogates || emoji.diversity)return true
+            return false
+        }
         return isEmojiDisabled.call(this, ...arguments)
     }
 }

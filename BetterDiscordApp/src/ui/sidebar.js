@@ -24,6 +24,8 @@ export default class V2C_SideBar extends BDV2.reactComponent {
         this.setInitialState();
         this.onClick = this.onClick.bind(this);
         this.setSelected = this.setSelected.bind(this);
+
+        sidebars.push(this)
     }
 
     setInitialState() {
@@ -69,9 +71,25 @@ export default class V2C_SideBar extends BDV2.reactComponent {
             si.className = this.nscn;
         }
 
-        this.setState({selected: null});
+        setUnselected()
         this.setState({selected: id});
 
         if (this.props.onClick) this.props.onClick(id);
     }
+
+    componentWillUnmount(){
+        let sidebarIndex = sidebars.findIndex(e => e === this)
+        if(sidebarIndex)sidebars.splice(sidebarIndex, 1)
+    }
+}
+
+const sidebars = []
+
+export function setUnselected(){
+    sidebars.forEach((sidebar) => {
+        if(!sidebar.state.selected)return
+        sidebar.setState({
+            selected: null
+        })
+    })
 }

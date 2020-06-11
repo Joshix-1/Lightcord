@@ -9,9 +9,8 @@ import TooltipWrap from "../ui/tooltipWrap";
 
 export default class V2_SettingsPanel_Sidebar {
 
-    constructor(onClick, onClickLightcord) {
+    constructor(onClick) {
         this.onClick = onClick;
-        this.onClickLightcord = onClickLightcord
     }
 
     get items() {

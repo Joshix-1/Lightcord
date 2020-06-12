@@ -109,8 +109,6 @@ async function privateInit(){
             fs.writeFileSync(ZeresPluginLibraryPath, content)
         })
 
-        // Should we download 1XenoLib and BDFDB too ? response: No
-
         BetterDiscordConfig.haveInstalledDefault = true // Inform User about what we just did
     }
     if(!fs.existsSync(themePath)){

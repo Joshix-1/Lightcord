@@ -78,6 +78,7 @@ export const settings = {
 
     /* Content */
     "Content Error Modal":        {id: "fork-ps-1", info: "Shows a modal with plugin/theme errors", implemented: true,  hidden: false, cat: "core", category: "content manager"},
+    "Scan Plugins":               {id: "fork-ps-6", info: "Scan plugins for any threat that can be hidden inside.", implemented: true,  hidden: false, cat: "core", category: "content manager"},
     "Show Toasts":                {id: "fork-ps-2", info: "Shows a small notification for important information", implemented: true,  hidden: false, cat: "core", category: "content manager"},
     "Scroll To Settings":         {id: "fork-ps-3", info: "Auto-scrolls to a plugin's settings when the button is clicked (only if out of view)", implemented: true,  hidden: false, cat: "core", category: "content manager"},
     "Automatic Loading":          {id: "fork-ps-5", info: "Automatically loads, reloads, and unloads plugins and themes", implemented: true,  hidden: false, cat: "core", category: "content manager"},
@@ -129,6 +130,7 @@ export const defaultCookie = {
     "fork-ps-3": true,
     "fork-ps-4": true,
     "fork-ps-5": true,
+    "fork-ps-6": true,
     "fork-es-2": false,
     "fork-es-3": true,
     "fork-wp-1": false,

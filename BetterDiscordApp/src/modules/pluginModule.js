@@ -107,7 +107,7 @@ PluginModule.prototype.loadPlugin = async function(filename) {
         if (settingsCookie["fork-ps-2"]) Utils.showToast(`${filename} could not be loaded.`, {type: "error"});
         return Utils.err("ContentManager", `${filename} could not be loaded.`, error);
     }
-    const plugin = Object.values(bdplugins).find(p => p.filename == filename).plugin;
+    const plugin = Object.values(bdplugins).find(p => (console.log(p.filename, filename)) || p.filename == filename).plugin;
     try { if (plugin.load && typeof(plugin.load) == "function") plugin.load();}
     catch (err) {if (settingsCookie["fork-ps-1"]) Utils.showContentErrors({plugins: [err]});}
     Utils.log("ContentManager", `${plugin.getName()} v${plugin.getVersion()} was loaded.`);

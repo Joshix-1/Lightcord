@@ -4,16 +4,11 @@ import * as crypto from "crypto"
 import BDV2 from "./v2"
 import tooltipWrap from "../ui/tooltipWrap"
 import Utils from "./utils"
+import { createReadStream } from "fs"
+import { basename } from "path"
 
-const debug = true
 const cache = {}
 const cache2 = {}
-/*
-const PinnedModule = BDModules.get(e => e.default && e.default.getPinnedMessages)[0].default
-const ChannelModule = BDModules.get(e => e.default && e.default.getChannelId)[0].default
-const fetchMessagesModule = BDModules.get(e => e.default && e.default.fetchMessages)[0].default
-const fetchMessagesModule2 = BDModules.get(e => e.default && e.default.fetchMessages)[1].default
-const getMessagesModule = BDModules.get(e => e.default && e.default.getMessages)[0].default*/
 
 export default new class PluginCertifier {
     constructor(){}
@@ -25,103 +20,15 @@ export default new class PluginCertifier {
     }
 
     start(){
-        /*const dispatcher = window.Lightcord.DiscordModules.dispatcher
-        const constants = window.Lightcord.DiscordModules.constants
 
-        const originalFetchMessages = fetchMessagesModule.fetchMessages
-        fetchMessagesModule.fetchMessages = function(){
-            const returnValue = originalFetchMessages.apply(this, arguments)
-            if(returnValue instanceof Promise){
-                returnValue
-                .then(() => {
-                    const ev = getMessagesModule.getMessages(ChannelModule.getChannelId())
-                    process.nextTick(() => {
-                        for(const message of ev._array){
-                            const attachments = message.attachments || []
-                            if(attachments.length === 0)continue // no attachments
-            
-                            attachments.forEach(attachment => {
-                                processAttachment(attachment)
-                            })
-                        }
-                    })
-                })
-            }
-            return returnValue
-        }
+    }
 
-        const originalFetchMessages2 = fetchMessagesModule2.fetchMessages
-        fetchMessagesModule2.fetchMessages = function(){
-            const returnValue = originalFetchMessages2.apply(this, arguments)
-            if(returnValue instanceof Promise){
-                returnValue
-                .then(() => {
-                    const ev = getMessagesModule.getMessages(ChannelModule.getChannelId())
-                    process.nextTick(() => {
-                        for(const message of ev._array){
-                            const attachments = message.attachments || []
-                            if(attachments.length === 0)continue // no attachments
-            
-                            attachments.forEach(attachment => {
-                                processAttachment(attachment)
-                            })
-                        }
-                    })
-                })
-            }
-            return returnValue
-        }
-
-        const alreadyUsed = {}
-        const originalGetPinnedMessages = PinnedModule.getPinnedMessages.bind(PinnedModule)
-        PinnedModule.getPinnedMessages = function(){
-            const pinned = originalGetPinnedMessages(...arguments)
-            if(!pinned || alreadyUsed[pinned.id])return pinned
-            alreadyUsed[pinned.id] = true
-            
-            setTimeout(() => {
-                delete alreadyUsed[pinned.id]
-                for(const message of pinned.messages){
-                    const attachments = message.attachments || []
-                    if(attachments.length === 0)continue // no attachments
-    
-                    attachments.forEach(attachment => {
-                        processAttachment(attachment)
-                    })
-                }
-            }, 50);
-
-            return pinned
-        }
-
-        dispatcher.subscribe(constants.ActionTypes.MESSAGE_CREATE, (ev) => {
-            const message = ev.message
-            if(message.channel_id !== ChannelModule.getChannelId())return
-            process.nextTick(() => {
-                const attachments = message.attachments || []
-                if(attachments.length === 0)return // no attachments
-
-                attachments.forEach(attachment => {
-                    processAttachment(attachment)
-                })
-            })
-        })
-
-        const messages = getMessagesModule.getMessages(ChannelModule.getChannelId())
-        process.nextTick(() => {
-            for(const message of messages._array){
-                const attachments = message.attachments || []
-                if(attachments.length === 0)continue // no attachments
-
-                attachments.forEach(attachment => {
-                    processAttachment(attachment)
-                })
-            }
-        })*/
+    isTrusted(hash){
+        return cache[hash] && !cache[hash].suspect
     }
 }
 
-function checkViruses(hash, data, id){
+export function checkViruses(hash, data, resultCallback, removeCallback){
     data = data.toString("utf8").split(/[^\w\d]+/g)
     let isHarmful = false
     for(let keyword of data){
@@ -161,8 +68,8 @@ function checkViruses(hash, data, id){
                 /_0x\w{4}\('0x[\dabcdef]+'\)/g,
                 /_0x\w{4}\('0x[\dabcdef]+'[, ]+'[^']{4}'\)/g, // _0x8db7('0x0', 'x1]f')
                 /** mangled */
-                /\w+\('0x[\dabcdef]+'\)/g,
-                /\w+\('0x[\dabcdef]+'[, ]+'[^']{4}'\)/g, // _0x8db7('0x0', 'x1]f')
+                /\w+\('0x[\dabcdef]+'\)/g, // b('0x0')
+                /\w+\('0x[\dabcdef]+'[, ]+'[^']{4}'\)/g, // b('0x0', 'x1]f')
             ]
             for(let regex of regexps){
                 if(isHarmful)break
@@ -171,7 +78,7 @@ function checkViruses(hash, data, id){
         }
     }
 
-    if(!isHarmful)return
+    if(!isHarmful)return removeCallback()
     cache[hash] = {
         suspect: true,
         name: hashToUrl[hash].split("/").pop(),
@@ -181,38 +88,56 @@ function checkViruses(hash, data, id){
     
     console.log(`Found potentially dangerous ${cache[hash].type.toLowerCase()}: ${cache[hash].name}`)
 
-    renderToElements(id, cache[hash], cache[hash].name)
+    resultCallback(cache[hash])
 }
 
 const hashToUrl = {}
 
-function processAttachment(attachment, id){
+export function checkHash(hash, data, filename, resultCallback, removeCallback){
+    console.log(`File: ${filename} hash: ${hash}`)
+    if(!cache[hash]){
+        nodeFetch("https://cdn.jsdelivr.net/gh/Lightcord/filehashes@master/hashes/"+hash, { // Using node-fetch to bypass cors
+            headers: {
+                "User-Agent": electron.remote.getCurrentWebContents().userAgent // have to set user-agent
+            }
+        }).then(async res => {
+            if(res.status !== 200){
+                if(filename.endsWith(".theme.css"))return removeCallback()
+                return checkViruses(hash, data, resultCallback, wrongCallback)
+            }
+            const result = await res.json()
+
+            cache[hash] = result
+
+            resultCallback(result)
+        }).catch(()=>{})
+    }else{
+        const result = cache[hash]
+
+        resultCallback(result)
+    }
+}
+
+export function processFile(__path, resultCallback, removeCallback){    
+    const hash = crypto.createHash("sha256")
+    let data = Buffer.alloc(0)
+
+    createReadStream(__path).on("data", chunk => {
+        data = Buffer.concat([data, chunk])
+        hash.update(chunk)
+    }).on("end", () => {
+        const hashResult = hash.digest("hex")
+
+        hashToUrl[hashResult] = __path
+
+        checkHash(hashResult, data, basename(__path), resultCallback, removeCallback)
+    })
+}
+
+export function processAttachment(attachment, id){
     if(!document.getElementById(id))return
     if(!attachment.url.startsWith("https://cdn.discordapp.com/"))return document.getElementById(id).remove()
     if(!attachment.filename.endsWith(".plugin.js") && !attachment.filename.endsWith(".theme.css"))return document.getElementById(id).remove()
-
-    let nextHash = (hash, data) => {
-        if(!cache[hash]){
-            nodeFetch("https://cdn.jsdelivr.net/gh/Lightcord/filehashes@master/hashes/"+hash, { // Using node-fetch to bypass cors
-                headers: {
-                    "User-Agent": electron.remote.getCurrentWebContents().userAgent // have to set user-agent
-                }
-            }).then(async res => {
-                if(res.status !== 200)return checkViruses(hash, data, id)
-                const result = await res.json()
-
-                cache[hash] = result
-
-                renderToElements(id, result, attachment.filename)
-            }).catch(()=>{})
-        }else{
-            const result = cache[hash]
-
-            renderToElements(id, result, attachment.filename)
-        }
-    }
-
-    if(cache2[attachment.url])return nextHash(cache2[attachment.url])
 
     nodeFetch(attachment.url, {
         headers: {
@@ -232,7 +157,11 @@ function processAttachment(attachment, id){
             cache2[attachment.url] = hashResult
             hashToUrl[hashResult] = attachment.url
 
-            nextHash(hashResult, data)
+            checkHash(hashResult, data, attachment.filename, (result) => {
+                renderToElements(id, result, attachment.filename)
+            }, () => {
+                document.getElementById(id).remove()
+            })
         })
     }).catch(()=>{})
 }
@@ -252,7 +181,6 @@ function renderToElements(id, result, filename){
     if(!flowerStarModule)flowerStarModule = BDModules.get(e => e.flowerStarContainer)[0]
     if(!childModule)childModule = BDModules.get(e => e.childContainer)[0]
     
-
     console.log(result)
     if(result.suspect){
         try{

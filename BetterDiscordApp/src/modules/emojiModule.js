@@ -180,6 +180,10 @@ export default new class EmojiModule {
         this.cancelEmoteRender();
         this.cancelEmoteRender = null;
     }
+
+    start(){
+        
+    }
 }
 
 function D(e, t, n, r, o, i, s, u, l, c) {

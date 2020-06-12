@@ -9,6 +9,9 @@ import EditIcon from "./icons/edit";
 import DeleteIcon from "./icons/delete";
 import Switch from "./components/switch";
 import TooltipWrap from "./tooltipWrap";
+import { processFile } from "../modules/pluginCertifier";
+import contentManager from "../modules/contentManager";
+import { resolve } from "path";
 
 const React = BDV2.React;
 const anchorClasses = BDV2.anchorClasses;
@@ -32,7 +35,8 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
         this.state = {
             checked: this.props.enabled,
             settings: false,
-            reloads: 0
+            reloads: 0,
+            trusted: false
         };
     }
 
@@ -135,6 +139,10 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
         </TooltipWrap>;
     }
 
+    componentWillUnmount(){
+        this.unmounted = true
+    }
+
     get links() {
         const links = [];
         const addon = this.props.addon;
@@ -182,7 +190,21 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
         if (this.state.settings) return this.settingsComponent;
         const {authorId, authorLink} = this.props.addon;
 
-        return BDV2.react.createElement("div", {className: "bd-card bd-addon-card settings-closed ui-switch-item"},
+        const style = {}
+        if(!this.isScanning){
+            this.isScanning = true
+            processFile(resolve(this.props.addon.filename.endsWith(".plugin.js") ? contentManager.pluginsFolder : contentManager.themesFolder, this.props.addon.filename), (result) => {
+                if(this.unmounted)return
+                this.setState({
+                    isTrusted: !result.suspect
+                }, () => {})
+            })
+        }else{
+            if(this.state.isTrusted){
+                style.borderColor = "#4087ed"
+            }
+        }
+        return BDV2.react.createElement("div", {className: "bd-card bd-addon-card settings-closed ui-switch-item", style},
             BDV2.react.createElement("div", {className: "bd-addon-header bda-header"},
                     BDV2.react.createElement("div", {className: "bd-card-title bda-header-title"}, this.buildTitle(this.name, this.version, {name: this.author, id: authorId, link: authorLink})),
                     BDV2.react.createElement("div", {className: "bd-addon-controls bda-controls"},

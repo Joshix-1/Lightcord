@@ -95,7 +95,8 @@ export default class CardList extends BDV2.reactComponent {
             toggle: this.manager.toggle.bind(this.manager),
             //edit: this.edit.bind(this),
             remove: this.delete.bind(this),
-            addon: addon
+            addon: addon,
+            hash: addon.hash
         };
     }
 

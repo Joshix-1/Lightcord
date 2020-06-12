@@ -1,8 +1,8 @@
-const __non_webpack_require__ = window.require
 import {bdConfig, bdplugins, bdthemes} from "../0globals";
 import pluginModule from "./pluginModule";
 import themeModule from "./themeModule";
 import Utils from "./utils";
+import * as crypto from "crypto"
 
 const path = require("path");
 const fs = require("fs");
@@ -171,9 +171,9 @@ export default new class ContentManager {
         if (typeof(filename) === "undefined" || typeof(type) === "undefined") return;
         const isPlugin = type === "plugin";
         const baseFolder = isPlugin ? this.pluginsFolder : this.themesFolder;
-        try {__non_webpack_require__(path.resolve(baseFolder, filename));}
+        try {window.require(path.resolve(baseFolder, filename));}
         catch (error) {return {name: filename, file: filename, message: "Could not be compiled.", error: {message: error.message, stack: error.stack}};}
-        const content = __non_webpack_require__(path.resolve(baseFolder, filename));
+        const content = window.require(path.resolve(baseFolder, filename));
         if(!content.name)return {name: filename, file: filename, message: "Cannot escape the ID.", error: {message: "Cannot read property 'replace' of undefined", stack: "Cannot read property 'replace' of undefined"}}
         content.id = Utils.escapeID(content.name);
         if (isPlugin) {
@@ -189,14 +189,14 @@ export default new class ContentManager {
             delete bdthemes[content.name];
             bdthemes[content.name] = content;
         }
-    }
+    }   
 
     unloadContent(filename, type) {
         if (typeof(filename) === "undefined" || typeof(type) === "undefined") return;
         const isPlugin = type === "plugin";
         const baseFolder = isPlugin ? this.pluginsFolder : this.themesFolder;
         try {
-            delete __non_webpack_require__.cache[__non_webpack_require__.resolve(path.resolve(baseFolder, filename))];
+            delete window.require.cache[window.require.resolve(path.resolve(baseFolder, filename))];
         }
         catch (err) {return {name: filename, file: filename, message: "Could not be unloaded.", error: {message: err.message, stack: err.stack}};}
     }
@@ -204,7 +204,7 @@ export default new class ContentManager {
     isLoaded(filename, type) {
         const isPlugin = type === "plugin";
         const baseFolder = isPlugin ? this.pluginsFolder : this.themesFolder;
-        try {__non_webpack_require__.cache[__non_webpack_require__.resolve(path.resolve(baseFolder, filename))];}
+        try {window.require.cache[window.require.resolve(path.resolve(baseFolder, filename))];}
         catch (err) {return false;}
         return true;
     }

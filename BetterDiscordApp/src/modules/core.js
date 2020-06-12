@@ -47,6 +47,7 @@ Core.prototype.init = async function() {
         return;
     }
 
+    /*
     const latestLocalVersion = bdConfig.updater ? bdConfig.updater.LatestVersion : bdConfig.latestVersion;
     if (latestLocalVersion > bdConfig.version) {
         Utils.showConfirmationModal("Update Available", [`There is an update available for BandagedBD's Injector (${latestLocalVersion}).`, "You can either update and restart now, or later."], {
@@ -66,7 +67,7 @@ Core.prototype.init = async function() {
                 }
             }
         });
-    }
+    }*/
 
     Utils.log("Startup", "Initializing Settings");
     this.initSettings();
@@ -107,7 +108,7 @@ Core.prototype.init = async function() {
         DataStore.setBDData("version", bbdVersion);
     }
 
-    const emojiModule = EmojiModule
+    EmojiModule.start()
 
     Utils.suppressErrors(this.patchSocial.bind(this), "BD Social Patch")();
     Utils.suppressErrors(this.patchGuildPills.bind(this), "BD Guild Pills Patch")();
@@ -125,6 +126,7 @@ Core.prototype.init = async function() {
     }
     const logo = document.querySelector("#app-mount > div.typeWindows-1za-n7.withFrame-haYltI.titleBar-AC4pGV.horizontalReverse-3tRjY7.flex-1O1GKY.directionRowReverse-m8IjIq.justifyStart-2NDFzi.alignStretch-DpGPf3.da-typeWindows.da-withFrame.da-titleBar.da-horizontalReverse.da-flex.da-directionRowReverse.da-justifyStart.da-alignStretch > div.wordmarkWindows-1v0lYD.wordmark-2iDDfm.da-wordmarkWindows.da-wordmark")
     if(logo){
+        logo.style.top = "3px"
         logo.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="10" width="70" viewBox="0 0 72.54 10" style="margin-left: -5px, margin-top: 10px">
     <path fill="currentColor" d="M44.81,9.67V6.33c0-1.21,2.13-1.49,2.78-.28l2-.81A3.53,3.53,0,0,0,46.2,3c-1.92,0-3.81,1.13-3.81,3.33V9.67c0,2.21,1.89,3.33,3.77,3.33a3.87,3.87,0,0,0,3.45-2.18l-2.12-1C47,11.17,44.81,10.85,44.81,9.67ZM10.68,12.89h2.41V3.17H10.68ZM71.76,3.14H68.19V7.23L70.57,9.4v-4h1.27c.81,0,1.21.41,1.21,1v3c0,.63-.38,1.05-1.21,1.05H68.18v2.31h3.57c1.92,0,3.72-1,3.72-3.2V6.39C75.48,4.13,73.68,3.14,71.76,3.14ZM54.22,3c-2,0-4,1.1-4,3.34V9.66c0,2.23,2,3.34,4,3.34s3.95-1.11,3.95-3.34V6.34C58.19,4.11,56.2,3,54.22,3Zm1.55,6.66c0,.7-.78,1.06-1.54,1.06s-1.55-.35-1.55-1.06V6.34c0-.72.75-1.1,1.5-1.1s1.59.35,1.59,1.1ZM66.84,6.34c0-2.29-1.58-3.2-3.55-3.2H59.46v9.73h2.45V9.77h.43l2.22,3.09h3L65,9.52C66.13,9.15,66.84,8.14,66.84,6.34ZM63.33,7.65H61.91V5.43h1.42A1.11,1.11,0,1,1,63.33,7.65ZM29.83,13h2.42V3.06H29.83V6.73l-3,0V3.09H24.7v9.78h2.14V8.68l3,0ZM17.16,9.76V6.42c0-1.21,2.13-1.49,2.78-.28l2-.81a3.55,3.55,0,0,0-3.36-2.24c-1.92,0-3.81,1.13-3.81,3.33V9.76c0,2.21,2,3.15,3.9,3.15s3.58-1,3.58-3V7.58H18.79l0,1.36H20.3v.77C20.3,10.92,17.16,10.94,17.16,9.76Z" transform="translate(-2.93 -3)"/>
     <polygon fill="currentColor" points="35.91 0.06 38.43 0.06 38.43 1.84 35.92 1.81 35.97 10 33.55 10 33.49 1.75 30.98 1.74 30.98 0.06 33.49 0.06 35.91 0.06"/>
@@ -176,9 +178,13 @@ Core.prototype.initSettings = function () {
     }
 };
 
+
+let classNameLayer
+let classNameSocialLinks
+let classNameModal
+
 Core.prototype.initObserver = function () {
     const mainObserver = new MutationObserver((mutations) => {
-
         for (let i = 0, mlen = mutations.length; i < mlen; i++) {
             const mutation = mutations[i];
             if (typeof pluginModule !== "undefined") pluginModule.rawObserver(mutation);
@@ -188,13 +194,9 @@ Core.prototype.initObserver = function () {
 
             const node = mutation.addedNodes[0];
 
-            let [
-                classNameLayer, 
-                classNameSocialLinks
-            ] = [
-                BDModules.get((e) => e.layer && typeof e.layer === "string" && e.animating)[0].layer,
-                BDModules.get((e) => e.socialLinks && typeof e.socialLinks === "string")[0].socialLinks
-            ]
+            if(!classNameLayer)classNameLayer = BDModules.get((e) => e.layer && typeof e.layer === "string" && e.animating)[0].layer
+            if(!classNameSocialLinks)classNameSocialLinks = BDModules.get((e) => e.socialLinks && typeof e.socialLinks === "string")[0].socialLinks
+            if(!classNameModal)classNameModal = BDModules.get((e) => e.modal && typeof e.modal === "string" && e.inner && typeof e.inner === "string" && !e.responsiveWidthMobile)[0].modal
 
             if (node.classList.contains(classNameLayer)) {
                 if (node.getElementsByClassName("guild-settings-base-section").length) node.setAttribute("layer-id", "server-settings");
@@ -207,6 +209,28 @@ Core.prototype.initObserver = function () {
             }
 
             if (node.parentElement == document.body && node.querySelector("#ace_settingsmenu")) node.id = "ace_settingsmenu_container";
+
+            /*
+            if(node.classList.contains(classNameModal)){
+                try{
+                    /**
+                     * @type {Element}
+                     *//*
+                    const UserProfile = Utils.getNestedProp(node, "childNodes.0.childNodes.0")
+                    let user = BDV2.getInternalInstance(node).pendingProps.children.props.children.props.user
+                    console.log(user)
+    
+                    if(UserProfile && UserProfile.childNodes.length === 2){
+                        let header = UserProfile.childNodes[0].childNodes[0]
+                        
+                        let children = BDV2.getInternalInstance(header).return.pendingProps.children[1]
+                        console.log(children)
+                        children.push(BDV2.react.createElement("p", {}, "sltsv"))                        
+                    }
+                }catch(e){
+                    console.error("An error occured in Badge Rendering:", e)
+                }
+            }*/
 
             // Emoji Picker
             //node.getElementsByClassName("emojiPicker-3m1S-j").length && !node.querySelector(".emojiPicker-3m1S-j").parentElement.classList.contains("animatorLeft-1EQxU0")
@@ -481,7 +505,7 @@ Core.prototype.patchMemberList = function() {
             children.push(
                 BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord Developer"},
                     BDV2.React.createElement(Anchor, {className: "bd-member-badge", href: "https://github.com/Lightcord/Lightcord", title: "Lightcord", target: "_blank"},
-                        BDV2.React.createElement(LightcordLogo, {size: "32px", className: "bd-logo"})
+                        BDV2.React.createElement(LightcordLogo, {size: "16px", className: "bd-logo"})
                     )
                 )
             );

@@ -1,6 +1,7 @@
 import {settingsCookie} from "../0globals";
 import BDV2 from "./v2";
 import DOM from "./domtools";
+import Utils from "./utils";
 
 export default new class DevMode {
     constructor() {
@@ -51,24 +52,36 @@ export default new class DevMode {
             const selector = this.getSelector(e.target);
     
             let [
-                classNameLayer, 
+                classLayer, 
                 classItems
             ] = [
-                BDModules.get((e) => e.layer && typeof e.layer === "string" && e.disabledPointerEvents)[0].layer,
-                BDModules.get((e) => e.contextMenu)[0],
+                BDModules.get((e) => e.layer && typeof e.layer === "string" && e.disabledPointerEvents)[0],
+                BDModules.get((e) => e.menu)[0]
             ]
             
             function attach() {
-                let cm = DOM.query("."+classItems.contextMenu.split(" ")[0]);
+                if(!classItems || !classLayer.layer)return console.log(classItems, classLayer.layer)
+
+                let cm = DOM.query("."+Utils.removeDa(classItems.menu));
                 if (!cm) {
-                    const container = DOM.query("#app-mount");
-                    const cmWrap = DOM.createElement(`<div class="${classNameLayer}">`);
-                    cm = DOM.createElement(`<div class="${classItems.contextMenu} bd-context-menu"></div>`);
+                    const container = DOM.query("#app-mount > ."+Utils.removeDa(classLayer.layerContainer));
+                    const cmWrap = DOM.createElement(`<div class="${classLayer.layer}">`);
+                    cm = DOM.createElement(`<div class="${classItems.menu} ${classItems.styleFlexible} ${classItems.accommodateScrollbar} bd-context-menu" style=""></div>`);
                     cmWrap.append(cm);
                     container.append(cmWrap);
                     cmWrap.style.top = e.clientY + "px";
                     cmWrap.style.left = e.clientX + "px";
-                    cmWrap.style.zIndex = "1002";
+                    cmWrap.setAttribute("role", "menu")
+                    cmWrap.setAttribute("tabindex", "-1")
+                    cmWrap.id = "bd-copy-selector-context"
+                    cmWrap.setAttribute("aria-label", "Copy Selector Actions")
+
+                    const scrollerClasses = BDModules.get((e) => e.scrollerWrap)[0]
+                    const scrollerWrap = DOM.createElement(`<div class="${scrollerClasses.scrollerWrap} ${scrollerClasses.scrollerThemed} ${scrollerClasses.themeGhostHairline}"></div>`)
+                    const scroller = DOM.createElement(`<div class="${BDModules.get(e => e.scroller)[0].scroller} ${classItems.scroller}"></div>`)
+                    scrollerWrap.append(scroller)
+                    cm.append(scrollerWrap)
+
                     const removeCM = function(e) {
                         if (e.keyCode && e.keyCode !== 27) return;
                         cmWrap.remove();
@@ -80,17 +93,33 @@ export default new class DevMode {
                     document.addEventListener("contextmenu", removeCM);
                     document.addEventListener("keyup", removeCM);
                 }
-                const cmWrap = DOM.query("."+classNameLayer.split(" ")[0])
-    
-                const cmg = DOM.createElement(`<div class="${classItems.itemGroup}">`);
-                const cmi = DOM.createElement(`<div class="${classItems.item} ${classItems.clickable}">`);
+                const cmWrap = cm.parentElement
+                
+                const scroller = cm.childNodes[0].childNodes[0]
+                const cmg = DOM.createElement(`<div role="group"></div>`);
+                /**
+                 * @type {HTMLElement}
+                 */
+                const cmi = DOM.createElement(`<div class="${classItems.item} ${classItems.labelContainer} ${classItems.colorDefault}" role="menuitem" id="bd-copy-selector-item-cm"></div>`);
                 cmi.append(DOM.createElement(`<div class="${classItems.label}">Copy Selector</div>`));
                 cmi.addEventListener("click", () => {
                     BDV2.NativeModule.copy(selector);
-                    cm.style.display = "none";
+                    cmWrap.style.display = "none"
                 });
+                cmi.addEventListener("mouseover", (e) => {
+                    let elements = DOM.queryAll("div[role=menuitem]."+Utils.removeDa(classItems.focused))
+                    elements && elements.forEach(elem => elem.classList.remove(classItems.focused))
+                    cmi.classList.add(classItems.focused)
+                })
+                cmi.addEventListener("mouseout", (e) => {
+                    cmi.classList.remove(classItems.focused)
+                })
                 cmg.append(cmi);
-                cm.append(cmg);
+                if(scroller.childNodes.length){ // apend a separator
+                    const separator = DOM.createElement(`<div role="separator" class="${classItems.separator}"></div>`)
+                    scroller.append(separator)
+                }
+                scroller.append(cmg);
                 if(cmWrap.clientHeight < cmWrap.scrollHeight){
                     console.log("overflowing "+cmWrap.style.top)
                     cmWrap.style.top = (cmWrap.style.top - cmg.clientHeight) + "px";

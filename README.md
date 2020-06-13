@@ -33,8 +33,10 @@ npm run devInstall
 npm run test
 ```
 *You will have to do that everytime you pull/clone*
+<br/>
 Discord will launch next. You can see you have done it right by looking at the icon. 
 ![icon](https://github.com/Lightcord/Lightcord/blob/master/imagery/68747470733a2f2f692e696d6775722e636f6d2f72486e73504e4f2e706e67.png?raw=true)
+<br />
 Then everytime you want to launch it just type in
 ```sh
 npm run run

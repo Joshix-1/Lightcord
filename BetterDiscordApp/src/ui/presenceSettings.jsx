@@ -700,7 +700,7 @@ let StatusModules
 class Status extends React.Component {
     get modules(){
         return StatusModules || (StatusModules = [
-            BDModules.get(e => e.default && e.default.getPresence)[0].default.getPresence,
+            BDModules.get(e => e.default && e.default.getPresence)[0],
             BDModules.get(e => e.pointerEvents)[0].pointerEvents
         ])
     }
@@ -710,7 +710,7 @@ class Status extends React.Component {
             getPresence,
             pointerEvents
         ] = this.modules
-        let status = getPresence().status
+        let status = getPresence.default.getPresence().status
         if(status === "invisible")status = "offline"
         return <rect width="16" height="16" x="60" y="60" fill="#ffffff" mask={`url(#svg-mask-status-${status})`} className={pointerEvents}></rect>
     }

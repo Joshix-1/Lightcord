@@ -51,9 +51,9 @@ async function main(){
         console.info(`Minifying ${filepath} to ${newpath}`)
 
         if(filepath.endsWith("git.js")){
-            let commit = child_process.execSync("git rev-parse HEAD").toString()
-            console.info(`Obtained commit ${commit} for the compilation`)
-            await fs.promises.writeFile(newpath, terser.minify(fs.readFileSync(filepath, "utf8").replace(/"{commit}"/g, `"${commit.split("\n")[0]}"`)).code, "utf8")
+            let commit = child_process.execSync("git rev-parse HEAD").toString().split("\n")[0].trim()
+            console.info(`Obtained commit ${commit} for the build`)
+            await fs.promises.writeFile(newpath, terser.minify(fs.readFileSync(filepath, "utf8").replace(/"{commit}"/g, `"${commit}"`)).code, "utf8")
         }else{
             await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
         }
@@ -70,6 +70,19 @@ async function main(){
     }).then(() => {
         console.info(`Copied files and minified them from ${path.join(__dirname, "modules")}.`)
     })
+    await processNextDir(path.join(__dirname, "LightcordApi"), {
+        startDir: path.join(__dirname, "LightcordApi"),
+        newDir: path.join(__dirname, "distApp", "LightcordApi")
+    }, ((filepath) => filepath.endsWith(".js") && (!production ? !filepath.includes("node_modules") : true)), async (filepath, newpath) => {
+        console.info(`Minifying ${filepath} to ${newpath}`)
+        await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
+    }).then(() => {
+        console.info(`Copied files and minified them from ${path.join(__dirname, "LightcordApi")}.`)
+    })
+
+    await fs.promises.rmdirSync(path.join(__dirname, "distApp", "LightcordApi", "src"))
+    await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "webpack.config.json"))
+    await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "tsconfig.json"))
     
     fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "js"), {recursive: true})
     fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "css"), {recursive: true})

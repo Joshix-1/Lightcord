@@ -7,6 +7,7 @@ const regExe = process.env.SystemRoot ? path.join(process.env.SystemRoot, 'Syste
 // and the output from standard out.
 export function spawn(command: string, args: child_process.SpawnOptionsWithoutStdio, callback: (arg0: Error, arg1: string) => void) {
   let stdout = '';
+  console.log(`[\x1b[33mDEBUG\x1b[0m] Spawning "${command} with args`, args)
 
   let spawnedProcess: child_process.ChildProcessWithoutNullStreams;
   try {

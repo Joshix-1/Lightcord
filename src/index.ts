@@ -50,12 +50,15 @@ function hasArgvFlag(flag) {
 //Transform main thread into async
 (async function Main(){
     await electron.app.whenReady()
+
     console.log(`Initializing Lightcord.`)
     console.log(`Version: ${buildInfo.version}
 releaseChannel: ${buildInfo.releaseChannel}
 commit: ${buildInfo.commit}`)
+
     if(!electron.app.commandLine.hasSwitch('enable-transparent-visuals'))electron.app.commandLine.appendSwitch('enable-transparent-visuals');
     electron.app.setAppUserModelId(Constants.APP_ID);
+
     let coreModule
     create(() => {
         const startMinimized = hasArgvFlag('--start-minimized');

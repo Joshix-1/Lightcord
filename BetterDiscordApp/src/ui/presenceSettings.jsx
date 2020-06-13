@@ -1,3 +1,7 @@
+/**
+ * How the fuck did I do this
+ */
+
 import BDV2 from "../modules/v2";
 import V2C_SettingsTitle from "./settingsTitle";
 import V2C_SettingsGroup from "./settingsGroup";
@@ -8,11 +12,10 @@ import Select from "./select";
 import timestampRender from "./timestampRender"
 import { remote } from "electron";
 
-/**
- * @type {typeof import("react")}
- */
+
 const React = BDV2.React;
 
+let V2C_PresenceSettingsModules
 export default class V2C_PresenceSettings extends React.Component {
     constructor(props) {
         super(props);
@@ -27,6 +30,12 @@ export default class V2C_PresenceSettings extends React.Component {
         if(this.state.data.application_id){
             this.fetchAssets()
         }
+
+        this.assetComponents = new Set()
+    }
+
+    updateWhenFetched(comp){
+        this.assetComponents.add(comp)
     }
 
     /**
@@ -66,6 +75,8 @@ export default class V2C_PresenceSettings extends React.Component {
                 data: this.state.data,
                 assets: []
             })
+            this.forceUpdate()
+            this.assetComponents.forEach(e => e.forceUpdate())
             return
         }
         this.isfetching = true
@@ -84,6 +95,7 @@ export default class V2C_PresenceSettings extends React.Component {
                 })
             })
             this.forceUpdate()
+            this.assetComponents.forEach(e => e.forceUpdate())
         }).catch(() => {
             this.isfetching = false
             this.setState({
@@ -91,6 +103,7 @@ export default class V2C_PresenceSettings extends React.Component {
                 assets: []
             })
             this.forceUpdate()
+            this.assetComponents.forEach(e => e.forceUpdate())
         })
     }
 
@@ -100,45 +113,32 @@ export default class V2C_PresenceSettings extends React.Component {
         })
     }
 
+    get modules(){
+        return V2C_PresenceSettingsModules || (V2C_PresenceSettingsModules = [
+            BDModules.get(e => e.contentColumn)[0],
+            BDModules.get(e => e.marginBottom20)[0]
+        ])
+    }
+
     render() {
-        let contentModule = BDModules.get(e => e.contentColumn)[0]
+        let [
+            contentModule,
+            marginModule
+        ] = this.modules
         return (<div className={contentModule.contentColumn+" "+contentModule.contentColumnDefault+" content-column default"}
             style={{padding: "60px 40px 0px"}}>
                 <V2C_SettingsGroup title="RichPresence Settings" settings={this.props.settings} onChange={this.props.onChange}/>
                 <V2C_SettingsTitle text="RichPresence"/>
                 <div>
                     {/** options */}
-                    {RPCProps.map(e => {
-                        if(e.type === "text"){
-                            return <InputText setting={e} manager={this} id={e.id}/>
-                        }else if(e.type === "number"){
-                            let array = [<InputNumber setting={e} manager={this} id={e.id}/>]/*
-                            if(e.id === "timestamps.start"){
-                                array.unshift(<DiscordButton title="Copy Current Timestamp" onClick={() => {
-                                    DiscordNative.clipboard.copy(Date.now()+"")
-                                }} />)
-                            }*/
-                            return array
-                        }else if(e.type === "choice"){
-                            if(["assets.small", "assets.large"].includes(e.id)){
-                                return <InputChoice setting={e} manager={this} id={e.id} choices={[{value: "none", label: "No assets"}].concat(this.state.assets.map(e => {
-                                    return {
-                                        value: "asset-"+e.id,
-                                        label: e.name
-                                    }
-                                }))}/>
-                            }else{
-                                return "Unknown choice."
-                            }
-                        }
-                    })}
+                    {this.optionsComponents}
                 </div>
                 <div>
                     <V2C_SettingsTitle text="Preview"/>
                     {/** preview */}
                     <RpcPreview settings={this}/>
                 </div>
-                <div className={BDModules.get(e => e.marginBottom20)[0].marginBottom20}></div>
+                <div className={marginModule.marginBottom20}></div>
                 <button style={{opacity: 0.01}} onClick={window.ohgodohfuck}>
                     Oh god Oh fuck
                 </button>
@@ -148,6 +148,33 @@ export default class V2C_PresenceSettings extends React.Component {
                     See ? I pulled a litle sneaky on ya
                 </button>
         </div>)
+    }
+
+    get optionsComponents(){
+        return this._optionsComponents || (this._optionsComponents = RPCProps.map(e => {
+            if(e.type === "text"){
+                return <InputText setting={e} manager={this} id={e.id}/>
+            }else if(e.type === "number"){
+                let array = [<InputNumber setting={e} manager={this} id={e.id}/>]/*
+                if(e.id === "timestamps.start"){
+                    array.unshift(<DiscordButton title="Copy Current Timestamp" onClick={() => {
+                        DiscordNative.clipboard.copy(Date.now()+"")
+                    }} />)
+                }*/
+                return array
+            }else if(e.type === "choice"){
+                if(["assets.small", "assets.large"].includes(e.id)){
+                    return <InputChoice setting={e} manager={this} id={e.id} choices={[{value: "none", label: "No assets"}].concat(this.state.assets.map(e => {
+                        return {
+                            value: "asset-"+e.id,
+                            label: e.name
+                        }
+                    }))}/>
+                }else{
+                    return "Unknown choice."
+                }
+            }
+        }))
     }
 }
 const RPCProps = [
@@ -188,18 +215,43 @@ const RPCProps = [
     },
 ]
 
-class InputText extends React.Component {
+let inputTextModules
+class InputText extends React.PureComponent {
+    get modules(){
+        if(inputTextModules && inputTextModules[0])return inputTextModules
+        return inputTextModules = [
+            BDModules.get(e => e.removeKeybind)[0],
+            BDModules.get(e => e.marginBottom20)[0],
+            BDModules.get(e => e.defaultMarginh5)[0],
+            BDModules.get(e => e.colorStandard)[0],
+            BDModules.get(e => e.size32)[0],
+            BDModules.get(e => e._horizontal)[0],
+            BDModules.get(e => e.inputMini)[0],
+            BDModules.get(e => e.size16 && e.size20)[0],
+        ]
+    }
+
+    constructor(props){
+        super(props)
+        let setting = this.props.setting
+        this.state = {
+            data: this.props.manager.state.data[setting.id]
+        }
+    }
+
     render(){
         let setting = this.props.setting
 
-        let rowModule = BDModules.get(e => e.removeKeybind)[0]
-        let marginModule = BDModules.get(e => e.marginBottom20)[0]
-        let marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
-        let colorModule = BDModules.get(e => e.colorStandard)[0]
-        let sizeModule = BDModules.get(e => e.size32)[0]
-        let flexModule = BDModules.get(e => e._horizontal)[0]
-        let inputModule = BDModules.get(e => e.inputMini)[0]
-        let sizeModule2 = BDModules.get(e => e.size16 && e.size20)[0]
+        let [
+            rowModule,
+            marginModule,
+            marginModule2,
+            colorModule,
+            sizeModule,
+            flexModule,
+            inputModule,
+            sizeModule2,
+        ] = this.modules
 
         return (<div className={rowModule.row+" "+marginModule.marginBottom20}>
             <div className={`${rowModule.item} ${flexModule.flexChild}`}>
@@ -207,29 +259,67 @@ class InputText extends React.Component {
                     {setting.title}
                 </h5>
                 <div className={inputModule.inputWrapper}>
-                    <input class={`${inputModule.inputDefault} ${sizeModule2.size16}`} name="state" type="text" placeholder="" maxlength="999" value={this.props.manager.state.data[setting.id]} onChange={(ev) => {
-                        this.props.manager.onChange(this, ev.target.value)
+                    <input class={`${inputModule.inputDefault} ${sizeModule2.size16}`} name="state" type="text" placeholder="" maxlength="999" value={this.state.data} onChange={(ev) => {
+                        this.setState({
+                            data: ev.target.value
+                        })
+                        if(!this.lastEdited || this.lastEdited < Date.now() - 500){
+                            this.props.manager.onChange(this, ev.target.value)
+                            this.lastEdited = Date.now()
+                        }else if(!this.isTiming){
+                            this.isTiming = setTimeout(() => {
+                                this.props.manager.onChange(this, this.state.data)
+                                this.isTiming = null
+                                this.lastEdited = Date.now()
+                            }, 500);
+                        }
+                        this.forceUpdate()
                     }} />
                 </div>
             </div>
-            <div class={`${BDModules.get(e => e.divider && Object.keys(e).length === 1)[0].divider} ${BDModules.get(e => e.dividerDefault)[0].dividerDefault}`}></div>
+            <Divider/>
         </div>)
     }
 }
 
-class InputNumber extends React.Component {
+let InputNumberModules
+class InputNumber extends React.PureComponent {
+    get modules(){
+        return InputNumberModules || (InputNumberModules = [
+            BDModules.get(e => e.removeKeybind)[0],
+            BDModules.get(e => e.marginBottom20)[0],
+            BDModules.get(e => e.defaultMarginh5)[0],
+            BDModules.get(e => e.colorStandard)[0],
+            BDModules.get(e => e.size32)[0],
+            BDModules.get(e => e._horizontal)[0],
+            BDModules.get(e => e.inputMini)[0],
+            BDModules.get(e => e.size16 && e.size20)[0],
+            BDModules.get(e => e.colorTransparent)[0],
+        ])
+    }
+
+    constructor(props){
+        super(props)
+        let setting = this.props.setting
+        this.state = {
+            data: this.props.manager.state.data[setting.id]
+        }
+    }
+
     render(){
         let setting = this.props.setting
 
-        let rowModule = BDModules.get(e => e.removeKeybind)[0]
-        let marginModule = BDModules.get(e => e.marginBottom20)[0]
-        let marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
-        let colorModule = BDModules.get(e => e.colorStandard)[0]
-        let sizeModule = BDModules.get(e => e.size32)[0]
-        let flexModule = BDModules.get(e => e._horizontal)[0]
-        let inputModule = BDModules.get(e => e.inputMini)[0]
-        let sizeModule2 = BDModules.get(e => e.size16 && e.size20)[0]
-        let euhModule1 = BDModules.get(e => e.colorTransparent)[0]
+        let [
+            rowModule,
+            marginModule,
+            marginModule2,
+            colorModule,
+            sizeModule,
+            flexModule,
+            inputModule,
+            sizeModule2,
+            euhModule1,
+        ] = this.modules
 
 
         return (<div className={rowModule.row+" "+marginModule.marginBottom20}>
@@ -238,12 +328,23 @@ class InputNumber extends React.Component {
                     {setting.title}
                 </h5>
                 <div className={inputModule.inputWrapper}>
-                    <input class={`${inputModule.inputDefault} ${sizeModule2.size16}`} name="state" type="text" placeholder="" maxlength="999" value={this.props.manager.state.data[setting.id]} onChange={(ev) => {
-                        let newValue = ev.target.value.replace(/[^\d]+/g, "")
-                        if(newValue !== ev.target.value){
-                            ev.target.value = newValue
+                    <input class={`${inputModule.inputDefault} ${sizeModule2.size16}`} name="state" type="text" placeholder="" maxlength="999" value={this.state.data} onChange={(ev) => {
+                        let value = ev.target.value.replace(/[^\d]+/g, "")
+
+                        if(!this.lastEdited || this.lastEdited < Date.now() - 500){
+                            this.props.manager.onChange(this, value)
+                            this.lastEdited = Date.now()
+                        }else if(!this.isTiming){
+                            this.isTiming = setTimeout(() => {
+                                this.props.manager.onChange(this, this.state.data)
+                                this.isTiming = null
+                                this.lastEdited = Date.now()
+                            }, 500);
                         }
-                        this.props.manager.onChange(this, newValue)
+                        this.setState({
+                            data: value
+                        })
+                        this.forceUpdate()
                     }} />
                 </div>
                 {setting.id === "timestamps.start" ? 
@@ -255,40 +356,107 @@ class InputNumber extends React.Component {
                     </button>
                 </div> : null}
             </div>
-            <div class={`${BDModules.get(e => e.divider && Object.keys(e).length === 1)[0].divider} ${BDModules.get(e => e.dividerDefault)[0].dividerDefault}`}></div>
+            <Divider/>
         </div>)
     }
 }
 
-class InputChoice extends React.Component {
+let InputChoiceModules
+class InputChoice extends React.PureComponent {
+    constructor(props){
+        super(props)
+        let setting = this.props.setting
+        this.state = {
+            data: this.props.manager.state.data[setting.id] ? "asset-"+this.props.manager.state.data[setting.id] : "none"
+        }
+        this.props.manager.updateWhenFetched(this)
+    }
+
     onChange(data){
-        this.props.manager.onChange(this, data.value === "none" ? null : data.value.replace("asset-", ""))
+        let value = data.value
+
+        if(!this.lastEdited || this.lastEdited < Date.now() - 500){
+            this.props.manager.onChange(this, data.value === "none" ? null : data.value.replace("asset-", ""))
+            this.lastEdited = Date.now()
+        }else if(!this.isTiming){
+            this.isTiming = setTimeout(() => {
+                this.props.manager.onChange(this, this.state.data === "none" ? null : this.state.data.replace("asset-", ""))
+                this.isTiming = null
+                this.lastEdited = Date.now()
+            }, 500);
+        }
+        this.setState({
+            data: value
+        })
+        this.forceUpdate()
+    }
+    
+    get modules(){
+        return InputChoiceModules || (InputChoiceModules = [
+            BDModules.get(e => e.removeKeybind)[0],
+            BDModules.get(e => e.marginBottom20)[0],
+            BDModules.get(e => e.defaultMarginh5)[0],
+            BDModules.get(e => e.colorStandard)[0],
+            BDModules.get(e => e.size32)[0],
+            BDModules.get(e => e._horizontal)[0]
+        ])
     }
 
     render(){
         let setting = this.props.setting
 
-        let rowModule = BDModules.get(e => e.removeKeybind)[0]
-        let marginModule = BDModules.get(e => e.marginBottom20)[0]
-        let marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
-        let colorModule = BDModules.get(e => e.colorStandard)[0]
-        let sizeModule = BDModules.get(e => e.size32)[0]
-        let flexModule = BDModules.get(e => e._horizontal)[0]
+        let [
+            rowModule,
+            marginModule,
+            marginModule2,
+            colorModule,
+            sizeModule,
+            flexModule
+        ] = this.modules
         
-        let options = this.props.choices
+        let options = this.props.manager.state.assets.map(e => {
+            return {
+                value: "asset-"+e.id,
+                label: e.name
+            }
+        })
+
+        options.unshift({
+            id: "none",
+            label: "No assets"
+        })
 
         return (<div className={rowModule.row+" "+marginModule.marginBottom20}>
             <div className={`${rowModule.item} ${flexModule.flexChild}`}>
                 <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
                     {setting.title}
                 </h5>
-                <Select value={"asset-"+this.props.manager.state.data[setting.id] || "none"} onChange={this.onChange.bind(this)} options={options}/>
+                <Select value={this.state.data} onChange={this.onChange.bind(this)} options={options}/>
             </div>
-            <div class={`${BDModules.get(e => e.divider && Object.keys(e).length === 1)[0].divider} ${BDModules.get(e => e.dividerDefault)[0].dividerDefault}`}></div>
+            <Divider/>
         </div>)
     }
 }
 
+let DividerModules = []
+class Divider extends React.PureComponent {
+    get modules(){
+        return DividerModules&&DividerModules[0] ? DividerModules : (DividerModules = [
+            BDModules.get(e => e.divider && Object.keys(e).length === 1)[0],
+            BDModules.get(e => e.dividerDefault)[0]
+        ])
+    }
+
+    render(){
+        let [
+            divider,
+            dividerDefault
+        ] = this.modules
+
+        return <div class={`${divider.divider} ${dividerDefault.dividerDefault}`}></div>
+    }
+}
+/*
 class DiscordButton extends React.Component {
     render(){
         let rowModule = BDModules.get(e => e.removeKeybind)[0]
@@ -306,7 +474,7 @@ class DiscordButton extends React.Component {
             </div>
         </div>)
     }
-}
+}*/
 
 class RpcPreview extends React.Component {
     constructor(props = {}){
@@ -387,10 +555,28 @@ class Tab extends React.Component {
     }
 }
 
+let popoutModule
 class Popout extends React.Component {
+    get modules(){
+        return popoutModule || (popoutModule = [
+            BDModules.get(e => e.userPopout)[0],
+            BDModules.get(e => e._horizontal)[0],
+            BDModules.get(e => e.vertical && e.alignStretch && !e.streamerModeEnabledBtn)[0],
+            BDModules.get(e => e.bot)[0],
+            BDModules.get(e => e.activityUserPopout)[0],
+            BDModules.get(e => e.muted && e.wrapper && e.base)[0],
+            BDModules.get(e => e.size32)[0],
+            BDModules.get(e => e.themeGhostHairlineChannels)[0],
+            BDModules.get(e => e.note && Object.keys(e).length === 1)[0],
+            BDModules.get(e => e.pro && e.inline)[0],
+            BDModules.get(e => e.colorStandard)[0],
+            BDModules.get(e => e.default && e.default.Messages)[0].default.Messages,
+            BDModules.get(e => e.pointerEvents)[0],
+            BDModules.get(e => e.default && e.default.getCurrentUser)[0].default
+        ])
+    }
+
     render(){
-        let user = BDModules.get(e => e.default && e.default.getCurrentUser)[0].default.getCurrentUser()
-        let avatarURL = user.getAvatarURL(user.avatar.startsWith("a_") ? "gif" : "png")
         let [
             rootModule1,
             flexModule1,
@@ -404,22 +590,12 @@ class Popout extends React.Component {
             protipModule1,
             colorModule1,
             Messages,
-            avatarModule1
-        ] = [
-            BDModules.get(e => e.userPopout)[0],
-            BDModules.get(e => e._horizontal)[0],
-            BDModules.get(e => e.vertical && e.alignStretch && !e.streamerModeEnabledBtn)[0],
-            BDModules.get(e => e.bot)[0],
-            BDModules.get(e => e.activityUserPopout)[0],
-            BDModules.get(e => e.muted && e.wrapper && e.base)[0],
-            BDModules.get(e => e.size32)[0],
-            BDModules.get(e => e.themeGhostHairlineChannels)[0],
-            BDModules.get(e => e.note && Object.keys(e).length === 1)[0],
-            BDModules.get(e => e.pro && e.inline)[0],
-            BDModules.get(e => e.colorStandard)[0],
-            BDModules.get(e => e.default && e.default.Messages)[0].default.Messages,
-            BDModules.get(e => e.pointerEvents)[0]
-        ]
+            avatarModule1,
+            userModule1
+        ] = this.modules
+        let user = userModule1.getCurrentUser()
+        let avatarURL = user.getAvatarURL(user.avatar.startsWith("a_") ? "gif" : "png")
+
         let data = Object.assign({}, defaultRPC, this.props.preview.props.settings.state.data)
         timestampClass = timestampClass || activityModule1.timestamp
         
@@ -520,18 +696,46 @@ class Popout extends React.Component {
     }
 }
 
+let StatusModules
 class Status extends React.Component {
+    get modules(){
+        return StatusModules || (StatusModules = [
+            BDModules.get(e => e.default && e.default.getPresence)[0].default.getPresence,
+            BDModules.get(e => e.pointerEvents)[0].pointerEvents
+        ])
+    }
+
     render(){
-        let status = BDModules.get(e => e.default && e.default.getPresence)[0].default.getPresence().status
+        let [
+            getPresence,
+            pointerEvents
+        ] = this.modules
+        let status = getPresence().status
         if(status === "invisible")status = "offline"
-        let className = BDModules.get(e => e.pointerEvents)[0].pointerEvents
-        return <rect width="16" height="16" x="60" y="60" fill="#ffffff" mask={`url(#svg-mask-status-${status})`} className={className}></rect>
+        return <rect width="16" height="16" x="60" y="60" fill="#ffffff" mask={`url(#svg-mask-status-${status})`} className={pointerEvents}></rect>
     }
 }
 
 let timestampClass = ""
 
+let ProfileModules
 class Profile extends React.Component {
+    get modules(){
+        return ProfileModules || (ProfileModules = [
+            BDModules.get(e => e.flex && e._horizontal)[0],
+            BDModules.get(e => e.vertical && e.alignStretch && !e.streamerModeEnabledBtn)[0],
+            BDModules.get(e => e.topSectionStreaming)[0],
+            BDModules.get(e => e.pointerEvents)[0],
+            BDModules.get(e => e.bot)[0],
+            BDModules.get(e => e.activityProfile)[0],
+            BDModules.get(e => e.muted && e.wrapper && e.base)[0],
+            BDModules.get(e => e.size32)[0],
+            BDModules.get(e => e.scrollerFade)[0],
+            BDModules.get(e => e.note && Object.keys(e).length === 1)[0],
+            BDModules.get(e => e.default && e.default.Messages)[0].default.Messages
+        ])
+    }
+
     render(){
         let user = BDModules.get(e => e.default && e.default.getCurrentUser)[0].default.getCurrentUser()
         let avatarURL = user.getAvatarURL(user.avatar.startsWith("a_") ? "gif" : "png")
@@ -547,19 +751,7 @@ class Profile extends React.Component {
             scrollerModule1,
             noteModule1,
             Messages
-        ] = [
-            BDModules.get(e => e.flex && e._horizontal)[0],
-            BDModules.get(e => e.vertical && e.alignStretch && !e.streamerModeEnabledBtn)[0],
-            BDModules.get(e => e.topSectionStreaming)[0],
-            BDModules.get(e => e.pointerEvents)[0],
-            BDModules.get(e => e.bot)[0],
-            BDModules.get(e => e.activityProfile)[0],
-            BDModules.get(e => e.muted && e.wrapper && e.base)[0],
-            BDModules.get(e => e.size32)[0],
-            BDModules.get(e => e.scrollerFade)[0],
-            BDModules.get(e => e.note && Object.keys(e).length === 1)[0],
-            BDModules.get(e => e.default && e.default.Messages)[0].default.Messages
-        ]
+        ] = this.modules
         let data = Object.assign({}, defaultRPC, this.props.preview.props.settings.state.data)
         timestampClass = timestampClass || activityModule1.timestamp
 

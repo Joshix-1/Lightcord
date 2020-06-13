@@ -53,7 +53,7 @@ async function main(){
         if(filepath.endsWith("git.js")){
             let commit = child_process.execSync("git rev-parse HEAD").toString()
             console.info(`Obtained commit ${commit} for the compilation`)
-            await fs.promises.writeFile(newpath, terser.minify((await fs.promises.readFile(filepath, "utf8")).replace("{commit}", commit)).code, "utf8")
+            await fs.promises.writeFile(newpath, terser.minify(fs.readFileSync(filepath, "utf8").replace(/"{commit}"/g, `"${commit.split("\n")[0]}"`)).code, "utf8")
         }else{
             await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
         }

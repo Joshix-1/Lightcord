@@ -186,7 +186,6 @@ async function privateInit(){
     }
 
     dispatcher.subscribe("USER_SETTINGS_UPDATE", (data) => {
-        console.log(data)
         DiscordNative.ipc.send("UPDATE_THEME", data.settings.theme)
     })
 
@@ -342,7 +341,6 @@ async function privateInit(){
                     }
                     data.friend_suggestion_count = data.friend_suggestion_count || 0
                     data.presences = data.presences || []
-                    console.log(data)
                 }else{
                     logger.log(`Logged in as an user. Skipping`)
                 }
@@ -357,6 +355,8 @@ async function privateInit(){
                 gatewayModule.default.prototype[methodName] = function(){
                     if(!isBot)return original.call(this, ...arguments)
                 }
+            }else{
+                logger.warn(`Couldn't find ${methodName} on gateway.`)
             }
         }
         cancelGatewayPrototype("updateGuildSubscriptions")
@@ -371,14 +371,17 @@ async function privateInit(){
         cancelGatewayPrototype("streamSetPaused")
         const hasUnreadModules = BDModules.get(e => e.default && e.default.hasUnread)
         hasUnreadModules.forEach((mod) => {
-            const original = mod.default.hasUnread
+            const hasUnread = mod.default.hasUnread
             mod.default.hasUnread = function(){
                 if(isBot)return false
-                return original.call(this, ...arguments)
+                return hasUnread.call(this, ...arguments)
             }
             for (const fName of ['ack']) {
                 console.log(fName, mod[fName])
-                if(!mod || !mod[fName])continue
+                if(!mod || !mod[fName]){
+                    logger.warn("Couldn't find prop "+fName+" in ackmodule1")
+                    continue
+                }
                 let original = mod[fName]
                 mod[fName] = function(){
                     if(!isBot)return original.call(this, ...arguments)
@@ -396,12 +399,17 @@ async function privateInit(){
         if(ackModule){
             for (const fName of ['ack', 'ackCategory', 'localAck', 'ackGuild']) {
                 console.log(fName, ackModule[fName])
-                if(!ackModule || !ackModule[fName])continue
+                if(!ackModule || !ackModule[fName]){
+                    logger.warn("Couldn't find prop "+fName+" in ackmodule2")
+                    continue
+                }
                 let original = ackModule[fName]
                 ackModule[fName] = function(){
                     if(!isBot)return original.call(this, ...arguments)
                 }
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const getTokenModule = BDModules.get(e => e.default && e.default.getToken)[0]
         if(getTokenModule){
@@ -412,6 +420,8 @@ async function privateInit(){
                 if(isBot)return token.startsWith("Bot ") ? token : "Bot " + token
                 return token
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const relationshipsModule = BDModules.get(e => e.default && e.default.fetchRelationships)[0]
         if(relationshipsModule){
@@ -425,6 +435,8 @@ async function privateInit(){
                     })
                 })
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const consentModule = BDModules.get(e => e.fetchConsents)[0]
         if(consentModule){
@@ -446,6 +458,8 @@ async function privateInit(){
                 if(!isBot)return setConsents.call(this, ...arguments)
                 return Promise.reject(new Error("Lightcord bot emulation cannot change this setting."))
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const harvestModule = BDModules.get(e => e.getHarvestStatus)[0]
         if(harvestModule){
@@ -462,6 +476,8 @@ async function privateInit(){
                 if(!isBot)return requestHarvest.call(this, ...arguments)
                 return Promise.reject()
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const harvestDisabledModule = BDModules.get(e => e.getSanitizedRestrictedGuilds)[0]
         if(harvestDisabledModule){
@@ -469,6 +485,8 @@ async function privateInit(){
             harvestDisabledModule.harvestDisabled = function(){
                 if(!isBot)return harvestDisabled.call(this, ...arguments)
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const settingModule = BDModules.get(e => e.default && e.default.updateRemoteSettings)[0]
         if(settingModule){
@@ -477,6 +495,8 @@ async function privateInit(){
                 if(isBot)return Promise.resolve()
                 return updateRemoteSettings.call(this, ...arguments)
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const oauth2Module = BDModules.get(e => e.default && Object.keys(e.default).length === 2 && e.default.fetch && e.default.delete)[0]
         if(oauth2Module){
@@ -495,6 +515,8 @@ async function privateInit(){
                 if(!isBot)return deleteFunc.call(this, ...arguments)
                 oauth2Module.fetch()
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const paymentModule = BDModules.get(e => e.fetchPaymentSources)[0]
         if(paymentModule){
@@ -571,6 +593,8 @@ async function privateInit(){
                 let resolve
                 return new Promise((res) => (resolve = res))
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const markServerReadShortcut = BDModules.get(e => e.MARK_SERVER_READ)[0]
         if(markServerReadShortcut){
@@ -580,6 +604,8 @@ async function privateInit(){
                 return action.call(this, ...arguments)
             }
             markServerReadShortcut.default && markServerReadShortcut.default.MARK_SERVER_READ && (markServerReadShortcut.default.MARK_SERVER_READ.action = markServerReadShortcut.MARK_SERVER_READ.action)
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const applicationStatisticModule = BDModules.get(e => e.fetchActivityStatistics)[0]
         if(applicationStatisticModule){
@@ -593,6 +619,8 @@ async function privateInit(){
                     })
                 })
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const subsInvoiceModule = BDModules.get(e => e.fetchSubscriptionInvoicePreview)[0]
         if(subsInvoiceModule){
@@ -654,6 +682,8 @@ async function privateInit(){
                 if(!isBot)return useSubscriptionInvoice.call(this, ...arguments)
                 return useSubscriptionInvoice.call(this, Object.assign(arguments[0], {preventFetch: true}), ...Array.from(arguments).slice(1))
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const subsModule = BDModules.get(e => e.fetchUserPremiumGuildSubscriptionSlots)[0]
         if(subsModule){
@@ -681,6 +711,8 @@ async function privateInit(){
                     reject(new Error("Lightcord bot emulation cannot use Server Boosts"))
                 })
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const entitlementsModule = BDModules.get(e => e.fetchUserEntitlementsForApplication)[0]
         if(entitlementsModule){
@@ -704,6 +736,8 @@ async function privateInit(){
                 })
                 return new Promise((res) => (resolve = res))
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const giftModule1 = BDModules.get(e => e.fetchGiftableEntitlements)[0]
         if(giftModule1){
@@ -720,6 +754,8 @@ async function privateInit(){
                     })
                 })
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const libraryModule = BDModules.get(e => e.fetchLibrary)[0]
         if(libraryModule){
@@ -733,6 +769,8 @@ async function privateInit(){
                     })
                 })
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const hypesquadModule = BDModules.get(e => e.default && e.default.joinHypeSquadOnline)[0]
         if(hypesquadModule){
@@ -741,6 +779,8 @@ async function privateInit(){
                 if(!isBot)return joinHypeSquadOnline.call(this, ...arguments)
                 return Promise.reject(new Error("Lightcord bot emulation cannot join hypesquad."))
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const mentionModule = BDModules.get(e => e.default && e.default.fetchRecentMentions)[0]
         if(mentionModule){
@@ -761,6 +801,8 @@ async function privateInit(){
                     })
                 })
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const templateModule = BDModules.get(e => e.default && e.default.loadTemplatesForGuild)[0]
         if(templateModule){
@@ -769,6 +811,8 @@ async function privateInit(){
                 if(!isBot)return loadTemplatesForGuild.call(this, ...arguments)
                 return Promise.reject(new Error("Lightcord bot emulation cannot use Guild Templates"))
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
         const searchModule = BDModules.get(e => e.default && e.default.prototype && e.default.prototype.retryLater)[0]
         if(searchModule){
@@ -777,6 +821,8 @@ async function privateInit(){
                 if(!isBot)return fetch.call(this, ...arguments)
                 n(new Error("Lightcord bot emulation cannot search in guild."))
             }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
         }
     })().catch(() => {})
 

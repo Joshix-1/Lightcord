@@ -80,8 +80,8 @@ async function main(){
         console.info(`Copied files and minified them from ${path.join(__dirname, "LightcordApi")}.`)
     })
 
-    await fs.promises.rmdirSync(path.join(__dirname, "distApp", "LightcordApi", "src"))
-    await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "webpack.config.json"))
+    await fs.promises.rmdir(path.join(__dirname, "distApp", "LightcordApi", "src"), {"recursive": true})
+    await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "webpack.config.js"))
     await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "tsconfig.json"))
     
     fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "js"), {recursive: true})

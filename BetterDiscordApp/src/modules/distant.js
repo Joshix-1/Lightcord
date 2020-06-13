@@ -86,7 +86,7 @@ export default new class DistantServer {
                         promise[1](user.badges)
                     }
                 }).catch((err) => {// Couldn't fetch badges: error
-                    console.error(err)
+                    if(!(err instanceof LightcordError))console.error(err)
                     users.forEach(data => {
                         data[1]([])// resolve no badge fetched
                     })
@@ -139,7 +139,7 @@ class LightcordError extends Error {
 
 export const Constants = {
     SERVER_URL: "http://127.0.0.1",
-    badges: [
+    badges: [ // TODO: 
         {
             name: "Lightcord User",
             id: "01cfa7b0-7cdb-4b0e-8258-9c6a78235c93",
@@ -151,7 +151,10 @@ export const Constants = {
         }, {
             name: "Lightcord Bug Hunter",
             id: "f04698f5-816b-41e3-bd01-92291193d7a5",
-            defaultUsers: [],
+            defaultUsers: [
+                "696481194443014174",
+                "696003456611385396"
+            ],
             scopes: [],
             component: BugHunterBadge,
             href: "https://github.com/lightcord/lightcord/wiki/badges/bug_hunter"

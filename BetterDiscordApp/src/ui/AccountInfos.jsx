@@ -1,12 +1,5 @@
 import BDV2 from "../modules/v2";
 import V2C_SettingsTitle from "./settingsTitle";
-import V2C_SettingsGroup from "./settingsGroup";
-import dataStore from "../modules/dataStore";
-import { defaultRPC, settingsRPC } from "../0globals";
-import CustomRichPresence from "../modules/CustomRichPresence"
-import Select from "./select";
-import timestampRender from "./timestampRender"
-import DOMTools from "../modules/domtools";
 
 /**
  * @type {typeof import("react")}

@@ -9,17 +9,13 @@ export default class Switch extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
-    onChange() {
+    onChange(value) {
         if (this.props.disabled) return;
-        this.props.onChange(!this.state.checked);
+        this.props.onChange(value);
         this.setState({checked: !this.state.checked});
     }
 
     render() {
-        const enabledClass = this.props.disabled ? " bd-switch-disabled" : "";
-        const checkedClass = this.state.checked ? " bd-switch-checked" : "";
-        return  <div className={`bd-switch` + enabledClass + checkedClass}>
-                    <input type="checkbox" id={this.props.id} className={`bd-checkbox`} disabled={this.props.disabled} checked={this.state.checked} onChange={this.onChange} />
-                </div>;
+        return <Lightcord.Api.Components.inputs.Switch onChange={this.onChange} value={this.state.checked} />
     }
 }

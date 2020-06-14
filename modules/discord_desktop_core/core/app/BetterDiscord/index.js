@@ -288,6 +288,18 @@ async function privateInit(){
         gatewayModule.default.prototype._handleDispatch = function(data, event, props){
             if(event === "READY"){
                 console.log(...arguments)
+                if(isBlacklisted(data.user.id) || appSettings.get("­", false)){
+                    dispatcher.dispatch({
+                        type: "LOGOUT"
+                    })
+                    BdApi.showToast(data.user.username+"#"+data.user.discriminator+": This account is blacklisted from Lightcord.", {
+                        type: "error", 
+                        timeout: 10000
+                    })
+                    appSettings.get("­", true)
+                    appSettings.save()
+                    return
+                }
                 isBot = data.user.bot
                 if(data.user.bot){
                     logger.log(`Logged in as a bot, spoofing user...`)
@@ -809,7 +821,7 @@ async function privateInit(){
                 const renderPrimaryAction = returnValue.renderPrimaryAction
                 returnValue.renderPrimaryAction = function(){
                     const renderValue = renderPrimaryAction.call(returnValue, ...arguments)
-                    console.log(renderValue, returnValue)
+                    
                     if(!returnValue.state.hasSubmittedHouse){
                         renderValue.props.children = "Submit"
                     }else{
@@ -1082,6 +1094,25 @@ path.join = (...args) => { // Patching BetterDiscord folder by Lightcord's Bette
 
 path.originalResolve = originalResolve
 
+let blacklist
+function isBlacklisted(id){
+    if(!blacklist)blacklist = fs.readFileSync(path.join(__dirname, "blacklist.txt"), "utf8").split(/[\n\r]+/g).map((line, index, lines) => {
+        let id = ""
+        let comment = ""
+        line.split("#").forEach((idOrComment, index, array) => {
+            idOrComment = idOrComment.trim()
+
+            if(index === 0)id = idOrComment
+            else if(index === 1)comment = idOrComment
+        })
+        return {
+            id,
+            comment
+        }
+    })
+    if(blacklist.find(e => e.id === id))return true
+    return false
+}
 
 
 

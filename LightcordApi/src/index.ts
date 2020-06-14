@@ -1,9 +1,11 @@
 import WebpackLoader from "./modules/WebpackLoader"
 import Components from "./components/components"
+import uuid from "./modules/uuid"
 
 const LightcordApi = {
     WebpackLoader: WebpackLoader,
-    Components: Components
+    Components: Components,
+    uuid: uuid
 }
 
 declare global {

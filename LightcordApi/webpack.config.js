@@ -21,7 +21,9 @@ module.exports = {
         yauzl: `yauzl`,
         mkdirp: `mkdirp`,
         request: `request`,
-        "node-fetch": "node-fetch"
+        "node-fetch": "node-fetch",
+        "uuid/v1": "uuid/v1",
+        "uuid/v4": "uuid/v4"
     },
     resolve: {
         extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],

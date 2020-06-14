@@ -103,12 +103,6 @@ class WebContents extends EventEmitter {
     webContents.on('devtools-opened', () => {
       this.emit('devtools-opened');
     });
-    webContents.on("devtools-closed", () => {
-      setTimeout(() => {
-        common.getCurrentWindow().setBackgroundColor("#00000000")
-        common.getCurrentWindow().center()
-      }, 500);
-    })
   }
 
   setBackgroundThrottling(enabled) {

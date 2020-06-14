@@ -52,7 +52,7 @@ module.exports = {
       }
     ]
   },
-  plugins: [
+  plugins: [  
     new CircularDependencyPlugin({
       // exclude detection of files based on a RegExp
       exclude: /a\.js|node_modules/,

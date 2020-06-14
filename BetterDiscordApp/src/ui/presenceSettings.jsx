@@ -121,6 +121,7 @@ export default class V2C_PresenceSettings extends React.Component {
     }
 
     render() {
+        console.log("Rerendering rpc manager")
         let [
             contentModule,
             marginModule
@@ -181,27 +182,34 @@ const RPCProps = [
     {
         title: "Application ID",
         id: "application_id",
-        type: "number"
+        type: "number",
+        placeholder: "711416957718757418"
     },
     {
         title: "Name",
         id: "name",
-        type: "text"
+        type: "text",
+        placeholder: "Lightcord"
     },
     {
         title: "Details",
         id: "details",
-        type: "text"
+        type: "text",
+        placeholder: "Browsing Discord"
     },
     {
         title: "State",
         id: "state",
-        type: "text"
+        type: "text",
+        placeholder: "Lightcord Client"
     },
     {
         title: "Timestamp Start",
         id: "timestamps.start",
-        type: "number"
+        type: "number",
+        get placeholder(){
+            return Date.now()
+        }
     },
     {
         title: "LargeAsset",
@@ -237,6 +245,22 @@ class InputText extends React.PureComponent {
         this.state = {
             data: this.props.manager.state.data[setting.id]
         }
+
+        this.input = <window.Lightcord.Api.Components.inputs.TextInput placeholder={setting.placeholder} name={setting.id} value={this.state.data} onChange={(value) => {
+            this.setState({
+                data: value
+            })
+            if(!this.lastEdited || this.lastEdited < Date.now() - 500){
+                this.props.manager.onChange(this, value)
+                this.lastEdited = Date.now()
+            }else if(!this.isTiming){
+                this.isTiming = setTimeout(() => {
+                    this.props.manager.onChange(this, this.state.data)
+                    this.isTiming = null
+                    this.lastEdited = Date.now()
+                }, 500);
+            }
+        }} type="text"/>
     }
 
     render(){
@@ -258,24 +282,7 @@ class InputText extends React.PureComponent {
                 <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
                     {setting.title}
                 </h5>
-                <div className={inputModule.inputWrapper}>
-                    <input class={`${inputModule.inputDefault} ${sizeModule2.size16}`} name="state" type="text" placeholder="" maxlength="999" value={this.state.data} onChange={(ev) => {
-                        this.setState({
-                            data: ev.target.value
-                        })
-                        if(!this.lastEdited || this.lastEdited < Date.now() - 500){
-                            this.props.manager.onChange(this, ev.target.value)
-                            this.lastEdited = Date.now()
-                        }else if(!this.isTiming){
-                            this.isTiming = setTimeout(() => {
-                                this.props.manager.onChange(this, this.state.data)
-                                this.isTiming = null
-                                this.lastEdited = Date.now()
-                            }, 500);
-                        }
-                        this.forceUpdate()
-                    }} />
-                </div>
+                {this.input}
             </div>
             <Divider/>
         </div>)
@@ -304,6 +311,28 @@ class InputNumber extends React.PureComponent {
         this.state = {
             data: this.props.manager.state.data[setting.id]
         }
+
+        this.input = <window.Lightcord.Api.Components.inputs.TextInput placeholder={setting.placeholder} name={setting.id} value={this.state.data} type="number" onChange={(value, name, input) => {
+            value = value.replace(/[^\d]+/g, "")
+            if(value == this.state.data){
+                input.setValue(value)
+                return
+            }
+
+            if(!this.lastEdited || this.lastEdited < Date.now() - 500){
+                this.props.manager.onChange(this, value)
+                this.lastEdited = Date.now()
+            }else if(!this.isTiming){
+                this.isTiming = setTimeout(() => {
+                    this.props.manager.onChange(this, this.state.data)
+                    this.isTiming = null
+                    this.lastEdited = Date.now()
+                }, 500);
+            }
+            this.setState({
+                data: value
+            })
+        }} type="text"/>
     }
 
     render(){
@@ -316,9 +345,6 @@ class InputNumber extends React.PureComponent {
             colorModule,
             sizeModule,
             flexModule,
-            inputModule,
-            sizeModule2,
-            euhModule1,
         ] = this.modules
 
 
@@ -327,34 +353,11 @@ class InputNumber extends React.PureComponent {
                 <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
                     {setting.title}
                 </h5>
-                <div className={inputModule.inputWrapper}>
-                    <input class={`${inputModule.inputDefault} ${sizeModule2.size16}`} name="state" type="text" placeholder="" maxlength="999" value={this.state.data} onChange={(ev) => {
-                        let value = ev.target.value.replace(/[^\d]+/g, "")
-
-                        if(!this.lastEdited || this.lastEdited < Date.now() - 500){
-                            this.props.manager.onChange(this, value)
-                            this.lastEdited = Date.now()
-                        }else if(!this.isTiming){
-                            this.isTiming = setTimeout(() => {
-                                this.props.manager.onChange(this, this.state.data)
-                                this.isTiming = null
-                                this.lastEdited = Date.now()
-                            }, 500);
-                        }
-                        this.setState({
-                            data: value
-                        })
-                        this.forceUpdate()
-                    }} />
-                </div>
+                {this.input}
                 {setting.id === "timestamps.start" ? 
-                <div className={BDModules.get(e => e.buttonWrapper)[0].buttonWrapper}>
-                    <button type="button" class={`${flexModule.flexChild} ${euhModule1.button} ${euhModule1.lookFilled} ${euhModule1.colorBrand} ${euhModule1.sizeSmall} ${euhModule1.grow}`} style={{flex: "0 1 auto"}} onClick={() => {
-                        DiscordNative.clipboard.copy(Date.now()+"")
-                    }}>
-	                    <div class={euhModule1.contents}>Copy current timestamp</div>
-                    </button>
-                </div> : null}
+                <Lightcord.Api.Components.inputs.Button text="Copy current timestamp" onClick={() => {
+                    DiscordNative.clipboard.copy(Date.now()+"")
+                }} color="brand"/> : null}
             </div>
             <Divider/>
         </div>)
@@ -376,7 +379,7 @@ class InputChoice extends React.PureComponent {
         let value = data.value
 
         if(!this.lastEdited || this.lastEdited < Date.now() - 500){
-            this.props.manager.onChange(this, data.value === "none" ? null : data.value.replace("asset-", ""))
+            this.props.manager.onChange(this, value === "none" ? null : value.replace("asset-", ""))
             this.lastEdited = Date.now()
         }else if(!this.isTiming){
             this.isTiming = setTimeout(() => {
@@ -422,7 +425,7 @@ class InputChoice extends React.PureComponent {
         })
 
         options.unshift({
-            id: "none",
+            value: "none",
             label: "No assets"
         })
 
@@ -456,25 +459,20 @@ class Divider extends React.PureComponent {
         return <div class={`${divider.divider} ${dividerDefault.dividerDefault}`}></div>
     }
 }
-/*
+
 class DiscordButton extends React.Component {
     render(){
         let rowModule = BDModules.get(e => e.removeKeybind)[0]
         let marginModule = BDModules.get(e => e.marginBottom20)[0]
         let flexModule = BDModules.get(e => e._horizontal)[0]
-        let euhModule1 = BDModules.get(e => e.colorTransparent)[0]
 
         return (<div className={rowModule.row+" "+marginModule.marginBottom20}>
             <div className={`${rowModule.item} ${flexModule.flexChild}`}>
-                <div className={BDModules.get(e => e.buttonWrapper)[0].buttonWrapper}>
-                    <button type="button" class={`${flexModule.flexChild} ${euhModule1.button} ${euhModule1.lookFilled} ${euhModule1.colorBrand} ${euhModule1.sizeSmall} ${euhModule1.grow}`} style={{flex: "0 1 auto"}} onClick={this.onClick}>
-	                    <div class={euhModule1.contents}>{this.props.title}</div>
-                    </button>
-                </div>
+                <Lightcord.Api.Components.inputs.Button text={this.props.title} onClick={this.props.onClick} color="brand"/>
             </div>
         </div>)
     }
-}*/
+}
 
 class RpcPreview extends React.Component {
     constructor(props = {}){
@@ -598,6 +596,21 @@ class Popout extends React.Component {
 
         let data = Object.assign({}, defaultRPC, this.props.preview.props.settings.state.data)
         timestampClass = timestampClass || activityModule1.timestamp
+
+        let images = (() => {
+            if(!data["assets.large"])return null
+            let images = []
+            if(data["assets.large"]){
+                images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.large"]}.png`} class={`${activityModule1.assetsLargeImageUserPopout} ${data["assets.small"] ? activityModule1.assetsLargeMaskUserPopout : ""}`} />)
+            }
+            if(data["assets.small"]){
+                images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.small"]}.png`} class={activityModule1.assetsSmallImageUserPopout} />)
+            }
+            if(!images.length)return null
+            return <div class={activityModule1.assets}>
+                {images}
+            </div>
+        })()
         
         return (<div className="lc-userPopout">
             <div class={rootModule1.userPopout} role="dialog" tabindex="-1">
@@ -630,20 +643,8 @@ class Popout extends React.Component {
                     <div class={`${activityModule1.activityUserPopout} ${rootModule1.activity}`}>
                         <h3 class={`${activityModule1.headerTextNormal} ${textModule1.base} ${sizeModule1.size12}`}>{Messages.USER_ACTIVITY_HEADER_PLAYING}</h3>
                         <div class={activityModule1.bodyNormal}>
-                            {(() => {
-                                if(!data["assets.large"])return null
-                                let images = []
-                                if(data["assets.large"]){
-                                    images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.large"]}.png`} class={`${activityModule1.assetsLargeImageUserPopout} ${data["assets.small"] ? activityModule1.assetsLargeMaskUserPopout : ""}`} />)
-                                }
-                                if(data["assets.small"]){
-                                    images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.small"]}.png`} class={activityModule1.assetsSmallImageUserPopout} />)
-                                }
-                                return <div class={activityModule1.assets}>
-                                    {images}
-                                </div>
-                            })()}
-                            <div class={activityModule1.contentImagesUserPopout} style={{flex: "1 1 auto"}}>
+                            {images}
+                            <div class={images ? activityModule1.contentImagesUserPopout : activityModule1.contentNoImagesUserPopout} style={{flex: "1 1 auto"}}>
                                 {(() => {
                                     if(!data.name)return null
                                     return <h3 class={`${activityModule1.nameNormal} ${textModule1.base} ${sizeModule1.size14}`} title={data.name}>
@@ -752,8 +753,24 @@ class Profile extends React.Component {
             noteModule1,
             Messages
         ] = this.modules
+
         let data = Object.assign({}, defaultRPC, this.props.preview.props.settings.state.data)
         timestampClass = timestampClass || activityModule1.timestamp
+
+        let images = (() => {
+            if(!data["assets.large"])return null
+            let images = []
+            if(data["assets.large"]){
+                images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.large"]}.png`} class={`${activityModule1.assetsLargeImageProfile} ${data["assets.small"] ? activityModule1.assetsLargeMaskProfile : ""}`} />)
+            }
+            if(data["assets.small"]){
+                images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.small"]}.png`} class={activityModule1.assetsSmallImageProfile} />)
+            }
+            if(!images.length)return null
+            return <div class={activityModule1.assets}>
+                {images}
+            </div>
+        })()
 
         return [
             <div className="lc-tab">
@@ -784,20 +801,8 @@ class Profile extends React.Component {
                                     {Messages.USER_ACTIVITY_HEADER_PLAYING}
                                 </h3>
                                 <div class={activityModule1.bodyNormal}>
-                                    {(() => {
-                                        if(!data["assets.large"])return null
-                                        let images = []
-                                        if(data["assets.large"]){
-                                            images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.large"]}.png`} class={`${activityModule1.assetsLargeImageProfile} ${data["assets.small"] ? activityModule1.assetsLargeMaskProfile : ""}`} />)
-                                        }
-                                        if(data["assets.small"]){
-                                            images.push(<img alt="" src={`https://cdn.discordapp.com/app-assets/${data.application_id}/${data["assets.small"]}.png`} class={activityModule1.assetsSmallImageProfile} />)
-                                        }
-                                        return <div class={activityModule1.assets}>
-                                            {images}
-                                        </div>
-                                    })()}
-                                    <div class={activityModule1.contentImagesProfile} style={{flex: "1 1 auto"}}>
+                                    {images}
+                                    <div class={images ? activityModule1.contentImagesProfile : activityModule1.contentNoImagesUserPopout} style={{flex: "1 1 auto"}}>
                                         {(() => {
                                             if(!data.name)return null
                                             return <h3 class={`${activityModule1.nameNormal} ${textModule1.base} ${sizeModule1.size14}`} title={data.name}>

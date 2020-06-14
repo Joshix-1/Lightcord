@@ -12,7 +12,7 @@ export default class Switch extends React.Component {
     onChange(value) {
         if (this.props.disabled) return;
         this.props.onChange(value);
-        this.setState({checked: !this.state.checked});
+        this.setState({checked: value});
     }
 
     render() {

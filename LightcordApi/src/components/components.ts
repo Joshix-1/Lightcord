@@ -3,6 +3,7 @@ import Switch from "./Discord/Switch"
 import RadioGroup from "./Discord/RadioGroup"
 import TextArea from "./Discord/TextArea"
 import TextInput from "./Discord/TextInput"
+import Dropdown from "./Discord/Dropdown"
 
 export default {
     inputs: {
@@ -11,6 +12,7 @@ export default {
         Choices: RadioGroup,
         RadioGroup: RadioGroup,
         TextArea: TextArea,
-        TextInput: TextInput
+        TextInput: TextInput,
+        Dropdown: Dropdown
     }
 }

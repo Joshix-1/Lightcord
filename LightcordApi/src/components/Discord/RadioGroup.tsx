@@ -2,7 +2,7 @@ import NOOP from "../../modules/noop"
 import WebpackLoader from "../../modules/WebpackLoader"
 
 
-type ChoicesProps = {
+type RadioGroupProps = {
     options?: {
         color?: string,
         name: string,
@@ -18,15 +18,15 @@ type ChoicesProps = {
 }
 
 let RadioGroupModule
-export default class RadioGroup extends React.Component<ChoicesProps, ChoicesProps> {
-    constructor(props:ChoicesProps){
+export default class RadioGroup extends React.Component<RadioGroupProps, RadioGroupProps> {
+    constructor(props:RadioGroupProps){
         props = RadioGroup.normalizeProps(props)
         super(props)
         this.state = props
         this.onChange = this.onChange.bind(this)
     }
 
-    static normalizeProps(props:ChoicesProps):ChoicesProps{
+    static normalizeProps(props:RadioGroupProps):RadioGroupProps{
         if(!props || typeof props !== "object")props = {}
         let defaultOptions = false
         if(!props.options || !Array.isArray(props.options)){

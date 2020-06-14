@@ -8,7 +8,6 @@ import V2C_SettingsGroup from "./settingsGroup";
 import dataStore from "../modules/dataStore";
 import { defaultRPC, settingsRPC } from "../0globals";
 import CustomRichPresence from "../modules/CustomRichPresence"
-import Select from "./select";
 import timestampRender from "./timestampRender"
 import { remote } from "electron";
 
@@ -434,7 +433,8 @@ class InputChoice extends React.PureComponent {
                 <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
                     {setting.title}
                 </h5>
-                <Select value={this.state.data} onChange={this.onChange.bind(this)} options={options}/>
+                <window.Lightcord.Api.Components.inputs.Dropdown value={this.state.data} options={options} onChange={this.onChange.bind(this)} />
+                {/*<Select value={this.state.data} onChange={this.onChange.bind(this)} options={options}/>*/}
             </div>
             <Divider/>
         </div>)

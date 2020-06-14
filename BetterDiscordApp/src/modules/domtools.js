@@ -751,3 +751,5 @@ export default class DOMTools {
         return node instanceof jQuery ? node[0] : node;
     }
 }
+
+window.Lightcord.BetterDiscord.DOM = DOMTools

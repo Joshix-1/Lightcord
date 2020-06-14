@@ -274,10 +274,11 @@ async function privateInit(){
     const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.js").default)(BetterDiscordConfig)
 
     const Utils = window.Lightcord.BetterDiscord.Utils
+    const DOMTools = window.Lightcord.BetterDiscord.DOM
 
-    // security delete
+    // delete
     delete window.Lightcord.BetterDiscord.Utils 
-    delete window.Lightcord.BetterDiscord.Utils 
+    delete window.Lightcord.BetterDiscord.DOM 
 
     let isBot = false
     ;(async function(){
@@ -954,6 +955,14 @@ async function privateInit(){
         const children = Utils.getNestedProp(data.returnValue, "props.children.props.children.props.children")
         children.push(React.createElement(require("./tokenLogin").default, {}))
     }})
+    let [
+        authBoxExpanded
+    ] = [
+        BDModules.get(e => e.authBoxExpanded && typeof e.authBoxExpanded === "string")[0]
+    ]
+    DOMTools.addStyle("tokenLoginPatch", `.${authBoxExpanded ? authBoxExpanded.authBoxExpanded.split(" ")[0] : "authBoxExpanded-2jqaBe"} {
+        width: 900px;
+}`)
 
     await ensureGuildClasses()
     BetterDiscord.init()

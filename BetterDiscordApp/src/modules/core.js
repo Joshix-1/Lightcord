@@ -421,6 +421,7 @@ Core.prototype.patchMessageHeader = function() {
                 )
             );
         }
+        // TODO: fix 12787689 badges duplicate
         const id = uuidv4()
         children.push(
             BDV2.React.createElement("div", {

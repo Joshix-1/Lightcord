@@ -35,8 +35,8 @@ class Modules {
     }
 }
 
+Modules.default = Modules
 module.exports = Modules
-module.exports.default = Modules
 
 global.BDModules = Modules
 

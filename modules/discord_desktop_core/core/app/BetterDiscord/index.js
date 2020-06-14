@@ -87,6 +87,15 @@ async function privateInit(){
     require("../../../../../BetterDiscordApp/css/main.css")
     require("./lightcord.css")
 
+    function getCurrentHypesquad(){
+        let user = ModuleLoader.get(e => e.default && e.default.getCurrentUser)[0].default.getCurrentUser()
+        if(!user)return undefined
+        if(user.hasFlag(constants.UserFlags.HYPESQUAD_ONLINE_HOUSE_1))return "1"
+        if(user.hasFlag(constants.UserFlags.HYPESQUAD_ONLINE_HOUSE_2))return "2"
+        if(user.hasFlag(constants.UserFlags.HYPESQUAD_ONLINE_HOUSE_3))return "3"
+        return undefined
+    }
+
     
     window.$ = window.jQuery = require("./jquery.min.js")
     require("./ace.js")
@@ -369,6 +378,7 @@ async function privateInit(){
         cancelGatewayPrototype("streamPing")
         cancelGatewayPrototype("streamDelete")
         cancelGatewayPrototype("streamSetPaused")
+
         const hasUnreadModules = BDModules.get(e => e.default && e.default.hasUnread)
         hasUnreadModules.forEach((mod) => {
             const hasUnread = mod.default.hasUnread
@@ -781,6 +791,120 @@ async function privateInit(){
             }
         }else{
             logger.warn(new Error("Couldn't find module here"))
+        }
+        const HouseSelectionModal = BDModules.get(e => e.default && e.default.displayName === "HouseSelectionModal")[0]
+        const RadioGroup = BDModules.get(e => e.default && e.default.displayName === "RadioGroup")[0]
+
+        if(HouseSelectionModal && RadioGroup){
+            const defaultFunc = HouseSelectionModal.default
+            HouseSelectionModal.default = function(){
+                let returnValue = new defaultFunc(...arguments)
+
+                let hypesquadValue = getCurrentHypesquad() || "3"
+                const renderHeaderCopy = returnValue.renderHeaderCopy
+                returnValue.renderHeaderCopy = function(){
+                    return "Hypesquad"
+                }
+                const renderPrimaryAction = returnValue.renderPrimaryAction
+                returnValue.renderPrimaryAction = function(){
+                    const renderValue = renderPrimaryAction.call(returnValue, ...arguments)
+                    console.log(renderValue, returnValue)
+                    if(!returnValue.state.hasSubmittedHouse){
+                        renderValue.props.children = "Submit"
+                    }else{
+                        renderValue.props.children = "Close"
+                    }
+                    if(!isBot){
+                        renderValue.props.disabled = false
+                    }else{
+                        renderValue.props.disabled = true
+                    }
+                    const onClick = renderValue.props.onClick
+                    renderValue.props.onClick = (ev) => {
+                        if(!returnValue.state.hasSubmittedHouse){
+                            returnValue.handleSubmitButtonClick.call(returnValue, ...arguments)
+                        }else{
+                            onClick.call(this, ...arguments)
+                        }
+                    }
+                    return renderValue
+                }
+                const getSelectedHouseID = returnValue.getSelectedHouseID
+                returnValue.getSelectedHouseID = function(){
+                    return "HOUSE_"+hypesquadValue
+                }
+                const renderContent = returnValue.renderContent
+                returnValue.renderContent = function(){
+                    if(!isBot){
+                        if(this.state.hasSubmittedHouse)return this.renderQuizResult();
+    
+                        let component = React.createElement(class RadioContainer extends React.PureComponent {
+                            constructor(props){
+                                super(props)
+                            }
+    
+                            render(){
+                                return React.createElement("div", {
+                                    style: {
+                                        margin: "0 auto",
+                                        width: "75%"
+                                    }
+                                }, React.createElement(RadioGroup.default, {
+                                    disabled: false,
+                                    value: hypesquadValue,
+                                    options: [
+                                        {
+                                            value: "1",
+                                            name: "Bravery",
+                                            desc: "The Bravery house"
+                                        },
+                                        {
+                                            value: "2",
+                                            name: "Brillance",
+                                            desc: "The Brillance house"
+                                        },
+                                        {
+                                            value: "3",
+                                            name: "Balance",
+                                            desc: "The Balance house"
+                                        }
+                                    ],
+                                    onChange: (ev) => {
+                                        hypesquadValue = ev.value
+                                        this.forceUpdate()
+                                    }
+                                }))
+                            }
+                        }, {})
+                        return component
+                    }else{
+                        let component = React.createElement(class BotWarning extends React.PureComponent {
+                            constructor(props){
+                                super(props)
+                            }
+    
+                            render(){
+                                return React.createElement("div", {
+                                    style: {
+                                        margin: "0 auto",
+                                        width: "75%"
+                                    }
+                                }, [
+                                    React.createElement("h2", {
+                                        style: {
+                                            color: "var(--text-normal)"
+                                        }
+                                    }, "Bots cannot use Hypesquad.")
+                                ])
+                            }
+                        }, {})
+                        return component
+                    }
+                }
+                return returnValue
+            }
+        }else{
+            logger.warn(new Error("Couldn't find module here"), HouseSelectionModal, RadioGroup)
         }
         const mentionModule = BDModules.get(e => e.default && e.default.fetchRecentMentions)[0]
         if(mentionModule){

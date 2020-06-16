@@ -1,6 +1,7 @@
 import NOOP from "../../modules/noop"
 import WebpackLoader from "../../modules/WebpackLoader"
 import { ReactNode, CSSProperties } from "react"
+import Utils from "../../modules/Utils"
 
 type DropdownProps = {
     className?: string,
@@ -43,13 +44,14 @@ type themeOverride = {
 let DropdownModules
 export default class Dropdown extends React.Component<DropdownProps, DropdownProps> {
     constructor(props:DropdownProps){
-        props = Dropdown.normalizeProps(props)
         super(props)
+        props = Dropdown.normalizeProps(props)
         this.state = props
         this.onChange = this.onChange.bind(this)
     }
 
     static normalizeProps(props:DropdownProps):DropdownProps{
+        props = Object.create(props)
         if(!props || typeof props !== "object")props = {}
         if(typeof props.className !== "string")delete props.className
         if(typeof props.darkThemeColorOverrides !== "object" || !props.darkThemeColorOverrides)delete props.darkThemeColorOverrides
@@ -69,7 +71,13 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownPro
         if(typeof props.styleOverrides !== "object")delete props.styleOverrides
         if(typeof props.value !== "string")props.value = null
 
-        return props
+        let levels = [props]
+        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
+            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
+        }
+        let finals = Object.assign({}, ...levels)
+
+        return finals
     }
 
     onChange(value){

@@ -1,5 +1,6 @@
 import WebpackLoader from "../../modules/WebpackLoader"
 import NOOP from "../../modules/noop"
+import Utils from "../../modules/Utils"
 
 type TextAreaProps = {
     name?: string,
@@ -24,8 +25,8 @@ type TextAreaProps = {
 let TextAreaModules
 export default class TextArea extends React.Component<TextAreaProps, TextAreaProps> {
     constructor(props){
-        props = TextArea.normalizeProps(props)
         super(props)
+        props = TextArea.normalizeProps(props)
         this.state = Object.create(props)
 
         this.onChange = this.onChange.bind(this)
@@ -35,6 +36,7 @@ export default class TextArea extends React.Component<TextAreaProps, TextAreaPro
     }
 
     static normalizeProps(props:TextAreaProps):TextAreaProps {
+        props = Object.create(props)
         if(!props)props = {}
         if(!props.name || typeof props.name !== "string")props.name = ""
         if(!props.disabled || typeof props.disabled !== "boolean")props.disabled = false
@@ -54,7 +56,13 @@ export default class TextArea extends React.Component<TextAreaProps, TextAreaPro
         if(typeof props.onBlur !== "function")props.onBlur = NOOP
         if(typeof props.onKeyDown !== "function")props.onKeyDown = NOOP
 
-        return props
+        let levels = [props]
+        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
+            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
+        }
+        let finals = Object.assign({}, ...levels)
+
+        return finals
     }
 
     get modules(){
@@ -91,6 +99,7 @@ export default class TextArea extends React.Component<TextAreaProps, TextAreaPro
         if(!this.state){
             this.state = Object.create(props)
         }
+
         return <TextAreaComponent {...props} onChange={this.onChange} onFocus={this.onFocus} onBlur={this.onBlur} onKeyDown={this.onKeyDown}/>
     }
 

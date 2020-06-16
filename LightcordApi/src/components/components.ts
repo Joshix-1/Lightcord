@@ -1,9 +1,11 @@
-import DiscordButton from "./Discord/Button"
-import Switch from "./Discord/Switch"
-import RadioGroup from "./Discord/RadioGroup"
-import TextArea from "./Discord/TextArea"
-import TextInput from "./Discord/TextInput"
-import Dropdown from "./Discord/Dropdown"
+import DiscordButton from "./inputs/Button"
+import Switch from "./inputs/Switch"
+import RadioGroup from "./inputs/RadioGroup"
+import TextArea from "./inputs/TextArea"
+import TextInput from "./inputs/TextInput"
+import Dropdown from "./inputs/Dropdown"
+import Title from "./general/Title"
+import SettingsTitle from "./general/SettingsTitle"
 
 export default {
     inputs: {
@@ -14,5 +16,9 @@ export default {
         TextArea: TextArea,
         TextInput: TextInput,
         Dropdown: Dropdown
+    },
+    general: {
+        Title: Title,
+        SettingsTitle: SettingsTitle
     }
 }

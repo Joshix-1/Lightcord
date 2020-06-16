@@ -27,6 +27,7 @@ import V2C_AccountInfos from "../ui/AccountInfos";
 import { remote } from "electron";
 import AntiAdDM from "./AntiAdDM";
 import blurPrivate from "./blurPrivate";
+import disableTyping from "./disableTyping";
 
 export default new class V2_SettingsPanel {
 
@@ -244,6 +245,13 @@ export default new class V2_SettingsPanel {
                 blurPrivate.disable()
             }
         }
+        if (id === "lightcord-7") {
+            if(enabled){
+                disableTyping.enable()
+            }else{
+                disableTyping.disable()
+            }
+        }
 
         this.saveSettings();
     }
@@ -264,6 +272,7 @@ export default new class V2_SettingsPanel {
         if (settingsCookie["lightcord-3"]) remote.getCurrentWindow().setAlwaysOnTop(true)
         if (settingsCookie["lightcord-4"]) AntiAdDM.enable()
         if (settingsCookie["lightcord-6"]) blurPrivate.enable()
+        if (settingsCookie["lightcord-7"]) disableTyping.enable()
 
         if (settingsCookie["fork-ps-5"]) {
             ContentManager.watchContent("plugin");

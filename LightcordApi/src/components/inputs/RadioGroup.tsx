@@ -1,5 +1,6 @@
 import NOOP from "../../modules/noop"
 import WebpackLoader from "../../modules/WebpackLoader"
+import Utils from "../../modules/Utils"
 
 
 type RadioGroupProps = {
@@ -20,13 +21,14 @@ type RadioGroupProps = {
 let RadioGroupModule
 export default class RadioGroup extends React.Component<RadioGroupProps, RadioGroupProps> {
     constructor(props:RadioGroupProps){
-        props = RadioGroup.normalizeProps(props)
         super(props)
+        props = RadioGroup.normalizeProps(props)
         this.state = props
         this.onChange = this.onChange.bind(this)
     }
 
     static normalizeProps(props:RadioGroupProps):RadioGroupProps{
+        props = Object.create(props)
         if(!props || typeof props !== "object")props = {}
         let defaultOptions = false
         if(!props.options || !Array.isArray(props.options)){
@@ -51,7 +53,13 @@ export default class RadioGroup extends React.Component<RadioGroupProps, RadioGr
         if(typeof props.infoClassName !== "string")props.infoClassName = ""
         if(!props.onChange || typeof props.onChange !== "function")props.onChange = NOOP
 
-        return props
+        let levels = [props]
+        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
+            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
+        }
+        let finals = Object.assign({}, ...levels)
+
+        return finals
     }
 
     onChange(ev){

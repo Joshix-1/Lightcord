@@ -47,6 +47,14 @@ export default class Button extends React.Component<{
                 </button>
             </div>)
     }
+
+    static get AllPreviews(){
+        return AllPreviews || (AllPreviews = [
+            
+        ])
+    }
 }
+
+
 
 export type ButtonColor = "brand" | "grey" | "red" | "green" | "yellow" | "primary" | "link" | "white" | "black" | "transparent"

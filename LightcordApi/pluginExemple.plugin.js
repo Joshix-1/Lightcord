@@ -3,7 +3,7 @@
  */
 
 module.exports = class LightcordApiExemple {
-    getName() {return "Lightcord Api Exemple";} // Name of your plugin to show on the plugins page 
+    getName() {return "LightcordApiExemple";} // Name of your plugin to show on the plugins page 
     getDescription() {return "Describe the basic functions. Maybe a support server link.";} // Description to show on the plugins page 
     getVersion() {return "0.0.1";} // Current version. I recommend following semantic versioning <http://semver.org/> (e.g. 0.0.1)
     getAuthor() {return "Not Thomiz";} // Your name
@@ -21,4 +21,19 @@ module.exports = class LightcordApiExemple {
     stop() {} // Called when the plugin is deactivated
 
     observer(changes) {} // Observer for the `document`. Better documentation than I can provide is found here: <https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver>
+
+    getSettingsPanel(){
+        let settings = [
+            {
+                component: "inputs.Button",
+                props: {
+                    children: [
+                        "sltsv"
+                    ],
+                    color: "red"
+                }
+            }
+        ]
+        return windows.Lightcord.Api.Utils.PluginUtils.renderSettings(settings)
+    }
 }

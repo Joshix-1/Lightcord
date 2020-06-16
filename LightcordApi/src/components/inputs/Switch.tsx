@@ -1,6 +1,7 @@
 import WebpackLoader from "../../modules/WebpackLoader"
 import uuid from "../../modules/uuid"
 import NOOP from "../../modules/noop"
+import Utils from "../../modules/Utils"
 
 type SwitchProps = {
     id?: string,
@@ -17,14 +18,15 @@ type SwitchProps = {
 let SwitchModules
 export default class Switch extends React.Component<SwitchProps, {value: boolean}> {
     constructor(props:SwitchProps){
-        props = Switch.normalizeProps(props)
         super(props)
+        props = Switch.normalizeProps(props)
 
         this.state = Object.create(props)
         this.onChange = this.onChange.bind(this)
     }
 
     static normalizeProps(props:SwitchProps){
+        props = Object.create(props)
         if(!props)props = {}
         if(!props.id || typeof props.id !== "string")props.id = null
         if(!props.onChange || typeof props.onChange !== "function")props.onChange = NOOP
@@ -36,7 +38,13 @@ export default class Switch extends React.Component<SwitchProps, {value: boolean
         if(!props.size || !["default", "mini"].includes(props.size.toLowerCase()))props.size = "default"
         if(!props.style || typeof props.style !== "object")props.style = {}
 
-        return props
+        let levels = [props]
+        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
+            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
+        }
+        let finals = Object.assign({}, ...levels)
+
+        return finals
     }
 
 

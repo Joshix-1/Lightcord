@@ -1,5 +1,6 @@
 import WebpackLoader from "../../modules/WebpackLoader"
 import NOOP from "../../modules/noop"
+import Utils from "../../modules/Utils"
 
 type TextInputProps = {
     name?: string,
@@ -20,10 +21,12 @@ type TextInputProps = {
 let TextInputModules
 export default class TextInput extends React.PureComponent<TextInputProps, TextInputProps> {
     hasSet: boolean
-    constructor(props){
-        props = TextInput.normalizeProps(props)
+    constructor(props: TextInputProps){
         super(props)
+        props = TextInput.normalizeProps(props)
         this.state = props
+
+        console.log(this.state)
 
         this.onChange = this.onChange.bind(this)
         this.onFocus = this.onFocus.bind(this)
@@ -31,6 +34,7 @@ export default class TextInput extends React.PureComponent<TextInputProps, TextI
     }
 
     static normalizeProps(props:TextInputProps):TextInputProps {
+        props = Object.create(props)
         if(!props)props = {}
         if(!props.name || typeof props.name !== "string")props.name = ""
         if(!props.size || !["default", "mini"].includes(props.size))props.size = "default"
@@ -46,7 +50,13 @@ export default class TextInput extends React.PureComponent<TextInputProps, TextI
         if(typeof props.onFocus !== "function")props.onFocus = NOOP
         if(typeof props.onBlur !== "function")props.onBlur = NOOP
 
-        return props
+        let levels = [props]
+        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
+            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
+        }
+        let finals = Object.assign({}, ...levels)
+
+        return finals
     }
 
     get modules(){
@@ -80,8 +90,9 @@ export default class TextInput extends React.PureComponent<TextInputProps, TextI
 
         let props = TextInput.normalizeProps(this.state || this.props)
         if(!this.state){
-            this.state = Object.create(props)
+            this.state = props
         }
+        console.log(props)
         return <TextAreaComponent {...props} onChange={this.onChange} onFocus={this.onFocus} onBlur={this.onBlur}/>
     }
 

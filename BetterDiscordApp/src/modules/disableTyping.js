@@ -1,10 +1,7 @@
-import webpackModules from "./webpackModules"
-
 export default new class DisableTyping {
     constructor(){
         window.Lightcord.Api.ensureExported(e => e.default && e.default.startTyping)
         .then(typingModule => {
-            console.log(typingModule, new Error("gay"))
             let self = this
             const startTyping = typingModule.default.startTyping
             typingModule.default.startTyping = function(){

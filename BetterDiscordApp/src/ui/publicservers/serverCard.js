@@ -21,7 +21,7 @@ export default class V2C_ServerCard extends BDV2.reactComponent {
             // BDV2.react.createElement(
                 // "div",
                 // { className: "flex-1xMQg5 flex-1O1GKY horizontal-1ae9ci horizontal-2EEEnY flex-1O1GKY directionRow-3v3tfG justifyStart-2yIZo0 alignStretch-1hwxMa noWrap-3jynv6" },
-                BDV2.react.createElement("img", {ref: "img", className: "bd-server-image", src: server.iconUrl, onError: this.handleError.bind(this)}),
+                BDV2.react.createElement("img", {ref: "img", className: "bd-server-image", src: server.iconUrl, onError: this.handleError.bind(this), draggable: false}),
                 BDV2.react.createElement(
                     "div",
                     {className: flexModule.flexChild+" bd-server-content"},

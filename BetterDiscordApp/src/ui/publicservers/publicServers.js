@@ -174,7 +174,7 @@ export default class V2C_PublicServers extends BDV2.reactComponent {
             categories: ["community", "programming", "support"],
             description: "Official Lightcord server for support etc",
             identifier: "86004744966914048",
-            iconUrl: "https://cdn.discordapp.com/icons/705908350218666117/05a5652f7d1d0ae328ca7d6e2354a82a.webp",
+            iconUrl: "https://avatars3.githubusercontent.com/u/65690058?s=200&v=4",
             nativejoin: true,
             invite_code: "7eFff2A",
             pinned: true

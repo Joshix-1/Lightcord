@@ -2,6 +2,7 @@ import BugHunterBadge from "../svg/bug_hunter"
 import LightcordUserBadge from "../svg/LightcordUser";
 import nodeFetch from "node-fetch"
 import { settingsCookie } from "../0globals";
+import Circus from "../svg/circus";
 
 export function uuidv4() { // Generate UUID (No crypto rng)
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -158,6 +159,15 @@ export const Constants = {
             scopes: [],
             component: BugHunterBadge,
             href: "https://github.com/lightcord/lightcord/wiki/badges/bug_hunter"
+        }, {
+            name: "Buffoon",
+            id: "06904d31-65b4-41ec-a50c-8658bbd1af96",
+            defaultUsers: [
+                "389016895543705602"
+            ],
+            scopes: [],
+            component: Circus,
+            href: "https://www.youtube.com/watch?v=EJtb6z-dlT8"
         }
     ]
 }

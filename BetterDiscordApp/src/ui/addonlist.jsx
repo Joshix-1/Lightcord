@@ -105,8 +105,12 @@ export default class CardList extends BDV2.reactComponent {
         return typeof value == "string" ? value : value.toString();
     }
 
+    get list(){
+        return this.props.type === "plugins" ? Object.values(bdplugins) : Object.values(bdthemes);
+    }
+
     getAddons() {
-        const sortedAddons = this.props.list.sort((a, b) => {
+        const sortedAddons = this.list.sort((a, b) => {
             const cap = this.state.sort.charAt(0).toUpperCase() + this.state.sort.slice(1);
             const first = a.plugin && a.plugin[`get${cap}`] ? this.getString(a.plugin[`get${cap}`]()) : a[this.state.sort];
             const second = b.plugin && b.plugin[`get${cap}`] ? this.getString(b.plugin[`get${cap}`]())  : b[this.state.sort];
@@ -153,28 +157,25 @@ export default class CardList extends BDV2.reactComponent {
             }</Tooltip>;
         const addonCards = this.getAddons();
 
-        return <Scroller contentColumn={true} fade={true} dark={true}>
-                <ContentColumn title={`${this.props.type.toUpperCase()}—${addonCards.length}`}>
-                    <button key="folder-button" className="bd-button bd-pfbtn" onClick={this.openFolder.bind(this)}>Open {this.isPlugins ? "Plugin" : "Theme"} Folder</button>
-                    {!settingsCookie["fork-ps-5"] && refreshIcon}
-                    <div className="bd-controls bd-addon-controls">
-                        <Search onChange={this.search} placeholder={`Search ${this.props.type}...`} />
-                        <div className="bd-addon-dropdowns">
-                            <div className="bd-select-wrapper">
-                                <label className="bd-label">Sort by:</label>
-                                <Dropdown options={this.sortOptions} onChange={this.sort} style="transparent" />
-                            </div>
-                            <div className="bd-select-wrapper">
-                                <label className="bd-label">Order:</label>
-                                <Dropdown options={this.directions} onChange={this.reverse} style="transparent" />
-                            </div>
-                            
-                        </div>
+        return <ContentColumn title={`${this.props.type.toUpperCase()}—${addonCards.length}`}>
+            <button key="folder-button" className="bd-button bd-pfbtn" onClick={this.openFolder.bind(this)}>Open {this.isPlugins ? "Plugin" : "Theme"} Folder</button>
+            {!settingsCookie["fork-ps-5"] && refreshIcon}
+            <div className="bd-controls bd-addon-controls">
+                <Search onChange={this.search} placeholder={`Search ${this.props.type}...`} />
+                <div className="bd-addon-dropdowns">
+                    <div className="bd-select-wrapper">
+                        <label className="bd-label">Sort by:</label>
+                        <Dropdown options={this.sortOptions} onChange={this.sort} style="transparent" />
                     </div>
-                    <div className="bda-slist bd-addon-list">{addonCards}</div>
-                </ContentColumn>
-                <Tools key="tools" />
-            </Scroller>;
+                    <div className="bd-select-wrapper">
+                        <label className="bd-label">Order:</label>
+                        <Dropdown options={this.directions} onChange={this.reverse} style="transparent" />
+                    </div>
+                    
+                </div>
+            </div>
+            <div className="bda-slist bd-addon-list">{addonCards}</div>
+        </ContentColumn>
     }
 }
 

@@ -42,10 +42,37 @@ global.BDModules = Modules
 
 function setReq(){
     try{
-        req = webpackJsonp.push([[], {__extra_id__: (module, exports, req) => module.exports = req}, [["__extra_id__"]]]);
+        req = webpackJsonp.push([[], {__extra_id__: (mdl, exports, req) => mdl.exports = req}, [["__extra_id__"]]]);
         if(req){
             delete req.m.__extra_id__;
-            delete req.c.__extra_id__;
+            delete req.c.__extra_id__;/*
+            Object.defineProperty(req.c, "0", {
+                get: () => ({
+                    i: 0,
+                    l: true,
+                    exports: require("react")
+                }),
+                configurable: false,
+                enumerable: true
+            })
+            Object.defineProperty(req.c, "856", {
+                get: () => ({
+                    i: 856,
+                    l: true,
+                    exports: require("react")
+                }),
+                configurable: false,
+                enumerable: true
+            })
+            Object.defineProperty(req.c, "71", {
+                get: () => ({
+                    i: 71,
+                    l: true,
+                    exports: require("react-dom")
+                }),
+                configurable: false,
+                enumerable: true
+            })*/
         }
     }catch(e){
         req = undefined

@@ -33,7 +33,7 @@ async function main(){
         for(let file of fs.readdirSync(folder, {withFileTypes: true})){
             if(file.isFile()){
                 let filepath = path.join(folder, file.name)
-                if(predicate(filepath)){
+                if(predicate(filepath), false){
                     await compile(filepath, path.join(filepath.replace(folders.startDir, folders.newDir)), "..")
                 }else{
                     await fs.promises.copyFile(filepath, filepath.replace(folders.startDir, folders.newDir))

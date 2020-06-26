@@ -27,12 +27,15 @@
   "private": true,
   "devDependencies": {
     "@types/auto-launch": "^5.0.1",
+    "@types/electron-devtools-installer": "^2.2.0",
     "@types/mkdirp": "^1.0.0",
     "@types/node": "^12.12.39",
     "@types/rimraf": "^3.0.0",
     "@types/uuid": "^8.0.0",
     "@types/yauzl": "^2.9.1",
     "electron": "8.3.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "terser": "^4.7.0"
   }
 }

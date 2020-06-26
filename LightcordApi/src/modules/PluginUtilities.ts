@@ -16,7 +16,7 @@ export default new class PluginUtilities {
     renderSettingsToReact(settings:SettingItem[]){
         let items = []
         settings.forEach(item => {
-            console.log(item)
+            
             if(typeof item !== "object")return items.push(item)
             if(item.props && "children" in item.props){
                 if(!Array.isArray(item.props.children))item.props.children = [item.props.children]

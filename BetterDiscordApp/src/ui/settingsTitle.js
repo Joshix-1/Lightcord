@@ -8,7 +8,7 @@ export default class V2C_SettingsTitle extends BDV2.reactComponent {
     render() {
         return BDV2.react.createElement(
             "h2",
-            {className: "ui-form-title h2 margin-reset margin-bottom-20 "+BDModules.get(e => e.marginTop60)[0].marginTop60},
+            {className: "ui-form-title h2 margin-reset margin-bottom-20"},
             this.props.text
         );
     }

@@ -87,10 +87,7 @@ export default class V2C_CssEditor extends BDV2.reactComponent {
         const self = this;
 
         const {detached} = self.state;
-        let contentModule = BDModules.get(e => e.contentColumn)[0]
-        return BDV2.react.createElement(
-            "div",
-            {className: contentModule.contentColumn+" "+contentModule.contentColumnDefault+" content-column default", style: {padding: "60px 40px 0px"}},
+        return [
             detached && BDV2.react.createElement(
                 "div",
                 {id: "editor-detached"},
@@ -162,7 +159,7 @@ export default class V2C_CssEditor extends BDV2.reactComponent {
                     )
                 )
             )
-        );
+        ]
     }
 
     onClick(arg) {

@@ -23,46 +23,18 @@ type TextAreaProps = {
 }
 
 let TextAreaModules
-export default class TextArea extends React.Component<TextAreaProps, TextAreaProps> {
-    constructor(props){
+export default class TextArea extends React.Component<TextAreaProps, {value: string}> {
+    constructor(props:TextAreaProps){
         super(props)
-        props = TextArea.normalizeProps(props)
-        this.state = Object.create(props)
 
         this.onChange = this.onChange.bind(this)
         this.onFocus = this.onFocus.bind(this)
         this.onBlur = this.onBlur.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
-    }
 
-    static normalizeProps(props:TextAreaProps):TextAreaProps {
-        props = Object.create(props)
-        if(!props)props = {}
-        if(!props.name || typeof props.name !== "string")props.name = ""
-        if(!props.disabled || typeof props.disabled !== "boolean")props.disabled = false
-        if(typeof props.placeholder !== "string")props.placeholder = ""
-        if(typeof props.autoFocus !== "boolean")props.autoFocus = false
-        if(typeof props.resizeable !== "boolean")props.resizeable = false
-        if(typeof props.flex !== "boolean")props.flex = false
-        if(typeof props.autosize !== "boolean")props.autosize = false
-        if(typeof props.rows !== "number")props.rows = 3
-        if(typeof props.value !== "string")props.value = ""
-        if(typeof props.error !== "string")props.error = null
-        if(props.maxLength && typeof props.maxLength !== "number")props.maxLength = 999
-        if(typeof props.className !== "string")props.className = ""
-        if(typeof props.id !== "string")props.id = null
-        if(typeof props.onChange !== "function")props.onChange = NOOP
-        if(typeof props.onFocus !== "function")props.onFocus = NOOP
-        if(typeof props.onBlur !== "function")props.onBlur = NOOP
-        if(typeof props.onKeyDown !== "function")props.onKeyDown = NOOP
-
-        let levels = [props]
-        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
-            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
+        this.state = {
+            value: props.value || ""
         }
-        let finals = Object.assign({}, ...levels)
-
-        return finals
     }
 
     get modules(){
@@ -72,22 +44,22 @@ export default class TextArea extends React.Component<TextAreaProps, TextAreaPro
     }
 
     onChange(value, name){
-        this.state.onChange(value, name)
+        this.props.onChange(value, name)
         this.setState({
             value
         })
     }
 
     onFocus(ev, name){
-        this.state.onFocus(ev, name)
+        this.props.onFocus(ev, name)
     }
 
     onBlur(ev, name){
-        this.state.onBlur(ev, name)
+        this.props.onBlur(ev, name)
     }
     
     onKeyDown(ev){
-        this.state.onKeyDown(ev)
+        this.props.onKeyDown(ev)
     }
 
     render(){
@@ -95,15 +67,97 @@ export default class TextArea extends React.Component<TextAreaProps, TextAreaPro
             TextAreaComponent
         ] = this.modules
 
-        let props = TextArea.normalizeProps(this.state || this.props)
-        if(!this.state){
-            this.state = Object.create(props)
-        }
+        let props = this.props
 
-        return <TextAreaComponent {...props} onChange={this.onChange} onFocus={this.onFocus} onBlur={this.onBlur} onKeyDown={this.onKeyDown}/>
+        return <TextAreaComponent {...props} onChange={this.onChange} onFocus={this.onFocus} onBlur={this.onBlur} onKeyDown={this.onKeyDown} value={this.state.value}/>
     }
 
     get value(){
-        return this.state.value
+        return this.state.value || ""
+    }
+
+    static defaultProps:TextAreaProps = {
+        name: null,
+        disabled: false,
+        placeholder: null,
+        autoFocus: false,
+        resizeable: false,
+        flex: false,
+        autosize: false,
+        rows: 3,
+        value: "",
+        error: null,
+        maxLength: null,
+        className: null,
+        id: null,
+        onChange: NOOP,
+        onFocus: NOOP,
+        onBlur: NOOP,
+        onKeyDown: NOOP
+    }
+    static get AllPreviews(){
+        return AllPreviews || (() => {
+            AllPreviews = []
+            AllPreviews.push([{
+                name: "api-preview-textarea"
+            }])
+            AllPreviews.push([{
+                disabled: false
+            }, {
+                disabled: true
+            }])
+            AllPreviews.push([{
+                placeholder: null
+            }])
+            AllPreviews.push([{
+                autoFocus: false
+            }, {
+                autoFocus: true
+            }])
+            AllPreviews.push([{
+                resizeable: false
+            }, {
+                resizeable: true
+            }])
+            AllPreviews.push([{
+                flex: false
+            }, {
+                flex: true
+            }])
+            AllPreviews.push([{
+                autosize: false
+            }, {
+                autosize: true
+            }])
+            AllPreviews.push([{
+                rows: 3
+            }, {
+                rows: 2
+            }, {
+                rows: 1
+            }])
+            AllPreviews.push([{
+                value: ""
+            }])
+            AllPreviews.push([{
+                error: null
+            }, {
+                error: "Example error"
+            }])
+            AllPreviews.push([{
+                maxLength: 100
+            }])
+            AllPreviews.push([{
+                className: ""
+            }])
+            AllPreviews.push([{
+                inputClassName: ""
+            }])
+            AllPreviews.push([{
+                id: "api-preview-textarea"
+            }])
+            return AllPreviews
+        })()
     }
 }
+let AllPreviews

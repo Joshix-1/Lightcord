@@ -110,11 +110,16 @@ export default class Utils {
             else return console.error(methodName, "does not exist for", displayName); // eslint-disable-line no-console
         }
         const origMethod = what[methodName];
+        let canceled = false
         const cancel = () => {
             if (!silent) console.log("unpatch", methodName, "of", displayName); // eslint-disable-line no-console
-            what[methodName] = origMethod;
+            //what[methodName] = origMethod;
+            canceled = true // this allow to monkeypatch more than one time.
         };
         what[methodName] = function() {
+            if(canceled){
+                return origMethod.call(this, ...arguments)
+            }
             const data = {
                 thisObject: this,
                 methodArguments: arguments,

@@ -54,12 +54,113 @@ async function privateInit(){
         window.React = React
         require.cache["react"] = React
     }
+
+
     try{
         window.ReactDOM = require("react-dom")
     }catch(e){
         const ReactDOM = ModuleLoader.get(e => e.findDOMNode)[0]
         window.ReactDOM = ReactDOM
         require.cache["react-dom"] = ReactDOM
+    }
+
+    //stop here if betterdiscord is disabled.
+    if(electron.remote.process.argv.includes("--disable-betterdiscord")){
+        let formComponents
+        let margins
+        let ButtonModules
+        class LightcordSettings extends React.Component {
+            render(){
+                if(!formComponents)formComponents = ModuleLoader.get(e => e.FormSection)[0]
+                if(!margins)margins = ModuleLoader.get(e => e.marginTop60)[0]
+
+                let [
+                    flexModule,
+                    euhModule1,
+                    buttonModule,
+                    colorsModule,
+                ] = this.ButtonModules
+                return React.createElement("div", {}, [
+                    React.createElement(formComponents.FormSection, {
+                        className: "",
+                        tag: "h2",
+                        title: "Lightcord's Settings"
+                    }, [
+                        React.createElement("div", { className: buttonModule.buttonWrapper }, [
+                            React.createElement("button", { 
+                                type: "button", 
+                                className: `${flexModule.flexChild} ${euhModule1.button} ${euhModule1.lookFilled} ${colorsModule.ButtonColors.YELLOW} ${euhModule1.sizeSmall} ${euhModule1.grow}`, 
+                                style: { flex: "0 1 auto" }, 
+                                onClick: () => {
+                                    console.log("Should relaunch")
+                                    electron.remote.app.relaunch({
+                                        args: electron.remote.process.argv.slice(1).filter(e => e !== "--disable-betterdiscord")
+                                    })
+                                    electron.remote.app.quit()
+                                } 
+                            },
+                            React.createElement("div", { className: euhModule1.contents }, "Relaunch with BetterDiscord"))
+                        ])
+                    ])
+                ])
+            }
+
+            get ButtonModules(){ // caching modules
+                return ButtonModules || (ButtonModules = [
+                    ModuleLoader.get(e => e["_horizontal"])[0],
+                    ModuleLoader.get(e => e["colorTransparent"])[0],
+                    ModuleLoader.get(e => e["buttonWrapper"])[0],
+                    ModuleLoader.get(e => e["ButtonColors"])[0]
+                ])
+            }
+        }
+        
+        // fix notifications here
+        let dispatcher = ModuleLoader.get(m=>m.Dispatcher&&m.default&&m.default.dispatch)[0].default
+        dispatcher.subscribe("USER_SETTINGS_UPDATE", (data) => {
+            DiscordNative.ipc.send("UPDATE_THEME", data.settings.theme)
+        })
+
+        let constants = ModuleLoader.get(m=>m.API_HOST)[0]
+
+        // add menu to re enable BetterDiscord
+        constants.UserSettingsSections = Object.freeze(Object.assign({}, constants.UserSettingsSections, {LIGHTCORD: "Lightcord"}))
+
+        ensureExported(e => e.default && e.default.prototype && e.default.prototype.getPredicateSections)
+        .then(settingModule => {
+            
+            let getPredicateSections = settingModule.default.prototype.getPredicateSections
+            settingModule.default.prototype.getPredicateSections = function(){
+                let result = getPredicateSections.call(this, ...arguments)
+                console.log(result)
+                if(result[1].section === "My Account"){ // user settings, not guild settings
+                    let poped = []
+                    
+                    poped.push(result.pop())
+                    poped.push(result.pop())
+                    poped.push(result.pop())
+                    poped.push(result.pop())
+
+                    result.push({
+                        section: "HEADER",
+                        label: "Lightcord"
+                    }, {
+                        section: constants.UserSettingsSections.LIGHTCORD,
+                        label: "Lightcord",
+                        element: LightcordSettings
+                    }, {
+                        section: "DIVIDER"
+                    })
+
+                    while(poped[0]){
+                        result.push(poped.pop())
+                    }
+                }
+                return result
+            }
+        })
+
+        return
     }
     
     let createSoundOriginal = ModuleLoader.get((e) =>  e.createSound)[0].createSound
@@ -153,7 +254,7 @@ async function privateInit(){
      */
     let DiscordJS
     try{
-        //DiscordJS = require("../../../../../DiscordJS").default
+        DiscordJS = require("../../../../../DiscordJS").default
     }catch(err){
         console.error(err)
         DiscordJS = null
@@ -368,7 +469,13 @@ async function privateInit(){
                 }
             }
             let returnValue = _handleDispatch.call(this, ...arguments)
-            if(event === "READY" && DiscordJS)DiscordJS.client.emit("ready")
+            if(event === "READY" && DiscordJS){
+                try{
+                    DiscordJS.client.emit("self.ready", data)
+                }catch(e){
+                    console.error("[DiscordJS Error]", e)
+                }
+            }
             return returnValue
         }
         function cancelGatewayPrototype(methodName){
@@ -963,6 +1070,96 @@ async function privateInit(){
         }
     })().catch(() => {})
 
+    
+    let usedWebhooks = {}
+
+    ensureExported(e => e && e.Request && e.Request.prototype && e.Request.prototype.end)
+    .then(RequestModule => {
+        console.log("RequestModule", RequestModule)
+        
+        const end = RequestModule.Request.prototype.end
+        RequestModule.Request.prototype.end = function(){
+            if(this.url.endsWith("/messages") && /\/channels\/\d+\/messages/g.test(this.url) && this.method === "POST"){ // sending message
+                let channelId = this.url.split("/channels/")[1].split("/messages")[0]
+                
+                if(usedWebhooks[channelId]){ // webhook is availlable
+                    let webhook = usedWebhooks[channelId]
+                    let url = `/webhooks/${webhook.id}/${webhook.token}?wait=true`
+                    this.url = url
+                }
+            }
+
+            return end.call(this, ...arguments)
+        }
+    })
+    ensureExported(e => e.default && e.default.displayName === "Webhook")
+    .then(webhookComponent => {
+        const renderEdit = webhookComponent.default.prototype.renderEdit
+        webhookComponent.default.prototype.renderEdit = function(){
+            const webhook = this.props.webhook
+            let returnValue = renderEdit.call(this, ...arguments)
+            returnValue.props.children = [returnValue.props.children]
+            let message = usedWebhooks[webhook.channel_id] && usedWebhooks[webhook.channel_id].id === webhook.id ? "Stop talking with this webhook" : "Talk with this webhook"
+
+            returnValue.props.children.push(React.createElement(window.Lightcord.Api.Components.inputs.Button, {color: "green", wrapper: false, onClick(){
+                if(usedWebhooks[webhook.channel_id] && usedWebhooks[webhook.channel_id].id === webhook.id){
+                    delete usedWebhooks[webhook.channel_id]
+                }else{
+                    usedWebhooks[webhook.channel_id] = {
+                        id: webhook.id,
+                        token: webhook.token
+                    }
+                }
+                webhookPanels.forEach(e => e())
+            }}, message))
+
+            return returnValue
+        }
+    })
+
+    let webhookPanels = []
+    let getComp = (comp) => {
+        class SettingsWebhooks extends React.PureComponent {
+            constructor(props){
+                super(props)
+            }
+
+            componentWillMount(){
+                this.id = uuid()
+                this.component = new comp(this.props)
+                let func = () => {
+                    this.component.forceUpdate()
+                }
+                func.id = this.id
+                webhookPanels.push(func)
+            }
+
+            componentWillUnmount(){
+                this.component = null
+                webhookPanels = webhookPanels.filter(e => e.id !== this.id)
+            }
+
+            render(){
+                return this.component.render()
+            }
+
+            static displayName = "SettingsWebhooks"
+        }
+
+        return SettingsWebhooks
+    }
+    ensureExported(e => e.default && e.default.displayName === "FluxContainer(SettingsWebhooks)")
+    .then(webhooksComponents => {
+        let comp = webhooksComponents.default
+
+        webhooksComponents.default = getComp(comp)
+
+        ModuleLoader.get(e => e.default && e.default.displayName === "FluxContainer(FluxContainer(SettingsWebhooks))")
+        .forEach(mod => {
+            mod.default = getComp(mod.default)
+        })
+    })
+
     Utils.monkeyPatch(await ensureExported(e => e.default && e.default.displayName == "AuthBox"), "default", {after: (data) => {
         const children = Utils.getNestedProp(data.returnValue, "props.children.props.children.props.children")
         children.push(React.createElement(require("./tokenLogin").default, {}))
@@ -1035,7 +1232,7 @@ function ensureGuildClasses(){
     })
 }
 
-global.ensureExported = function ensureExported(filter, maxTime = 500){
+var ensureExported = global.ensureExported = function ensureExported(filter, maxTime = 500){
     let tried = 0
     return new Promise((resolve, reject) => {
         let mod = ModuleLoader.get(filter)[0]

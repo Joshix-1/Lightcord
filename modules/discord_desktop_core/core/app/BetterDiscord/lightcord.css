@@ -46,14 +46,12 @@
   flex-direction: row;
 }
 .lc-tab {
-  border-radius: 8px;
+  /*border-radius: 8px;*/
   overflow: hidden;
   position: relative;
   margin: 0 auto;
   width: 600px;
   max-width: 100%;
-  -webkit-box-shadow: 0 0 20px 2px rgba(4,4,5,.3);
-  box-shadow: 0 0 20px 2px rgba(4,4,5,.3);
   -webkit-transform: scale(.85);
   transform: scale(.85);
   -webkit-box-sizing: border-box;
@@ -73,6 +71,10 @@
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+}
+.lc-tab-box-shadow {
+  -webkit-box-shadow: 0 0 20px 2px rgba(4,4,5,.3);
+  box-shadow: 0 0 20px 2px rgba(4,4,5,.3);
 }
 .lc-navItem {
   padding: 14px 20px;

@@ -38,6 +38,8 @@ PluginModule.prototype.loadPlugins = async function () {
                 bdpluginErrors.push({name: name, file: bdplugins[plugins[i]].filename, message: "start() could not be fired.", error: {message: err.message, stack: err.stack}});
             }
         }
+
+        await new Promise((resolve) => setTimeout(resolve, 10))
     }
     this.savePluginData();
 

@@ -30,7 +30,8 @@ if(process.platform === "win32"){
                 id: this.id,
                 title: this.title,
                 body: this.body,
-                icon: this.icon
+                icon: this.icon,
+                theme: settingStore ? settingStore.default.theme : "dark"
             })
         }
 
@@ -52,7 +53,9 @@ if(process.platform === "win32"){
     }
 }
 
+let settingStore
 ensureExported((e => e.default && e.default.theme))
 .then(themeStore => {
+    settingStore = themeStore
     ipcRenderer.send("UPDATE_THEME", themeStore.default.theme)
 }).catch(console.error)

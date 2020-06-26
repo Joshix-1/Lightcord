@@ -28,17 +28,33 @@ import { remote } from "electron";
 import AntiAdDM from "./AntiAdDM";
 import blurPrivate from "./blurPrivate";
 import disableTyping from "./disableTyping";
+import ApiPreview from "../ui/ApiPreview";
+import V2C_SettingsTitle from "../ui/settingsTitle";
+import Switch from "../ui/switch";
+import MarginTop from "../ui/margintop";
 
 export default new class V2_SettingsPanel {
 
     constructor() {
-        this.sideBarOnClick = this.sideBarOnClick.bind(this);
         this.onChange = this.onChange.bind(this);
         this.updateSettings = this.updateSettings.bind(this);
-        this.sidebar = new V2_SettingsPanel_Sidebar(this.sideBarOnClick);
-        // this.buildPluginProps = this.buildPluginProps.bind(this);
-        // this.buildThemeProps = this.buildThemeProps.bind(this);
-        this.showOriginal = this.showOriginal.bind(this);
+        this.sidebar = new V2_SettingsPanel_Sidebar();
+
+        this.registerComponents()
+    }
+
+    registerComponents(){
+        /** Lightcord */
+        this.sidebar.register("lightcord", makeComponent(this.lightcordComponent.bind(this)))
+        this.sidebar.register("status", makeComponent(this.PresenceComponent.bind(this)))
+        this.sidebar.register("accountinfo", makeComponent(this.AccountInfosComponent.bind(this)))
+        this.sidebar.register("lcapipreview", makeComponent(this.ApiPreviewComponent.bind(this)))
+
+        /* Bandaged BD */
+        this.sidebar.register("core", makeComponent(this.coreComponent.bind(this)))
+        this.sidebar.register("customcss", makeComponent(this.customCssComponent.bind(this)))
+        this.sidebar.register("plugins", makeComponent(this.renderAddonPane("plugins")))
+        this.sidebar.register("themes", makeComponent(this.renderAddonPane("themes")))
     }
 
     get root() {
@@ -100,33 +116,6 @@ export default new class V2_SettingsPanel {
             }
             return arr;
         }, []);
-    }
-
-    sideBarOnClick(id) {
-        const contentRegion = DOM.query(".contentRegion-3nDuYy, .content-region");
-        contentRegion.style.display = "none";
-        this.root.style.display = "";
-        switch (id) {
-            case "core":
-                this.renderCoreSettings();
-                break;
-            case "customcss":
-                this.renderCustomCssEditor();
-                break;
-            case "plugins":
-            case "themes":
-                this.renderAddonPane(id);
-                break;
-            case "lightcord":
-                this.renderLightcordSettings()
-                break
-            case "status":
-                this.renderPresenceSettings()
-                break
-            case "accountinfo":
-                this.renderAccountInfos()
-                break
-        }
     }
 
     onClick() {}
@@ -295,100 +284,62 @@ export default new class V2_SettingsPanel {
         Object.assign(settingsRPC, DataStore.getSettingGroup("rpc"));
     }
 
-    showOriginal() {
-        BDV2.reactDom.unmountComponentAtNode(this.root);
-        this.root.style.display = "none";
-        DOM.query("."+BDModules.get(e => e.contentRegion)[0].contentRegion.split(" ")[0]+", .content-region").style.display = "";
-    }
-
     renderSidebar() {
-        const tabs = document.querySelectorAll("[class*='side-'] > [class*='item-']");
-        for (const element of tabs) {
-            element.removeEventListener("click", this.showOriginal);
-            element.addEventListener("click", this.showOriginal);
-        }
-        this.sidebar.render();
+        return this.sidebar.render();
     }
 
-    get coreComponent() {
-        return BDV2.react.createElement(Scroller, {contentColumn: true, fade: true, dark: true},
-            BDV2.react.createElement(SectionedSettingsPanel, {key: "cspanel", onChange: this.onChange, sections: this.coreSettings}),
-            BDV2.react.createElement(Tools, {key: "tools"})
-        );
+    coreComponent() {
+        return BDV2.react.createElement(SectionedSettingsPanel, {key: "cspanel", onChange: this.onChange, sections: this.coreSettings})
     }
 
-    get lightcordComponent() {
-        return BDV2.react.createElement(Scroller, {contentColumn: true, fade: true, dark: true},
-            BDV2.react.createElement(SectionedSettingsPanel, {key: "lspannel", onChange: this.onChange, sections: this.lightcordSettings}),
-            BDV2.react.createElement(Tools, {key: "tools"})
-        );
+    lightcordComponent() {
+        return [
+            this.lightcordSettings.map((section, i) => {
+                return [
+                    (i === 0 ? null : BDV2.react.createElement(MarginTop)),
+                    BDV2.react.createElement("h2", {className: "ui-form-title h2 margin-reset margin-bottom-20"}, section.title),
+                    section.settings.map(setting => {
+                        return BDV2.react.createElement(Switch, {id: setting.id, key: setting.id, data: setting, checked: settingsCookie[setting.id], onChange: (id, checked) => {
+                            this.onChange(id, checked);
+                        }})
+                    })
+                ]
+            }), 
+            BDV2.react.createElement(window.Lightcord.Api.Components.inputs.Button, {color: "yellow", onClick(){
+                console.log("Should relaunch")
+                remote.app.relaunch({
+                    args: remote.process.argv.slice(1).concat(["--disable-betterdiscord"])
+                })
+                remote.app.quit()
+            }}, "Relaunch without BetterDiscord")
+        ]
     }
 
-    get PresenceComponent() {
-        return BDV2.react.createElement(Scroller, {contentColumn: true, fade: true, dark: true},
-            BDV2.react.createElement(V2C_PresenceSettings, {
-                key: "lppannel",
-                onChange: this.onChange, 
-                settings: this.PresenceSettings
-            }),
-            BDV2.react.createElement(Tools, {key: "tools"})
-        );
+    PresenceComponent() {
+        return BDV2.react.createElement(V2C_PresenceSettings, {
+            key: "lppannel",
+            onChange: this.onChange, 
+            settings: this.PresenceSettings
+        })
     }
 
-    get AccountInfosComponent() {
-        return BDV2.react.createElement(Scroller, {contentColumn: true, fade: true, dark: true},
-            BDV2.react.createElement(V2C_AccountInfos, {
-                key: "lapannel"
-            }),
-            BDV2.react.createElement(Tools, {key: "tools"})
-        );
+    AccountInfosComponent() {
+        return BDV2.react.createElement(V2C_AccountInfos, {
+            key: "lapannel"
+        })
     }
 
-    get customCssComponent() {
-        return BDV2.react.createElement(Scroller, {contentColumn: true, fade: true, dark: true},
-            BDV2.react.createElement(CssEditor, {key: "csseditor"}),
-            BDV2.react.createElement(Tools, {key: "tools"})
-        );
+    ApiPreviewComponent() {
+        return BDV2.react.createElement(ApiPreview, {
+            key: "lapipannel"
+        })
     }
 
-    renderCoreSettings() {
-        const root = this.root;
-        if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
-        BDV2.reactDom.render(this.coreComponent, root);
+    customCssComponent() {
+        return BDV2.react.createElement(CssEditor, {key: "csseditor"})
     }
-
-    renderLightcordSettings() {
-        const root = this.root;
-        if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
-        BDV2.reactDom.render(this.lightcordComponent, root);
-    }
-
-    renderPresenceSettings() {
-        const root = this.root;
-        if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
-        BDV2.reactDom.render(this.PresenceComponent, root);
-    }
-
-    renderAccountInfos() {
-        const root = this.root;
-        if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
-        BDV2.reactDom.render(this.AccountInfosComponent, root);
-    }
-
-    renderCustomCssEditor() {
-        const root = this.root;
-        if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
-        BDV2.reactDom.render(this.customCssComponent, root);
-    }
-
-    // renderAddonPane(type) {
-    //     const root = this.root;
-    //     if (!root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
-    //     BDV2.reactDom.render(this.contentComponent(type), root);
-    // }
 
     renderAddonPane(type) {
-        if (!this.root) return Utils.err("SettingsPanel", "FAILED TO LOCATE ROOT: .layer-3QrUeG .standardSidebarView-3F1I7i");
         // I know this shouldn't be here, but when it isn't,
         // React refuses to change the button when going
         // between plugins and themes page... something
@@ -397,19 +348,6 @@ export default new class V2_SettingsPanel {
             constructor(props) {
                 super(props);
                 this.prefix = this.props.type.replace("s", "");
-                this.onChange = this.onChange.bind(this);
-            }
-        
-            componentDidMount() {
-                BDEvents.on(`${this.prefix}-reloaded`, this.onChange);
-                BDEvents.on(`${this.prefix}-loaded`, this.onChange);
-                BDEvents.on(`${this.prefix}-unloaded`, this.onChange);
-            }
-        
-            componentWillUnmount() {
-                BDEvents.off(`${this.prefix}-reloaded`, this.onChange);
-                BDEvents.off(`${this.prefix}-loaded`, this.onChange);
-                BDEvents.off(`${this.prefix}-unloaded`, this.onChange);
             }
         
             onChange() {
@@ -425,7 +363,17 @@ export default new class V2_SettingsPanel {
             set: function() {console.warn("Addon policy for plugins #5 https://github.com/rauenzi/BetterDiscordApp/wiki/Addon-Policies#plugins");},
             get: () => originalRender
         });
-        const list = type === "plugins" ? Object.values(bdplugins) : Object.values(bdthemes);
-        return BDV2.reactDom.render(BDV2.react.createElement(ContentList, {type, onChange: this.sideBarOnClick}, BDV2.react.createElement(CardList, {type, list})), this.root);
+        return function(){
+            return BDV2.react.createElement(ContentList, {type}, BDV2.react.createElement(CardList, {type}))
+        }
     }
 };
+
+function makeComponent(children){
+    class SettingComponent extends React.Component {
+        render(){
+            return children()
+        }
+    }
+    return SettingComponent
+}

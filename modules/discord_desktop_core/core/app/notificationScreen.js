@@ -121,6 +121,10 @@ function handleNotificationsClear() {
 }
 
 function handleNotificationShow(e, notification) {
+  if(lastUsedTheme !== notification.theme){
+    lastUsedTheme = notification.theme
+    webContentsSend(notificationWindow, "UPDATE_THEME", lastUsedTheme)
+  }
   notifications.push(notification);
   updateNotifications();
   setTimeout(() => {

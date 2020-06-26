@@ -67,7 +67,7 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
             };
 
             const thisNode = this.refs.cardNode;
-            const container = thisNode.closest(".scroller");
+            const container = thisNode.closest("div[class*=\"scroller-\"]")
             if (!isHidden(container, thisNode)) return;
             const thisNodeOffset = DOM.offset(thisNode);
             const containerOffset = DOM.offset(container);

@@ -19,44 +19,34 @@ type TextInputProps = {
 }
 
 let TextInputModules
-export default class TextInput extends React.PureComponent<TextInputProps, TextInputProps> {
+export default class TextInput extends React.PureComponent<TextInputProps, {value: string}> {
     hasSet: boolean
     constructor(props: TextInputProps){
         super(props)
-        props = TextInput.normalizeProps(props)
-        this.state = props
-
-        console.log(this.state)
 
         this.onChange = this.onChange.bind(this)
         this.onFocus = this.onFocus.bind(this)
         this.onBlur = this.onBlur.bind(this)
+
+        this.state = {
+            value: props.value || ""
+        }
     }
 
-    static normalizeProps(props:TextInputProps):TextInputProps {
-        props = Object.create(props)
-        if(!props)props = {}
-        if(!props.name || typeof props.name !== "string")props.name = ""
-        if(!props.size || !["default", "mini"].includes(props.size))props.size = "default"
-        if(!props.disabled || typeof props.disabled !== "boolean")props.disabled = false
-        if(typeof props.placeholder !== "string")props.placeholder = ""
-        if(typeof props.value !== "string")props.value = ""
-        if(typeof props.error !== "string")props.error = null
-        if(props.maxLength && typeof props.maxLength !== "number")props.maxLength = 999
-        if(typeof props.className !== "string")props.className = ""
-        if(typeof props.inputClassName !== "string")props.inputClassName = ""
-        if(typeof props.id !== "string")props.id = null
-        if(typeof props.onChange !== "function")props.onChange = NOOP
-        if(typeof props.onFocus !== "function")props.onFocus = NOOP
-        if(typeof props.onBlur !== "function")props.onBlur = NOOP
-
-        let levels = [props]
-        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
-            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
-        }
-        let finals = Object.assign({}, ...levels)
-
-        return finals
+    static defaultProps:TextInputProps = {
+        name: "",
+        size: "default",
+        disabled: false,
+        placeholder: "",
+        value: "",
+        error: null,
+        maxLength: 999,
+        className: "",
+        inputClassName: "",
+        id: null,
+        onChange: NOOP,
+        onFocus: NOOP,
+        onBlur: NOOP
     }
 
     get modules(){
@@ -67,7 +57,7 @@ export default class TextInput extends React.PureComponent<TextInputProps, TextI
 
     onChange(value, name){
         this.hasSet = false
-        this.state.onChange(value, name, this)
+        this.props.onChange(value, name, this)
         if(this.hasSet)return // prevent event if the onChange has changed the value.
         this.setState({
             value
@@ -76,11 +66,11 @@ export default class TextInput extends React.PureComponent<TextInputProps, TextI
     }
 
     onFocus(ev, name){
-        this.state.onFocus(ev, name, this)
+        this.props.onFocus(ev, name, this)
     }
 
     onBlur(ev, name){
-        this.state.onBlur(ev, name, this)
+        this.props.onBlur(ev, name, this)
     }
 
     render(){
@@ -88,16 +78,12 @@ export default class TextInput extends React.PureComponent<TextInputProps, TextI
             TextAreaComponent
         ] = this.modules
 
-        let props = TextInput.normalizeProps(this.state || this.props)
-        if(!this.state){
-            this.state = props
-        }
-        console.log(props)
-        return <TextAreaComponent {...props} onChange={this.onChange} onFocus={this.onFocus} onBlur={this.onBlur}/>
+        let props = this.props
+        return <TextAreaComponent {...props} onChange={this.onChange} onFocus={this.onFocus} onBlur={this.onBlur} value={this.state.value} />
     }
 
     get value(){
-        return this.state.value
+        return this.state.value || ""
     }
 
     setValue(value:string){
@@ -107,4 +93,41 @@ export default class TextInput extends React.PureComponent<TextInputProps, TextI
         this.forceUpdate()
         this.hasSet = true
     }
+
+    static get AllPreviews(){
+        return AllPreviews || (() => {
+            AllPreviews = []
+            AllPreviews.push([{
+                name: "api-preview-textinput"
+            }], [{
+                size: "default"
+            }, {
+                size: "mini"
+            }], [{
+                disabled: false
+            }, {
+                disabled: true
+            }], [{
+                placeholder: ""
+            }], [{
+                value: ""
+            }], [{
+                error: null
+            }, {
+                error: "Example error"
+            }], [{
+                maxLength: 999
+            }], [{
+                className: ""
+            }], [{
+                inputClassName: ""
+            }], [{
+                id: "api-preview-textinput"
+            }], [{
+                onChange: (value: string, name: string) => {}
+            }])
+            return AllPreviews
+        })()
+    }
 }
+let AllPreviews

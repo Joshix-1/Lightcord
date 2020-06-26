@@ -149,7 +149,7 @@ export default new class DevMode {
                 if (el==el.ownerDocument.documentElement) names.unshift(el.tagName.toLowerCase()+Array.from(el.classList.entries()).map(e => "."+e).join(""));
                 else{
                   for (var c=1,e=el;e.previousElementSibling;e=e.previousElementSibling,c++);
-                  names.unshift(el.tagName.toLowerCase()+(el.className || "").split(" ").map(e => "."+e).join("")+":nth-child("+c+")");
+                  names.unshift(el.tagName.toLowerCase()+((typeof el.className === "string" && el.className) || "").split(" ").filter(e => !!e).map(e => "."+e).join("")+":nth-child("+c+")");
                 }
                 el=el.parentNode;
               }

@@ -6,6 +6,9 @@ import TextInput from "./inputs/TextInput"
 import Dropdown from "./inputs/Dropdown"
 import Title from "./general/Title"
 import SettingsTitle from "./general/SettingsTitle"
+import Tabs, { Tab } from "./general/Tabs"
+import SettingSubTitle from "./general/SettingSubTitle"
+import CodeBlock from "./general/CodeBlock"
 
 export default {
     inputs: {
@@ -19,6 +22,9 @@ export default {
     },
     general: {
         Title: Title,
-        SettingsTitle: SettingsTitle
+        SettingsTitle: SettingsTitle,
+        SettingSubTitle: SettingSubTitle,
+        Tabs: Tabs,
+        CodeBlock: CodeBlock
     }
 }

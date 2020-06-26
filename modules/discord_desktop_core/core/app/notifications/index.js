@@ -5743,9 +5743,14 @@
                     }
                 }), i.default.createElement("div", {
                     className: "notification-body"
-                }, i.default.createElement("header", null, this.props.title), i.default.createElement("p", {className: "notif-text theme-"+this.props.theme}, this.props.body))), i.default.createElement("div", {
-                    className: "notification-logo"
-                }))
+                }, i.default.createElement("header", null, this.props.title), 
+                    i.default.createElement("p", {
+                        className: "notif-text theme-"+this.props.theme
+                    }, truncateString(this.props.body, 40)))), 
+                        i.default.createElement("div", {
+                        className: "notification-logo"
+                    })
+                )
             }
         }),
         f = (0, o.default)({
@@ -5801,6 +5806,12 @@
             }
         });
     t.Notifications = f
+    function truncateString(str, num) {
+        if (str.length <= num) {
+            return str
+        }
+        return str.slice(0, num) + '...'
+    }
 }, function(e, t, n) {
     "use strict";
     var r = n(0),

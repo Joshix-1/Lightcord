@@ -6,7 +6,6 @@ import V2C_SettingsTitle from "./settingsTitle";
  */
 const React = BDV2.React;
 
-let contentModule = BDModules.get(e => e.contentColumn)[0]
 let marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
 let colorModule = BDModules.get(e => e.colorStandard)[0]
 let sizeModule = BDModules.get(e => e.size32)[0]
@@ -22,29 +21,27 @@ export default class V2C_AccountInfos extends React.Component {
     }
 
     render() {
-        if(!contentModule)contentModule = BDModules.get(e => e.contentColumn)[0]
         if(!marginModule2)marginModule2 = BDModules.get(e => e.defaultMarginh5)[0]
         if(!colorModule)colorModule = BDModules.get(e => e.colorStandard)[0]
         if(!sizeModule)sizeModule = BDModules.get(e => e.size32)[0]
-        return (<div className={contentModule.contentColumn+" "+contentModule.contentColumnDefault+" content-column default"}
-            style={{padding: "60px 40px 0px"}}>
-                <V2C_SettingsTitle text="Account Infos"/>
-                <div>
-                    <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
-                        Profile
-                    </h5>
-                    <CodeContent content={this.getProfileValue()} language="diff" />
-                    <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
-                        Statistics
-                    </h5>
-                    <CodeContent content={this.getStatistics()} language="diff" />
-                    <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
-                        Connected Sessions
-                    </h5>
-                    <CodeContent content={this.getSessionValue()} language="diff" />
-                </div>
-                <div className={BDModules.get(e => e.marginBottom20)[0].marginBottom20}></div>
-        </div>)
+        return [
+            <V2C_SettingsTitle text="Account Infos"/>,
+            <div>
+                <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
+                    Profile
+                </h5>
+                <CodeContent content={this.getProfileValue()} language="diff" />
+                <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
+                    Statistics
+                </h5>
+                <CodeContent content={this.getStatistics()} language="diff" />
+                <h5 className={colorModule.colorStandard+" "+sizeModule.size14+" "+marginModule2.h5+" "+marginModule2.defaultMarginh5}>
+                    Connected Sessions
+                </h5>
+                <CodeContent content={this.getSessionValue()} language="diff" />
+            </div>,
+            <div className={BDModules.get(e => e.marginBottom20)[0].marginBottom20}></div>
+        ]
     }
 
     getSessionValue(){

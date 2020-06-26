@@ -10,6 +10,7 @@ import { defaultRPC, settingsRPC } from "../0globals";
 import CustomRichPresence from "../modules/CustomRichPresence"
 import timestampRender from "./timestampRender"
 import { remote } from "electron";
+import MarginTop from "./margintop";
 
 
 const React = BDV2.React;
@@ -114,7 +115,6 @@ export default class V2C_PresenceSettings extends React.Component {
 
     get modules(){
         return V2C_PresenceSettingsModules || (V2C_PresenceSettingsModules = [
-            BDModules.get(e => e.contentColumn)[0],
             BDModules.get(e => e.marginBottom20)[0]
         ])
     }
@@ -122,32 +122,32 @@ export default class V2C_PresenceSettings extends React.Component {
     render() {
         console.log("Rerendering rpc manager")
         let [
-            contentModule,
             marginModule
         ] = this.modules
-        return (<div className={contentModule.contentColumn+" "+contentModule.contentColumnDefault+" content-column default"}
-            style={{padding: "60px 40px 0px"}}>
-                <V2C_SettingsGroup title="RichPresence Settings" settings={this.props.settings} onChange={this.props.onChange}/>
-                <V2C_SettingsTitle text="RichPresence"/>
-                <div>
-                    {/** options */}
-                    {this.optionsComponents}
-                </div>
-                <div>
-                    <V2C_SettingsTitle text="Preview"/>
-                    {/** preview */}
-                    <RpcPreview settings={this}/>
-                </div>
-                <div className={marginModule.marginBottom20}></div>
-                <button style={{opacity: 0.01}} onClick={window.ohgodohfuck}>
-                    Oh god Oh fuck
-                </button>
-                <button style={{opacity: 0.01}} onClick={() => {
-                    remote.shell.openExternal("https://www.youtube.com/watch?v=LkYa7rps_g4")
-                }}>
-                    See ? I pulled a litle sneaky on ya
-                </button>
-        </div>)
+        return [
+            <V2C_SettingsGroup title="RichPresence Settings" settings={this.props.settings} onChange={this.props.onChange}/>,
+            <MarginTop />,
+            <V2C_SettingsTitle text="RichPresence"/>,
+            <div>
+                {/** options */}
+                {this.optionsComponents}
+            </div>,
+            <div>
+                <MarginTop />
+                <V2C_SettingsTitle text="Preview"/>
+                {/** preview */}
+                <RpcPreview settings={this}/>
+            </div>,
+            <div className={marginModule.marginBottom20}></div>,
+            <button style={{opacity: 0.01}} onClick={window.ohgodohfuck}>
+                Oh god Oh fuck
+            </button>,
+            <button style={{opacity: 0.01}} onClick={() => {
+                remote.shell.openExternal("https://www.youtube.com/watch?v=LkYa7rps_g4")
+            }}>
+                See ? I pulled a litle sneaky on ya
+            </button>
+        ]
     }
 
     get optionsComponents(){
@@ -354,9 +354,9 @@ class InputNumber extends React.PureComponent {
                 </h5>
                 {this.input}
                 {setting.id === "timestamps.start" ? 
-                <Lightcord.Api.Components.inputs.Button text="Copy current timestamp" onClick={() => {
+                <Lightcord.Api.Components.inputs.Button onClick={() => {
                     DiscordNative.clipboard.copy(Date.now()+"")
-                }} color="brand"/> : null}
+                }} color="brand">Copy current timestamp</Lightcord.Api.Components.inputs.Button> : null}
             </div>
             <Divider/>
         </div>)
@@ -468,7 +468,9 @@ class DiscordButton extends React.Component {
 
         return (<div className={rowModule.row+" "+marginModule.marginBottom20}>
             <div className={`${rowModule.item} ${flexModule.flexChild}`}>
-                <Lightcord.Api.Components.inputs.Button text={this.props.title} onClick={this.props.onClick} color="brand"/>
+                <Lightcord.Api.Components.inputs.Button onClick={this.props.onClick} color="brand">
+                    {this.props.title}
+                </Lightcord.Api.Components.inputs.Button>
             </div>
         </div>)
     }
@@ -612,7 +614,7 @@ class Popout extends React.Component {
             </div>
         })()
         
-        return (<div className="lc-userPopout">
+        return (<div className="lc-userPopout lc-tab-box-shadow">
             <div class={rootModule1.userPopout} role="dialog" tabindex="-1">
                 <div class={rootModule1.headerPlaying}>
                     <div class={`${flexModule1.flex} ${stylingModule1.vertical} ${stylingModule1.justifyCenter} ${stylingModule1.alignCenter} ${stylingModule1.noWrap} ${rootModule1.headerTop}`} style={{flex: "1 1 auto"}}>
@@ -773,7 +775,7 @@ class Profile extends React.Component {
         })()
 
         return [
-            <div className="lc-tab">
+            <div className="lc-tab lc-tab-box-shadow">
                 <div class={`${flexModule1.flex} ${stylingModule1.vertical} ${stylingModule1.justifyStart} ${stylingModule1.alignStretch} ${stylingModule1.noWrap} ${rootModule1.root}`} style={{flex: "1 1 auto"}}>
                     <div class={rootModule1.topSectionPlaying}>
                         <header class={rootModule1.header}>
@@ -854,8 +856,7 @@ class Profile extends React.Component {
 						</div>
 					</div>
 				</div>
-            </div>,
-            <div class="lc- "></div>
+            </div>
         ]
     }
 }

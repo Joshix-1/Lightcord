@@ -4,11 +4,16 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "tsc --watch",
+    "build": "tsc"
   },
   "author": "jeanouina",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/collection": "^0.1.5"
+    "@discordjs/collection": "^0.1.5",
+    "ts-loader": "^7.0.5"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.5"
   }
 }

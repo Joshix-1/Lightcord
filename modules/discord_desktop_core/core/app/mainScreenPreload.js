@@ -43,8 +43,6 @@ const DiscordNative = {
 
 const BetterDiscord = require("./BetterDiscord")
 
-const _setImmediate = setImmediate;
-const _clearImmediate = clearImmediate;
 process.once('loaded', () => {
   // Implementing DiscordNative
   global.DiscordNative = DiscordNative;
@@ -56,13 +54,14 @@ process.once('loaded', () => {
   global.Buffer = Buffer
   global.require = require
 
-  // We keep these two functions in global because electron doesn't put these
-  // nodejs APIs in the module scope, and these two functions
-  // aren't harmful at all.
-  global.setImmediate = _setImmediate;
-  global.clearImmediate = _clearImmediate;
+  global.setImmediate = function(callback, ...args){
+    return setTimeout(callback, 0, ...args);
+  };
+  global.clearImmediate = clearTimeout;
 
+  const buildInfo = electron.remote.getGlobal("BuildInfo")
   console.log("%c%s", "color: #3767ad;font-size:25px", 'Lightcord Client\nhttps://github.com/Lightcord/Lightcord');
+  console.log("%c%s", "font-size:15px", `Version: ${buildInfo.version}\nCommit: ${buildInfo.commit || "Unknown"}`)
 
 
   let ftime = Date.now()

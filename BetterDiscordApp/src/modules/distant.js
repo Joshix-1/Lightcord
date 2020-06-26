@@ -140,7 +140,7 @@ class LightcordError extends Error {
 export const Constants = {
     SERVER_URL: "http://127.0.0.1",
     badges: [ // TODO: 
-        {
+        /*{
             name: "Lightcord User",
             id: "01cfa7b0-7cdb-4b0e-8258-9c6a78235c93",
             defaultUsers: [],
@@ -148,7 +148,7 @@ export const Constants = {
                 "user"
             ],
             component: LightcordUserBadge
-        }, {
+        }, */{
             name: "Lightcord Bug Hunter",
             id: "f04698f5-816b-41e3-bd01-92291193d7a5",
             defaultUsers: [

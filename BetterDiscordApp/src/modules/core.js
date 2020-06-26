@@ -16,6 +16,8 @@ import PluginCertifier from "./pluginCertifier";
 import distant, { uuidv4 } from "./distant";
 import EmojiModule from "./emojiModule"
 import {remote as electron} from "electron"
+import v2 from "./v2";
+import webpackModules from "./webpackModules";
 
 function Core() {
     // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
@@ -46,6 +48,8 @@ Core.prototype.init = async function() {
         Utils.alert("Not Supported", "BandagedBD does not work with Powercord. Please uninstall one of them.");
         return;
     }
+
+    Utils.suppressErrors(this.patchAttributes.bind(this), "LC Plugin Certifier Patch")();
 
     /*
     const latestLocalVersion = bdConfig.updater ? bdConfig.updater.LatestVersion : bdConfig.latestVersion;
@@ -135,6 +139,35 @@ Core.prototype.init = async function() {
     }
 };
 
+Core.prototype.patchAttributes = async function() {
+    let attribsPatchs = []
+    this.cancelPatchAttributes = function() {
+        attribsPatchs.forEach(e => e())
+    }
+
+    while(!v2.MessageComponent)await new Promise(resolve => setTimeout(resolve, 100))
+    
+    window.Lightcord.Api.ensureExported(e => e.default && e.default.displayName && e.default.displayName.includes("UserPopout"))
+    .then(UserPopout => {
+        console.log(UserPopout)
+        const render = UserPopout.default.prototype.render
+        UserPopout.default.prototype.render = function(){
+            const returnValue = render.call(this, ...arguments)
+            console.log(returnValue, this.props)
+            return returnValue
+        }
+    })
+    attribsPatchs.push(Utils.monkeyPatch(v2.MessageComponent, "default", {after: (data) => {
+        if(data.methodArguments[0].childrenMessageContent.props.message){ // this can be a blocked message (not opened)
+            data.returnValue.props["data-message-id"] = data.methodArguments[0].childrenMessageContent.props.message.id
+        }
+    }}))
+        /*
+    attribsPatchs.push(Utils.monkeyPatch(v2.MessageComponent, "default", {after: (data) => {
+        data.returnValue.props["message-id"] = data.methodArguments[0].childrenMessageContent.props.message.id
+    }}))*/
+}
+
 Core.prototype.checkForGuilds = function() {
     let timesChecked = 0;
     return new Promise(resolve => {
@@ -176,6 +209,30 @@ Core.prototype.initSettings = function () {
             }
         }
     }
+    window.Lightcord.Api.ensureExported(e => e.default && e.default.prototype && e.default.prototype.getPredicateSections)
+    .then(settingModule => {
+
+        let getPredicateSections = settingModule.default.prototype.getPredicateSections
+        settingModule.default.prototype.getPredicateSections = function(){
+            let result = getPredicateSections.call(this, ...arguments)
+
+            if(result[1].section === "My Account"){ // user settings, not guild settings
+                let poped = []
+                
+                poped.push(result.pop())
+                poped.push(result.pop())
+                poped.push(result.pop())
+                poped.push(result.pop())
+
+                result.push(...settingsPanel.renderSidebar())
+
+                while(poped[0]){
+                    result.push(poped.pop())
+                }
+            }
+            return result
+        }
+    })
 };
 
 
@@ -204,7 +261,6 @@ Core.prototype.initObserver = function () {
                 if (node.getElementsByClassName(classNameSocialLinks).length) {
                     node.setAttribute("layer-id", "user-settings");
                     node.setAttribute("id", "user-settings");
-                    if (!document.getElementById("bd-settings-sidebar")) settingsPanel.renderSidebar();
                 }
             }
 
@@ -332,13 +388,15 @@ Core.prototype.patchGuildListItems = function() {
         if (data.returnValue && data.thisObject) {
             const returnValue = data.returnValue;
             const guildData = data.thisObject.props;
-            returnValue.props.className += " bd-guild";
-            if (guildData.unread) returnValue.props.className += " bd-unread";
-            if (guildData.selected) returnValue.props.className += " bd-selected";
-            if (guildData.audio) returnValue.props.className += " bd-audio";
-            if (guildData.video) returnValue.props.className += " bd-video";
-            if (guildData.badge) returnValue.props.className += " bd-badge";
-            if (guildData.animatable) returnValue.props.className += " bd-animatable";
+            let className = returnValue.props.className
+            className += " bd-guild";
+            if (guildData.unread) className += " bd-unread";
+            if (guildData.selected) className += " bd-selected";
+            if (guildData.audio) className += " bd-audio";
+            if (guildData.video) className += " bd-video";
+            if (guildData.badge) className += " bd-badge";
+            if (guildData.animatable) className += " bd-animatable";
+            returnValue.props.className = className
             return returnValue;
         }
     }});
@@ -421,7 +479,6 @@ Core.prototype.patchMessageHeader = function() {
                 )
             );
         }
-        // TODO: fix 12787689 badges duplicate
         const id = uuidv4()
         children.push(
             BDV2.React.createElement("div", {
@@ -439,6 +496,10 @@ function applyBadges(id, user, chat){
     process.nextTick(() => {
         const div = document.getElementById("badges-"+id)
         if(!div || div.childNodes.length > 0)return
+        if(div.childNodes.length)return
+        let blockDiv = document.createElement("div")
+        blockDiv.style.display = "none"
+        div.appendChild(blockDiv)
 
         const Anchor = WebpackModules.find(m => m.displayName == "Anchor");
 

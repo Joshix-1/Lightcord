@@ -2,6 +2,7 @@ import NOOP from "../../modules/noop"
 import WebpackLoader from "../../modules/WebpackLoader"
 import { ReactNode, CSSProperties } from "react"
 import Utils from "../../modules/Utils"
+import unfreeze from "../../modules/Unfreeze"
 
 type DropdownProps = {
     className?: string,
@@ -42,47 +43,38 @@ type themeOverride = {
 }
 
 let DropdownModules
-export default class Dropdown extends React.Component<DropdownProps, DropdownProps> {
+export default class Dropdown extends React.Component<DropdownProps, {value: string|null}> {
     constructor(props:DropdownProps){
         super(props)
-        props = Dropdown.normalizeProps(props)
-        this.state = props
         this.onChange = this.onChange.bind(this)
+        this.state = {
+            value: props.value || null
+        }
     }
 
-    static normalizeProps(props:DropdownProps):DropdownProps{
-        props = Object.create(props)
-        if(!props || typeof props !== "object")props = {}
-        if(typeof props.className !== "string")delete props.className
-        if(typeof props.darkThemeColorOverrides !== "object" || !props.darkThemeColorOverrides)delete props.darkThemeColorOverrides
-        if(typeof props.disabled !== "boolean")props.disabled = false
-        if(typeof props.error !== "string")delete props.error
-        if(typeof props.isMulti !== "boolean")props.isMulti = false
-        if(typeof props.lightThemeColorOverrides !== "object" || !props.lightThemeColorOverrides)delete props.lightThemeColorOverrides
-        if(typeof props.multiValueRenderer !== "function")delete props.multiValueRenderer
-        if(typeof props.valueRenderer !== "function")delete props.valueRenderer
-        if(typeof props.optionRenderer !== "function")delete props.optionRenderer
-        if(typeof props.onChange !== "function")props.onChange = NOOP
-        if(!Array.isArray(props.options))props.options = [{
+    static defaultProps:DropdownProps = {
+        className: null,
+        error: null,
+        options: [{
             value: "none",
             "label": "No options - No options was passed to Dropdown. If you meant to put an empty dropdown, input an empty array."
-        }]
-        if(typeof props.searchable !== "boolean")props.searchable = false
-        if(typeof props.styleOverrides !== "object")delete props.styleOverrides
-        if(typeof props.value !== "string")props.value = null
-
-        let levels = [props]
-        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
-            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
-        }
-        let finals = Object.assign({}, ...levels)
-
-        return finals
+        }],
+        valueRenderer: null,
+        multiValueRenderer: null,
+        optionRenderer: null,
+        onChange: NOOP,
+        value: null,
+        disabled: false,
+        searchable: false,
+        clearable: false,
+        styleOverrides: null,
+        lightThemeColorOverrides: null,
+        darkThemeColorOverrides: null,
+        isMulti: false
     }
 
     onChange(value){
-        console.log(value)
-        this.state.onChange(value)
+        this.props.onChange(value)
         this.setState({
             value: value
         })
@@ -99,14 +91,58 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownPro
             DropdownComponent
         ] = this.modules
 
-        let props = Dropdown.normalizeProps(this.state || this.props)
-        if(!this.state){
-            this.state = Object.create(props)
-        }
-        return <DropdownComponent {...this.props} onChange={this.onChange}/>
+        let props = this.props
+        let returnValue = <DropdownComponent {...props} onChange={this.onChange} value={this.state.value}/>
+        return returnValue
     }
 
     get value(){
         return this.state.value
     }
+
+    static get AllPreviews(){
+        return AllPreviews || (() => {
+            AllPreviews = []
+            AllPreviews.push([{
+                error: null
+            }, {
+                error: "An error occured"
+            }], [{
+                options: [
+                    {
+                        value: "option1",
+                        label: "Option 1"
+                    },
+                    {
+                        value: "option2",
+                        label: "Option 2"
+                    },
+                    {
+                        value: "option3",
+                        label: "Option 3"
+                    }
+                ]
+            }], [{
+                value: "option1"
+            }], [{
+                disabled: false
+            }, {
+                disabled: true
+            }], [{
+                searchable: true
+            }, {
+                searchable: false
+            }], [{
+                clearable: true
+            }, {
+                clearable: false
+            }], [{
+                isMulti: false
+            }, {
+                isMulti: true
+            }])
+            return AllPreviews
+        })()
+    }
 }
+let AllPreviews

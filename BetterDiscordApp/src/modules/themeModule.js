@@ -18,6 +18,8 @@ ThemeModule.prototype.loadThemes = async function () {
         const theme = bdthemes[themes[i]];
         if (!themeCookie[theme.name]) themeCookie[theme.name] = false;
         if (themeCookie[theme.name]) DOM.addStyle(DOM.escapeID(theme.id), unescape(theme.css));
+
+        await new Promise((resolve) => setTimeout(resolve, 10))
     }
     for (const theme in themeCookie) {
         if (!bdthemes[theme]) delete themeCookie[theme];

@@ -19,51 +19,31 @@ type RadioGroupProps = {
 }
 
 let RadioGroupModule
-export default class RadioGroup extends React.Component<RadioGroupProps, RadioGroupProps> {
+export default class RadioGroup extends React.Component<RadioGroupProps, {value?: string}> {
+    static defaultProps:RadioGroupProps = {
+        options: [{
+            value: "none",
+            name: "No options",
+            desc: "No options was passed to Choices. If you meant to display no options at all, please pass an empty array.",
+            color: "#f04747"
+        }],
+        value: null,
+        disabled: false,
+        size: "medium",
+        itemType: "bar",
+        infoClassName: null,
+        onChange: NOOP
+    }
     constructor(props:RadioGroupProps){
         super(props)
-        props = RadioGroup.normalizeProps(props)
-        this.state = props
         this.onChange = this.onChange.bind(this)
-    }
-
-    static normalizeProps(props:RadioGroupProps):RadioGroupProps{
-        props = Object.create(props)
-        if(!props || typeof props !== "object")props = {}
-        let defaultOptions = false
-        if(!props.options || !Array.isArray(props.options)){
-            props.options = [{
-                value: "none",
-                name: "No options",
-                desc: "No options was passed to Choices. If you meant to display no options at all, please pass an empty array.",
-                color: "#f04747"
-            }]
-            defaultOptions = true
+        this.state = {
+            value: props.value
         }
-        if(!props.value || typeof props.value !== "string"){
-            if(defaultOptions){
-                props.value = "none"
-            }else{
-                props.value = null
-            }
-        }
-        if(typeof props.disabled !== "boolean")props.disabled = false
-        if(typeof props.size !== "string" || !["small", "medium"].includes(props.size.toLowerCase()))props.size = "medium"
-        if(typeof props.itemType !== "string" || !["bar", "panel"].includes(props.itemType))props.itemType = "bar"
-        if(typeof props.infoClassName !== "string")props.infoClassName = ""
-        if(!props.onChange || typeof props.onChange !== "function")props.onChange = NOOP
-
-        let levels = [props]
-        while(Utils.getNestedProps(props, levels.map(e => "__proto__").join("."))){
-            levels.push(Utils.getNestedProps(props, levels.map(e => "__proto__").join(".")))
-        }
-        let finals = Object.assign({}, ...levels)
-
-        return finals
     }
 
     onChange(ev){
-        this.state.onChange(ev.value)
+        this.props.onChange(ev.value)
         this.setState({
             value: ev.value
         })
@@ -80,16 +60,54 @@ export default class RadioGroup extends React.Component<RadioGroupProps, RadioGr
             RadioGroupComponent
         ] = this.modules
 
-        let props = RadioGroup.normalizeProps(this.state || this.props)
-        if(!this.state){
-            this.state = Object.create(props)
-        }
-        return <RadioGroupComponent options={props.options} onChange={this.onChange} value={props.value} disabled={props.disabled} 
+        let props = this.props
+        return <RadioGroupComponent options={props.options} onChange={this.onChange} value={this.state.value} disabled={props.disabled} 
             size={RadioGroupComponent.Sizes[props.size.toUpperCase()]} itemType={RadioGroupComponent.ItemTypes[props.itemType.toUpperCase()]} 
             infoClassName={props.infoClassName}/>
     }
 
-    get value(){
+    get value():string|null{
         return this.state.value
     }
+
+    static get AllPreviews(){
+        return AllPreviews || (() => {
+            AllPreviews = []
+            AllPreviews.push([{
+                options: [
+                    {
+                        value: "option1",
+                        name: "Option 1",
+                        desc: "description 1"
+                    },
+                    {
+                        value: "option2",
+                        name: "Option 2",
+                        desc: "description 2"
+                    },
+                    {
+                        value: "option3",
+                        name: "Option 3",
+                        desc: "description 3"
+                    }
+                ]
+            }], [{
+                value: "option1"
+            }], [{
+                disabled: false
+            }, {
+                disabled: true
+            }], [{
+                size: "medium"
+            }, {
+                size: "small"
+            }], [{
+                itemType: "bar"
+            }, {
+                itemType: "panel"
+            }])
+            return AllPreviews
+        })()
+    }
 }
+let AllPreviews

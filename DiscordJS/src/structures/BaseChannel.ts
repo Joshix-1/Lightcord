@@ -6,10 +6,12 @@ import Snowflake from "../util/Snowflake"
 export default class BaseChannel extends BaseStructure {
     id:string
     deleted:boolean
+    DiscordChannel:DiscordChannel
     constructor(channel:DiscordChannel){
         super()
         this.id = channel.id
         this.deleted = false
+        this.DiscordChannel = channel
     }
 
     get createdAt():Date{
@@ -21,5 +23,5 @@ export default class BaseChannel extends BaseStructure {
 
     delete() {
         return channelsModule.delete(this.id);
-      }
+    }
 }

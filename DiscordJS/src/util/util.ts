@@ -1,14 +1,41 @@
-import { DiscordChannel } from "./DiscordToModules"
-import { Channel } from "..";
+import { DiscordChannel, DiscordGuild, DiscordGuildMember, DiscordRole, DiscordMessage, DiscordUser } from "./DiscordToModules"
+import { Channel, Snowflake } from "..";
+import BaseChannel from "../structures/BaseChannel";
+import Guild from "../structures/Guild";
+import { TextChannel } from "../structures/TextChannel";
+import GuildMember from "../structures/GuildMember";
+import Role from "../structures/Role";
+import User from "../structures/User";
+import Message from "../structures/Message";
 
 export function createChannel(channel:DiscordChannel):Channel{
-    let constructor = channels[channel.type]
+    let constructor = channels[channel.type] || BaseChannel
     return new constructor(channel)    
 }
 
 const channels:(new(channel:DiscordChannel) => Channel)[] = [
-    TextChann
+    TextChannel
 ]
+
+export function createGuild(guild:DiscordGuild):Guild{
+    return new Guild(guild)
+}
+
+export function createGuildMember(member:DiscordGuildMember):GuildMember{
+    return new GuildMember(member)
+}
+
+export function createRole(role:DiscordRole):Role{
+    return new Role(role)
+}
+
+export function createMessage(message:DiscordMessage):Message{
+    return new Message(message)
+}
+
+export function createUser(user:DiscordUser):User{
+    return new User(user)
+}
 
 export function applyMixins(derivedCtor: any, baseCtors: any[]) {
     baseCtors.forEach(baseCtor => {
@@ -68,4 +95,17 @@ export function binaryToID(num:string):string {
     }
 
     return dec;
+}
+
+
+
+export type UserResolvable = User | Snowflake | Message | Guild | GuildMember
+
+export function resolveUserID(user:UserResolvable){
+    if(typeof user === "string")return user // ID
+    if(user instanceof User)return user.id // User
+    if(user instanceof Message)return user.author.id // Message Author
+    if(user instanceof Guild)return user.ownerID // Guild
+    if(user instanceof GuildMember)return user.id // GuildMember
+    return null
 }

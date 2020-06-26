@@ -30,7 +30,7 @@ export default new class DistantServer {
     set cache(data){
         if(typeof data !== "object" || typeof this._cache !== "object")return this._cache = data
         return this._cache = Object.assign(this._cache, data)
-    }
+    }/*
 
     async delete(){
         BdApi.showToast("Deleting all infos about you on Lightcord Servers...", {type: "warn"})
@@ -48,7 +48,7 @@ export default new class DistantServer {
             BdApi.showToast("An error occured, couldn't delete informations. See console for more infos", {type: "error"})
             throw new Error(`Couldn't delete all informations: ${err.stack}`)
         })
-    }
+    }*/
 
     /**
      * Get custom badges from the user ID.
@@ -68,6 +68,7 @@ export default new class DistantServer {
             if(badge.defaultUsers.includes(user))badges.push(badge)
         }
         const fetchedBadges = await new Promise((resolve) => {
+            if(!settingsCookie["lightcord-5"])return resolve([])
             badgesToFetch.push([user, resolve])
             setTimeout(() => {
                 let users = badgesToFetch

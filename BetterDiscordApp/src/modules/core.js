@@ -266,28 +266,6 @@ Core.prototype.initObserver = function () {
 
             if (node.parentElement == document.body && node.querySelector("#ace_settingsmenu")) node.id = "ace_settingsmenu_container";
 
-            /*
-            if(node.classList.contains(classNameModal)){
-                try{
-                    /**
-                     * @type {Element}
-                     *//*
-                    const UserProfile = Utils.getNestedProp(node, "childNodes.0.childNodes.0")
-                    let user = BDV2.getInternalInstance(node).pendingProps.children.props.children.props.user
-                    console.log(user)
-    
-                    if(UserProfile && UserProfile.childNodes.length === 2){
-                        let header = UserProfile.childNodes[0].childNodes[0]
-                        
-                        let children = BDV2.getInternalInstance(header).return.pendingProps.children[1]
-                        console.log(children)
-                        children.push(BDV2.react.createElement("p", {}, "sltsv"))                        
-                    }
-                }catch(e){
-                    console.error("An error occured in Badge Rendering:", e)
-                }
-            }*/
-
             // Emoji Picker
             //node.getElementsByClassName("emojiPicker-3m1S-j").length && !node.querySelector(".emojiPicker-3m1S-j").parentElement.classList.contains("animatorLeft-1EQxU0")
             //if (node.classList.contains(classNameLayer2) && node.getElementsByClassName(classNameEmojiPicker).length  && !node.querySelector("."+classNameEmojiPicker).parentElement.classList.contains(classNameAnimatorLeft)) quickEmoteMenu.obsCallback(node);

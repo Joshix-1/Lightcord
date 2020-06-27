@@ -7,7 +7,7 @@ import appSettings from './appSettings';
 const pak = require("../package.json")
 import * as path from "path"
 
-const settings = appSettings();
+const settings = appSettings.getSettings();
 
 function capitalizeFirstLetter(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);

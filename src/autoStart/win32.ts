@@ -39,7 +39,7 @@ import * as windowsUtils from "../windowsUtils"
 import appSettings from "../appSettings"
 
 
-const settings = appSettings();
+const settings = appSettings.getSettings();
 
 // TODO: We should use Constant's APP_NAME, but only once
 //       we set up backwards compat with this.

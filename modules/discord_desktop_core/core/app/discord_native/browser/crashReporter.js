@@ -3,23 +3,26 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.injectBuildInfo = injectBuildInfo;
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 const electron = require('electron');
 const lodash = require('lodash');
 const childProcess = require('child_process');
-const buildInfo = require('../../buildInfo');
+const { getElectronMajorVersion, flatten, reconcileCrashReporterMetadata } = require('../common/utility');
 
 const { CRASH_REPORTER_UPDATE_METADATA } = require('../common/constants').IPCEvents;
 
-const metadata = exports.metadata = {
-  channel: buildInfo.releaseChannel,
-  sentry: {
-    environment: buildInfo.releaseChannel,
-    release: buildInfo.version
-  }
-};
+const metadata = exports.metadata = {};
+
+function injectBuildInfo(buildInfo) {
+  metadata['channel'] = buildInfo.releaseChannel;
+  const sentryMetadata = metadata['sentry'] != null ? metadata['sentry'] : {};
+  sentryMetadata['environment'] = buildInfo.releaseChannel;
+  sentryMetadata['release'] = buildInfo.version;
+  metadata['sentry'] = sentryMetadata;
+}
 
 if (process.platform === 'linux') {
   const XDG_CURRENT_DESKTOP = process.env.XDG_CURRENT_DESKTOP || 'unknown';
@@ -30,15 +33,10 @@ if (process.platform === 'linux') {
   } catch (_) {} // just in case lsb_release doesn't exist
 }
 
-function getCrashReporterArgs(additional_metadata) {
-  additional_metadata = additional_metadata || {};
-  const final_metadata = lodash.defaultsDeep({}, metadata, additional_metadata);
-
-  for (const key in final_metadata) {
-    if (typeof final_metadata[key] === 'object') {
-      final_metadata[key] = JSON.stringify(final_metadata[key]);
-    }
-  }
+function getCrashReporterArgs(metadata) {
+  // NB: we need to flatten the metadata because modern electron caps metadata values at 127 bytes,
+  // which our sentry subobject can easily exceed.
+  let flat_metadata = flatten(metadata);
 
   return {
     productName: 'Discord',
@@ -46,17 +44,31 @@ function getCrashReporterArgs(additional_metadata) {
     submitURL: 'https://sentry.io/api/146342/minidump/?sentry_key=384ce4413de74fe0be270abe03b2b35a',
     uploadToServer: true,
     ignoreSystemCrashHandler: false,
-    extra: final_metadata
+    extra: flat_metadata
   };
 }
 
-//electron.crashReporter.start(getCrashReporterArgs());
+electron.crashReporter.start(getCrashReporterArgs(metadata));
 
 electron.ipcMain.handle(CRASH_REPORTER_UPDATE_METADATA, (() => {
   var _ref = _asyncToGenerator(function* (_, additional_metadata) {
-    const args = getCrashReporterArgs(additional_metadata);
-    //electron.crashReporter.start(args);
-    return args;
+    const final_metadata = lodash.defaultsDeep({}, metadata, additional_metadata || {});
+    const result = {
+      metadata: final_metadata
+    };
+
+    // In Electron 9 we only start the crashReporter once and let reconcileCrashReporterMetadata
+    // do the work of keeping `extra` up-to-date. Prior to this we would simply start crashReporter
+    // again to apply new metadata as well as pass the full arguments back to the renderer so it
+    // could do similarly.
+    if (getElectronMajorVersion() < 9) {
+      const args = getCrashReporterArgs(final_metadata);
+      electron.crashReporter.start(args);
+      result.args = args;
+    }
+
+    reconcileCrashReporterMetadata(electron.crashReporter, final_metadata);
+    return result;
   });
 
   return function (_x, _x2) {

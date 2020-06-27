@@ -10,7 +10,7 @@ var _electron = require('electron');
 
 var _appSettings = require('./appSettings');
 
-const settings = _appSettings();
+const settings = _appSettings.getSettings();
 
 function getEnableHardwareAcceleration() {
   // TODO: This should probably a constant

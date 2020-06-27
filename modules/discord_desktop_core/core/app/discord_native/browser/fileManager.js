@@ -13,7 +13,7 @@ const {
 
 electron.ipcMain.handle(FILE_MANAGER_GET_MODULE_PATH, (() => {
   var _ref = _asyncToGenerator(function* (_) {
-    return require("path").join(__dirname, "../../../../..");
+    return global.modulePath;
   });
 
   return function (_x) {

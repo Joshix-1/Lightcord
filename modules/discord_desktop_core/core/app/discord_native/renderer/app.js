@@ -1,38 +1,83 @@
 'use strict';
 
-async function getPath(path){
-  if (!allowedAppPaths.has(path)) {
-    throw new Error(`${path} is not an allowed app path`);
-  }
+let getPath = (() => {
+  var _ref2 = _asyncToGenerator(function* (path) {
+    if (!allowedAppPaths.has(path)) {
+      throw new Error(`${path} is not an allowed app path`);
+    }
 
-  return electron.ipcRenderer.invoke(APP_GET_PATH, path);
-}
+    return electron.ipcRenderer.invoke(APP_GET_PATH, path);
+  });
 
-async function setBadgeCount(count){
-  electron.ipcRenderer.invoke(APP_SET_BADGE_COUNT, count);
-}
+  return function getPath(_x2) {
+    return _ref2.apply(this, arguments);
+  };
+})();
 
-async function dockSetBadge(badge){
-  electron.ipcRenderer.invoke(APP_DOCK_SET_BADGE, badge);
-}
+let setBadgeCount = (() => {
+  var _ref3 = _asyncToGenerator(function* (count) {
+    electron.ipcRenderer.invoke(APP_SET_BADGE_COUNT, count);
+  });
 
-async function dockBounce(type){
-  return electron.ipcRenderer.invoke(APP_DOCK_BOUNCE, type);
-}
+  return function setBadgeCount(_x3) {
+    return _ref3.apply(this, arguments);
+  };
+})();
 
-async function dockCancelBounce(id){
-  electron.ipcRenderer.invoke(APP_DOCK_CANCEL_BOUNCE, id);
-}
+let dockSetBadge = (() => {
+  var _ref4 = _asyncToGenerator(function* (badge) {
+    electron.ipcRenderer.invoke(APP_DOCK_SET_BADGE, badge);
+  });
 
-async function relaunch(){
-  electron.ipcRenderer.invoke(APP_RELAUNCH);
-}
+  return function dockSetBadge(_x4) {
+    return _ref4.apply(this, arguments);
+  };
+})();
 
-async function getDefaultDoubleClickAction(){
-  return electron.ipcRenderer.invoke(APP_GET_DEFAULT_DOUBLE_CLICK_ACTION);
-}
+let dockBounce = (() => {
+  var _ref5 = _asyncToGenerator(function* (type) {
+    return electron.ipcRenderer.invoke(APP_DOCK_BOUNCE, type);
+  });
+
+  return function dockBounce(_x5) {
+    return _ref5.apply(this, arguments);
+  };
+})();
+
+let dockCancelBounce = (() => {
+  var _ref6 = _asyncToGenerator(function* (id) {
+    electron.ipcRenderer.invoke(APP_DOCK_CANCEL_BOUNCE, id);
+  });
+
+  return function dockCancelBounce(_x6) {
+    return _ref6.apply(this, arguments);
+  };
+})();
+
+let relaunch = (() => {
+  var _ref7 = _asyncToGenerator(function* () {
+    electron.ipcRenderer.invoke(APP_RELAUNCH);
+  });
+
+  return function relaunch() {
+    return _ref7.apply(this, arguments);
+  };
+})();
+
+let getDefaultDoubleClickAction = (() => {
+  var _ref8 = _asyncToGenerator(function* () {
+    return electron.ipcRenderer.invoke(APP_GET_DEFAULT_DOUBLE_CLICK_ACTION);
+  });
+
+  return function getDefaultDoubleClickAction() {
+    return _ref8.apply(this, arguments);
+  };
+})();
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 const electron = require('electron');
+const { UpdaterEvents } = require('../../Constants');
 
 const allowedAppPaths = new Set(['home', 'appData', 'desktop', 'documents', 'downloads']);
 const {
@@ -56,9 +101,15 @@ electron.ipcRenderer.invoke(APP_GET_MODULE_VERSIONS).then(versions => {
   moduleVersions = versions;
 });
 
-electron.ipcRenderer.on('DISCORD_MODULE_INSTALLED', async function(){
-  moduleVersions = await electron.ipcRenderer.invoke(APP_GET_MODULE_VERSIONS);
-});
+electron.ipcRenderer.on('DISCORD_MODULE_INSTALLED', (() => {
+  var _ref = _asyncToGenerator(function* (_) {
+    moduleVersions = yield electron.ipcRenderer.invoke(APP_GET_MODULE_VERSIONS);
+  });
+
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+})());
 
 function getReleaseChannel() {
   return releaseChannel;

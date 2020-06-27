@@ -30,7 +30,7 @@ electron.app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-requir
 electron.app.commandLine.appendSwitch("no-force-async-hooks-checks");
 
 function setupHardwareAcceleration() {
-  const settings = appSettings();
+  const settings = appSettings.getSettings();
   //@ts-ignore
   const electronMajor = parseInt(process.versions.electron.split('.')[0]);
   const allowed = process.env.DISCORD_ENABLE_HARDWARE_ACCELERATION || buildInfo.releaseChannel === 'development' || !(electronMajor === 7 && process.platform === 'darwin');

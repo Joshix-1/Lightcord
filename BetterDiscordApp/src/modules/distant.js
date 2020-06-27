@@ -164,7 +164,8 @@ export const Constants = {
             name: "Buffoon",
             id: "06904d31-65b4-41ec-a50c-8658bbd1af96",
             defaultUsers: [
-                "389016895543705602"
+                "389016895543705602",
+                "664600134528663565"
             ],
             scopes: [],
             component: Circus,

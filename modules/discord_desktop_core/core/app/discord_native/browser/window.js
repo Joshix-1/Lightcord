@@ -1,11 +1,14 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.injectGetWindow = injectGetWindow;
+
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 const electron = require('electron');
 const process = require('process');
-const { getMainWindowId } = require('../../mainScreen');
-const { getWindow: getWindowByKey } = require('../../popoutWindows');
 
 const {
   WINDOW_BLUR,
@@ -22,13 +25,17 @@ const {
   WINDOW_SET_ALWAYS_ON_TOP
 } = require('../common/constants').IPCEvents;
 
-function getWindow(key) {
-  return getWindowByKey(key) || electron.BrowserWindow.fromId(getMainWindowId());
+let injectedGetWindow = _key => {
+  return null;
+};
+
+function injectGetWindow(getWindow) {
+  injectedGetWindow = getWindow;
 }
 
 electron.ipcMain.handle(WINDOW_FLASH_FRAME, (() => {
   var _ref = _asyncToGenerator(function* (_, flag) {
-    const currentWindow = getWindow();
+    const currentWindow = injectedGetWindow();
     if (currentWindow == null || currentWindow.flashFrame == null) return;
     currentWindow.flashFrame(!currentWindow.isFocused() && flag);
   });
@@ -40,7 +47,7 @@ electron.ipcMain.handle(WINDOW_FLASH_FRAME, (() => {
 
 electron.ipcMain.handle(WINDOW_MINIMIZE, (() => {
   var _ref2 = _asyncToGenerator(function* (_, key) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win == null) return;
     win.minimize();
   });
@@ -52,7 +59,7 @@ electron.ipcMain.handle(WINDOW_MINIMIZE, (() => {
 
 electron.ipcMain.handle(WINDOW_RESTORE, (() => {
   var _ref3 = _asyncToGenerator(function* (_, key) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win == null) return;
     win.restore();
   });
@@ -64,7 +71,7 @@ electron.ipcMain.handle(WINDOW_RESTORE, (() => {
 
 electron.ipcMain.handle(WINDOW_MAXIMIZE, (() => {
   var _ref4 = _asyncToGenerator(function* (_, key) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win == null) return;
     if (win.isMaximized()) {
       win.unmaximize();
@@ -80,7 +87,7 @@ electron.ipcMain.handle(WINDOW_MAXIMIZE, (() => {
 
 electron.ipcMain.handle(WINDOW_FOCUS, (() => {
   var _ref5 = _asyncToGenerator(function* (_, key) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win == null) return;
     win.show();
   });
@@ -92,7 +99,7 @@ electron.ipcMain.handle(WINDOW_FOCUS, (() => {
 
 electron.ipcMain.handle(WINDOW_SET_ALWAYS_ON_TOP, (() => {
   var _ref6 = _asyncToGenerator(function* (_, key, enabled) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win == null) return;
     win.setAlwaysOnTop(enabled);
   });
@@ -104,7 +111,7 @@ electron.ipcMain.handle(WINDOW_SET_ALWAYS_ON_TOP, (() => {
 
 electron.ipcMain.handle(WINDOW_IS_ALWAYS_ON_TOP, (() => {
   var _ref7 = _asyncToGenerator(function* (_, key) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win == null) return false;
     return win.isAlwaysOnTop();
   });
@@ -116,7 +123,7 @@ electron.ipcMain.handle(WINDOW_IS_ALWAYS_ON_TOP, (() => {
 
 electron.ipcMain.handle(WINDOW_BLUR, (() => {
   var _ref8 = _asyncToGenerator(function* (_, key) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win != null && !win.isDestroyed()) {
       win.blur();
     }
@@ -129,7 +136,7 @@ electron.ipcMain.handle(WINDOW_BLUR, (() => {
 
 electron.ipcMain.handle(WINDOW_SET_PROGRESS_BAR, (() => {
   var _ref9 = _asyncToGenerator(function* (_, key, progress) {
-    const win = getWindow(key);
+    const win = injectedGetWindow(key);
     if (win == null) return;
     win.setProgressBar(progress);
   });
@@ -141,7 +148,7 @@ electron.ipcMain.handle(WINDOW_SET_PROGRESS_BAR, (() => {
 
 electron.ipcMain.handle(WINDOW_TOGGLE_FULLSCREEN, (() => {
   var _ref10 = _asyncToGenerator(function* (_, key) {
-    const currentWindow = getWindow(key);
+    const currentWindow = injectedGetWindow(key);
     currentWindow.setFullScreen(!currentWindow.isFullScreen());
   });
 
@@ -155,7 +162,7 @@ electron.ipcMain.handle(WINDOW_CLOSE, (() => {
     if (key == null && process.platform === 'darwin') {
       electron.Menu.sendActionToFirstResponder('hide:');
     } else {
-      const win = getWindow(key);
+      const win = injectedGetWindow(key);
       if (win == null) return;
       win.close();
     }
@@ -168,7 +175,7 @@ electron.ipcMain.handle(WINDOW_CLOSE, (() => {
 
 electron.ipcMain.handle(WINDOW_SET_BACKGROUND_THROTTLING, (() => {
   var _ref12 = _asyncToGenerator(function* (_, enabled) {
-    const win = getWindow();
+    const win = injectedGetWindow();
     if (win == null) return;
     win.webContents.setBackgroundThrottling(enabled);
   });

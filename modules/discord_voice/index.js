@@ -6,19 +6,18 @@ const yargs = require('yargs');
 const isElectronRenderer =
   typeof window !== 'undefined' && window != null && window.DiscordNative && window.DiscordNative.isRenderer;
 
-const appSettings = isElectronRenderer ? require('electron').remote.getGlobal('appSettings') : global.appSettings;
-const features = isElectronRenderer ? require('electron').remote.getGlobal('features') : global.features;
-const mainArgv = isElectronRenderer ? require('electron').remote.process.argv : [];
-const releaseChannel = isElectronRenderer ? require('electron').remote.getGlobal('releaseChannel') : '';
-const dialog = isElectronRenderer ? require('electron').remote.dialog : null;
-const useLegacyAudioDevice = appSettings ? appSettings.get('useLegacyAudioDevice') : false;
+const appSettings = isElectronRenderer ? window.DiscordNative.settings : global.appSettings;
+const features = isElectronRenderer ? window.DiscordNative.features : global.features;
+const mainArgv = isElectronRenderer ? window.DiscordNative.processUtils.getMainArgvSync() : [];
+const releaseChannel = isElectronRenderer ? window.DiscordNative.app.getReleaseChannel() : '';
+const useLegacyAudioDevice = appSettings ? appSettings.getSync('useLegacyAudioDevice') : false;
 const audioSubsystemSelected = appSettings
-  ? appSettings.get('audioSubsystem') === 'legacy'
+  ? appSettings.getSync('audioSubsystem') === 'legacy'
     ? 'legacy'
     : 'standard'
   : 'standard';
 const audioSubsystem = useLegacyAudioDevice || audioSubsystemSelected;
-const debugLogging = appSettings ? appSettings.get('debugLogging') : false;
+const debugLogging = appSettings ? appSettings.getSync('debugLogging') : false;
 
 const argv = yargs(mainArgv.slice(1))
   .describe('log-level', 'Logging level.')
@@ -62,6 +61,7 @@ features.declareSupported('loopback');
 features.declareSupported('experiment_config');
 features.declareSupported('remote_locus_network_control');
 features.declareSupported('connection_replay');
+features.declareSupported('simulcast');
 
 if (process.platform === 'win32') {
   features.declareSupported('voice_legacy_subsystem');
@@ -88,19 +88,13 @@ if (isElectronRenderer) {
   VoiceEngine.setImageDataAllocator((width, height) => new window.ImageData(width, height));
 }
 
-if (dialog != null) {
-  VoiceEngine.createReplayConnection = function (audioEngineId, callback) {
-    const paths = dialog.showOpenDialogSync(null, {
-      filters: [{name: 'All Files', extensions: ['*']}],
-    });
+VoiceEngine.createReplayConnection = function (audioEngineId, callback, replayLog) {
+  if (replayLog == null) {
+    return null;
+  }
 
-    if (paths == null || paths.length === 0) {
-      return null;
-    }
-
-    return new VoiceReplayConnection(paths[0], audioEngineId, callback);
-  };
-}
+  return new VoiceReplayConnection(replayLog, audioEngineId, callback);
+};
 
 VoiceEngine.setAudioSubsystem = function (subsystem) {
   if (appSettings == null) {
@@ -117,9 +111,10 @@ VoiceEngine.setAudioSubsystem = function (subsystem) {
 
   appSettings.set('audioSubsystem', subsystem);
   appSettings.set('useLegacyAudioDevice', false);
-  appSettings.save();
 
-  reloadElectronApp();
+  if (isElectronRenderer) {
+    window.DiscordNative.app.relaunch();
+  }
 };
 
 VoiceEngine.setDebugLogging = function (enable) {
@@ -134,8 +129,9 @@ VoiceEngine.setDebugLogging = function (enable) {
 
   appSettings.set('debugLogging', enable);
 
-  appSettings.save();
-  reloadElectronApp();
+  if (isElectronRenderer) {
+    window.DiscordNative.app.relaunch();
+  }
 };
 
 VoiceEngine.getDebugLogging = function () {

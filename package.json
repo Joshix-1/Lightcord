@@ -4,11 +4,12 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "tsc && electron .",
+    "compile": "node compile.js",
+    "test": "npm run compile && electron .",
     "run": "electron .",
     "build": "npm run build:minify && npm run build:electron",
-    "build:electron": "electron-packager ./distApp --ignore=\"(distApp|builds|\\.ts)\" --arch=ia32 --win32metadata.ProductName=\"Lightcord\" --win32metadata.CompanyName=\"Lightcord Inc.\" --protocol=discord --platform=\"win32,linux\" --out=builds --icon=app.ico --executable-name=\"Lightcord\" --asar.unpack=*.{node,dll} --overwrite",
-    "build:minify": "node compile.js",
+    "build:electron": "electron-packager ./distApp --ignore=\"(distApp|builds|\\.ts)\" --arch=ia32 --win32metadata.ProductName=\"Lightcord\" --win32metadata.CompanyName=\"Lightcord\" --protocol=discord --platform=\"win32,linux\" --out=builds --icon=app.ico --executable-name=\"Lightcord\" --asar.unpack=*.{node,dll} --overwrite",
+    "build:minify": "node build.js",
     "devInstall": "npm i -g --arch=ia32 electron@8.3.0 && npm i -g typescript && npm i --save-dev @types/node@12.12.39 && npm i --save-dev --arch=ia32 electron@8.3.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\""
   },
   "author": "",
@@ -33,6 +34,7 @@
     "@types/rimraf": "^3.0.0",
     "@types/uuid": "^8.0.0",
     "@types/yauzl": "^2.9.1",
+    "cross-spawn": "^7.0.3",
     "electron": "8.3.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

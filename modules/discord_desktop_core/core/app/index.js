@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.startup = startup;
 exports.handleSingleInstance = handleSingleInstance;
 exports.setMainWindowVisible = setMainWindowVisible;
-const { Menu } = require('electron');
+const { Menu, BrowserWindow } = require('electron');
 const yauzl = require("yauzl")
 const fetch = require("node-fetch").default
 
@@ -21,7 +21,7 @@ function startup(bootstrapModules) {
   require('./splashScreen');
   const moduleUpdater = require('./moduleUpdater');
   require('./autoStart');
-  require('./buildInfo');
+  const buildInfo = require('./buildInfo');
   const appSettings = require('./appSettings');
 
   const Constants = require('./Constants');
@@ -37,19 +37,26 @@ function startup(bootstrapModules) {
   rootCertificates.init();
 
   require('./discord_native/browser/accessibility');
-  require('./discord_native/browser/app');
+  const app = require('./discord_native/browser/app');
+  app.injectBuildInfo(buildInfo);
+  app.injectModuleUpdater(moduleUpdater);
   require('./discord_native/browser/clipboard');
   const crashReporter = require('./discord_native/browser/crashReporter');
-  require('./discord_native/browser/features');
+  crashReporter.injectBuildInfo(buildInfo);
+  const features = require('./discord_native/browser/features');
+  features.injectFeaturesBackend(appFeatures.getFeatures());
   require('./discord_native/browser/fileManager');
-  require('./discord_native/browser/gpuSettings');
-  require('./discord_native/browser/nativeModules');
+  const gpuSettings = require('./discord_native/browser/gpuSettings');
+  gpuSettings.injectGpuSettingsBackend(GPUSettings);
+  const nativeModules = require('./discord_native/browser/nativeModules');
+  nativeModules.injectModuleUpdater(moduleUpdater);
   require('./discord_native/browser/powerMonitor');
   require('./discord_native/browser/powerSaveBlocker');
   require('./discord_native/browser/processUtils');
-  require('./discord_native/browser/settings');
+  const settings = require('./discord_native/browser/settings');
+  settings.injectSettingsBackend(appSettings.getSettings());
   require('./discord_native/browser/spellCheck');
-  require('./discord_native/browser/window');
+  const windowNative = require('./discord_native/browser/window');
 
   // expose globals that will be imported by the webapp
   // global.releaseChannel is set in bootstrap
@@ -73,6 +80,11 @@ function startup(bootstrapModules) {
   })
   bootstrapModules.splashScreen.events.on("APP_SHOULD_LAUNCH", () => {
     mainScreen.init(false)
+
+    const { getWindow: getPopoutWindowByKey } = require('./popoutWindows');
+    windowNative.injectGetWindow(key => {
+      return getPopoutWindowByKey(key) || BrowserWindow.fromId(mainScreen.getMainWindowId());
+    });
   })
 
   mainScreen.events.on("ready", () => {
@@ -88,6 +100,11 @@ function startup(bootstrapModules) {
   if(Date.now() - global.appSettings.get("LAST_UPDATE_CHECK_TIMESTAMP", 0) < 6.48e+8){
     console.log("Starting with version "+version+" because it haven't been 1 week since the last check.")
     mainScreen.init(false)
+
+    const { getWindow: getPopoutWindowByKey } = require('./popoutWindows');
+    windowNative.injectGetWindow(key => {
+      return getPopoutWindowByKey(key) || BrowserWindow.fromId(mainScreen.getMainWindowId());
+    });
   }else{
     initByUpdate = true
     console.log("Checking if version "+version+" is outdated...")

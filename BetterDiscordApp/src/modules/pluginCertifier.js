@@ -29,9 +29,9 @@ export default new class PluginCertifier {
 }
 
 export function checkViruses(hash, data, resultCallback, removeCallback){
-    data = data.toString("utf8").split(/[^\w\d]+/g)
+    data = data.toString("utf8")
     let isHarmful = false
-    for(let keyword of data){
+    for(let keyword of data.split(/[^\w\d]+/g)){
         for(let oof of [
             "token",
             "email",
@@ -103,14 +103,15 @@ export function checkHash(hash, data, filename, resultCallback, removeCallback){
         }).then(async res => {
             if(res.status !== 200){
                 if(filename.endsWith(".theme.css"))return removeCallback()
-                return checkViruses(hash, data, resultCallback, wrongCallback)
+                checkViruses(hash, data, resultCallback, removeCallback)
+                return
             }
             const result = await res.json()
 
             cache[hash] = result
 
             resultCallback(result)
-        }).catch(()=>{})
+        }).catch(console.error)
     }else{
         const result = cache[hash]
 
@@ -160,7 +161,8 @@ export function processAttachment(attachment, id){
             checkHash(hashResult, data, attachment.filename, (result) => {
                 renderToElements(id, result, attachment.filename)
             }, () => {
-                document.getElementById(id).remove()
+                let elem = document.getElementById(id)
+                if(elem)elem.remove()
             })
         })
     }).catch(()=>{})

@@ -119,7 +119,7 @@ export function checkHash(hash, data, filename, resultCallback, removeCallback){
     }
 }
 
-export function processFile(__path, resultCallback, removeCallback){    
+export function processFile(__path, resultCallback, removeCallback = () => {}){    
     const hash = crypto.createHash("sha256")
     let data = Buffer.alloc(0)
 
@@ -130,6 +130,8 @@ export function processFile(__path, resultCallback, removeCallback){
         const hashResult = hash.digest("hex")
 
         hashToUrl[hashResult] = __path
+
+        console.log(arguments)
 
         checkHash(hashResult, data, basename(__path), resultCallback, removeCallback)
     })

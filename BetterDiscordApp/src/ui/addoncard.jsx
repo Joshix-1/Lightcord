@@ -197,8 +197,8 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
                 if(this.unmounted)return
                 this.setState({
                     isTrusted: !result.suspect
-                }, () => {})
-            })
+                })
+            }, () => {})
         }else{
             if(this.state.isTrusted){
                 style.borderColor = "#4087ed"

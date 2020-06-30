@@ -58,13 +58,12 @@ export default new class V2_PublicServers {
 
     _appendButton() {
         let [
-            classNameScroller
+            classNametutorialContainer
         ] = [
-            BDModules.get(e => e.scroller && e.scrollbarWidth)[0].scroller
+            Utils.removeDa(BDModules.get(e => e.downloadProgress && e.tutorialContainer)[0].tutorialContainer)
         ]
         if (DOM.query("#bd-pub-li")) return;
-        const wrapper = BDV2.guildClasses.wrapper.split(" ")[0];
-        const guilds = DOM.query(`.${wrapper} .${classNameScroller} >:first-child`);
+        const guilds = DOM.query(`div.${classNametutorialContainer} > div`);
         DOM.after(guilds, this.button);
     }
 

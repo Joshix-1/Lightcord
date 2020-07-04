@@ -6,6 +6,9 @@ import Utils from "./utils";
 import DOM from "./domtools";
 
 class ThemeModule {
+    constructor(){
+        window.Lightcord.BetterDiscord.ThemeModule = this
+    }
     get folder() {return ContentManager.themesFolder;}
 }
 

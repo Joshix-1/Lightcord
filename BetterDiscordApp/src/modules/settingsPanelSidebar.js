@@ -1,12 +1,3 @@
-import {bbdChangelog, LCChanelog} from "../0globals";
-import Utils from "./utils";
-import BDV2 from "./v2";
-import DOM from "./domtools";
-
-import SideBar from "../ui/sidebar";
-import History from "../ui/icons/history";
-import TooltipWrap from "../ui/tooltipWrap";
-
 export default class V2_SettingsPanel_Sidebar {
 
     constructor() {
@@ -50,7 +41,7 @@ export default class V2_SettingsPanel_Sidebar {
                 id: "accountinfo"
             }
         ]
-        if(!!window.Lightcord.Settings.devMode)items.push({
+        if(window.Lightcord.Settings.devMode)items.push({
             text: "Api Components Preview",
             id: "lcapipreview"
         })
@@ -74,8 +65,8 @@ export default class V2_SettingsPanel_Sidebar {
                 section: "DIVIDER"
             },
             {
-                section: "HEADER",
-                label: "Bandaged BD"
+                section: "CUSTOM",
+                element: this.getComponent("BDChangelogTitle")
             },
             ...this.items.map(e => {
                 return {
@@ -90,3 +81,7 @@ export default class V2_SettingsPanel_Sidebar {
         ]
     }
 }
+
+/**
+ * No need to export settingsPanelSidebar on window
+ */

@@ -2,11 +2,15 @@ import { DiscordChannel, DiscordGuild, DiscordGuildMember, DiscordRole, DiscordM
 import { Channel, Snowflake } from "..";
 import BaseChannel from "../structures/BaseChannel";
 import Guild from "../structures/Guild";
-import { TextChannel } from "../structures/TextChannel";
+import TextChannel from "../structures/TextChannel";
 import GuildMember from "../structures/GuildMember";
 import Role from "../structures/Role";
 import User from "../structures/User";
 import Message from "../structures/Message";
+import { ChannelTypes } from "./Constants";
+import CategoryChannel from "../structures/CategoryChannel";
+import Collection from "@discordjs/collection";
+import Permissions, { PermissionResolvable } from "./Permissions";
 
 export function createChannel(channel:DiscordChannel):Channel{
     let constructor = channels[channel.type] || BaseChannel
@@ -109,3 +113,38 @@ export function resolveUserID(user:UserResolvable){
     if(user instanceof GuildMember)return user.id // GuildMember
     return null
 }
+
+export type ChannelData = {
+    type?: ChannelTypes,
+    name?: string,
+    position?: number,
+    topic?: string,
+    nsfw?: boolean,
+    bitrate?: number,
+    userLimit?: number,
+    parent?: CategoryChannel|Snowflake,
+    permissionOverwrites?: ChannelCreationOverwrites[] | Collection<Snowflake, PermissionOverwrites>,
+    rateLimitPerUser?: number
+}
+
+export type ChannelCreationOverwrites = {
+    allow?: PermissionResolvable,
+    /**
+     * @deprecated
+     */
+    allowed?: PermissionResolvable,
+    deny?: PermissionResolvable,
+    /**
+     * @deprecated
+     */
+    denied?: PermissionResolvable,
+    id?: GuildMemberResolvable | RoleResolvable
+}
+
+export type PermissionOverwrites = keyof typeof Permissions.FLAGS | number | Permissions | PermissionResolvable[]
+
+export {BitFieldResolvable} from "./BitField"
+
+export type GuildMemberResolvable = GuildMember | User
+
+export type RoleResolvable = Role | Snowflake

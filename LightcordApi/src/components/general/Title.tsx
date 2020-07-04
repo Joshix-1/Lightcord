@@ -1,7 +1,5 @@
 import WebpackLoader from "../../modules/WebpackLoader"
 import { ReactNode } from "react"
-import uuid from "../../modules/uuid"
-import Utils from "../../modules/Utils"
 
 type TitleProps = {
     children?: ReactNode,

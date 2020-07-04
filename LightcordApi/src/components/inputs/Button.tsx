@@ -10,7 +10,8 @@ type ButtonProps = {
     wrapper?: boolean,
     look?: ButtonLook,
     size?: ButtonSize,
-    hoverColor?: ButtonHovers
+    hoverColor?: ButtonHovers,
+    disabled?: boolean
 }
 export default class Button extends React.Component<ButtonProps, {hover: boolean}> {
     constructor(props:ButtonProps){
@@ -65,6 +66,11 @@ export default class Button extends React.Component<ButtonProps, {hover: boolean
             }
             if("hoverColor" in this.props){
                 props.hoverColor = this.props.hoverColor
+            }
+            if("disabled" in this.props){
+                props.disabled = this.props.disabled
+            }else{
+                props.disabled = false
             }
         }
 
@@ -124,9 +130,10 @@ export default class Button extends React.Component<ButtonProps, {hover: boolean
             }} onMouseLeave={(ev) => {
                 if(!hoverColor)return
                 this.setState({hover: false})
-            }}>
+            }} disabled={props.disabled}>
             <div className={euhModule1.contents}>{props.children}</div>
         </button>
+
         if(props.wrapper){
             return <div className={buttonModule.buttonWrapper}>
                 {button}
@@ -169,6 +176,7 @@ export default class Button extends React.Component<ButtonProps, {hover: boolean
             AllPreviews.push([{children: "Test Button"}])
             AllPreviews.push([{onClick: () => {}}])
             AllPreviews.push([{wrapper: false}])
+            AllPreviews.push([{disabled: false}, {disabled: true}])
             return AllPreviews
         })()
     }

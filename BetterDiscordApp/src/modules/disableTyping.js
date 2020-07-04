@@ -13,6 +13,7 @@ export default new class DisableTyping {
             }
             this.disabled = true
         })
+        window.Lightcord.BetterDiscord.DisableTyping = this
     }
 
     disable(){

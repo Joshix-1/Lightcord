@@ -110,7 +110,7 @@ function startup(bootstrapModules) {
     console.log("Checking if version "+version+" is outdated...")
     bootstrapModules.splashScreen.initSplash()
     bootstrapModules.splashScreen.events.on("SPLASH_SCREEN_READY", () => {
-      fetch("https://haste.deroku.xyz/raw/oqigetomog", {
+      fetch("https://raw.githubusercontent.com/Lightcord/Lightcord/master/package.json", {
         headers: {
           "User-Agent": "Lightcord-Updater/1.0"
         }
@@ -150,7 +150,7 @@ function setMainWindowVisible(visible) {
 
 function updateApp(version){
   const bootstrapModules = require('./bootstrapModules')
-  const updateLink = "https://github.com/Lightcord/Lightcord/archive/master.zip"
+  //const updateLink = "https://github.com/Lightcord/Lightcord/archive/master.zip"
 
   bootstrapModules.splashScreen.setSplashState({
     status: "downloading-updates",

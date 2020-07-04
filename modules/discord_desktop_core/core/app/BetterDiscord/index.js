@@ -68,49 +68,32 @@ async function privateInit(){
     if(electron.remote.process.argv.includes("--disable-betterdiscord")){
         let formComponents
         let margins
-        let ButtonModules
         class LightcordSettings extends React.Component {
             render(){
                 if(!formComponents)formComponents = ModuleLoader.get(e => e.FormSection)[0]
                 if(!margins)margins = ModuleLoader.get(e => e.marginTop60)[0]
 
-                let [
-                    flexModule,
-                    euhModule1,
-                    buttonModule,
-                    colorsModule,
-                ] = this.ButtonModules
+                let button = require("./Button").default
+                
                 return React.createElement("div", {}, [
                     React.createElement(formComponents.FormSection, {
                         className: "",
                         tag: "h2",
                         title: "Lightcord's Settings"
-                    }, [
-                        React.createElement("div", { className: buttonModule.buttonWrapper }, [
-                            React.createElement("button", { 
-                                type: "button", 
-                                className: `${flexModule.flexChild} ${euhModule1.button} ${euhModule1.lookFilled} ${colorsModule.ButtonColors.YELLOW} ${euhModule1.sizeSmall} ${euhModule1.grow}`, 
-                                style: { flex: "0 1 auto" }, 
-                                onClick: () => {
-                                    console.log("Should relaunch")
-                                    electron.remote.app.relaunch({
-                                        args: electron.remote.process.argv.slice(1).filter(e => e !== "--disable-betterdiscord")
-                                    })
-                                    electron.remote.app.quit()
-                                } 
-                            },
-                            React.createElement("div", { className: euhModule1.contents }, "Relaunch with BetterDiscord"))
-                        ])
-                    ])
-                ])
-            }
-
-            get ButtonModules(){ // caching modules
-                return ButtonModules || (ButtonModules = [
-                    ModuleLoader.get(e => e["_horizontal"])[0],
-                    ModuleLoader.get(e => e["colorTransparent"])[0],
-                    ModuleLoader.get(e => e["buttonWrapper"])[0],
-                    ModuleLoader.get(e => e["ButtonColors"])[0]
+                    }, React.createElement(button, { 
+                        color: "yellow",
+                        look: "ghost",
+                        size: "medium",
+                        hoverColor: "red",
+                        onClick: () => {
+                            console.log("Should relaunch")
+                            electron.remote.app.relaunch({
+                                args: electron.remote.process.argv.slice(1).filter(e => e !== "--disable-betterdiscord")
+                            })
+                            electron.remote.app.quit()
+                        },
+                        wrapper: true
+                    }, "Relaunch with BetterDiscord"))
                 ])
             }
         }
@@ -132,7 +115,6 @@ async function privateInit(){
             let getPredicateSections = settingModule.default.prototype.getPredicateSections
             settingModule.default.prototype.getPredicateSections = function(){
                 let result = getPredicateSections.call(this, ...arguments)
-                console.log(result)
                 if(result[1].section === "My Account"){ // user settings, not guild settings
                     let poped = []
                     
@@ -261,25 +243,33 @@ async function privateInit(){
     }
 
     const appSettings = electron.remote.getGlobal("appSettings")
-    let Authorization = appSettings.get("LIGHTCORD_AUTH", false)
+    /*let Authorization = appSettings.get("LIGHTCORD_AUTH", false)
     let shouldShowPrompt = Authorization === false
 
     if(typeof Authorization !== "string"){
         Authorization = null
         appSettings.set("LIGHTCORD_AUTH", null)
         appSettings.save()
+    }*/
+
+    let cloneNullProto = (obj) => { // recreate object without __proto__
+        let o = Object.create(null)
+        Object.keys(obj).forEach(k => {
+            o[k] = obj[k]
+        })
+        return o
     }
 
-    window.Lightcord = {
-        DiscordModules: {
+    window.Lightcord = cloneNullProto({
+        DiscordModules: cloneNullProto({
             dispatcher,
             constants
-        },
-        Settings: {
+        }),
+        Settings: cloneNullProto({
             devMode: false,
             callRingingBeat: true
-        },
-        Api: {
+        }),
+        Api: cloneNullProto({/*
             get Authorization(){
                 return Authorization
             },
@@ -287,19 +277,21 @@ async function privateInit(){
                 if(typeof data !== "string" && data !== null)return Authorization
                 appSettings.set("LIGHTCORD_AUTH", Authorization = data)
                 appSettings.save()
-            },
-            ensureExported
-        },
-        BetterDiscord: { // Global BetterDiscord's exported modules / only for exporting to Lightcord's main script, not for using in plugins
+            },*/
+            Authorization: null,
+            ensureExported,
+            cloneNullProto
+        }),
+        BetterDiscord: cloneNullProto({ // Global BetterDiscord's exported modules
 
-        }
-    }
+        })
+    })
 
     dispatcher.subscribe("USER_SETTINGS_UPDATE", (data) => {
         DiscordNative.ipc.send("UPDATE_THEME", data.settings.theme)
     })
 
-    require("../../../../../LightcordApi/js/main")
+    require("../../../../../LightcordApi/js/main.js")
 
     /*
     if(shouldShowPrompt){
@@ -376,10 +368,6 @@ async function privateInit(){
 
     const Utils = window.Lightcord.BetterDiscord.Utils
     const DOMTools = window.Lightcord.BetterDiscord.DOM
-
-    // delete
-    delete window.Lightcord.BetterDiscord.Utils 
-    delete window.Lightcord.BetterDiscord.DOM 
 
     let isBot = false
     ;(async function(){
@@ -478,6 +466,9 @@ async function privateInit(){
             }
             return returnValue
         }
+        dispatcher.subscribe("LOGOUT", () => {
+            isBot = false
+        })
         function cancelGatewayPrototype(methodName){
             if(gatewayModule.default.prototype[methodName]){
                 const original = gatewayModule.default.prototype[methodName]
@@ -493,11 +484,17 @@ async function privateInit(){
         cancelGatewayPrototype("lobbyConnect")
         cancelGatewayPrototype("lobbyDisconnect")
         cancelGatewayPrototype("lobbyVoiceStatesUpdate")
-        cancelGatewayPrototype("guildStreamCreate")
+        cancelGatewayPrototype("streamCreate")
         cancelGatewayPrototype("streamWatch")
         cancelGatewayPrototype("streamPing")
         cancelGatewayPrototype("streamDelete")
         cancelGatewayPrototype("streamSetPaused")
+
+        const requestGuildMembers = gatewayModule.default.prototype.requestGuildMembers
+        gatewayModule.default.prototype.requestGuildMembers = function(){ // TODO: requestGuildMembers patch for bots.
+            /*if(!isBot)*/return requestGuildMembers.call(this, ...arguments)
+            console.log(arguments)
+        }
 
         const hasUnreadModules = BDModules.get(e => e.default && e.default.hasUnread)
         hasUnreadModules.forEach((mod) => {
@@ -1068,7 +1065,22 @@ async function privateInit(){
         }else{
             logger.warn(new Error("Couldn't find module here"))
         }
-    })().catch(() => {})
+        const inviteModule = BDModules.get(e => e.default && e.default.acceptInvite)[0]
+        if(inviteModule){
+            const acceptInvite = inviteModule.default.acceptInvite
+            inviteModule.default.acceptInvite = function(code, location, extraOptions){
+                if(!isBot)return acceptInvite.call(this, ...arguments)
+                dispatcher.dispatch({
+                    type: "INVITE_ACCEPT_FAILURE",
+                    code
+                })
+                Utils.showToast("Lightcord Bot Emulation cannot join guilds.", {type: "error"})
+                return Promise.reject("Lightcord Bot Emulation cannot join guilds.")
+            }
+        }else{
+            logger.warn(new Error("Couldn't find module here"))
+        }
+    })().catch(console.error.bind(console, `%c[Error Bot shit]`, "color:red"))
 
     
     let usedWebhooks = {}
@@ -1169,7 +1181,7 @@ async function privateInit(){
     ] = [
         BDModules.get(e => e.authBoxExpanded && typeof e.authBoxExpanded === "string")[0]
     ]
-    DOMTools.addStyle("tokenLoginPatch", `.${authBoxExpanded ? authBoxExpanded.authBoxExpanded.split(" ")[0] : "authBoxExpanded-2jqaBe"} {
+    DOMTools.addStyle("tokenLoginPatch", `.${authBoxExpanded ? Utils.removeDa(authBoxExpanded.authBoxExpanded) : "authBoxExpanded-2jqaBe"} {
         width: 900px;
 }`)
 
@@ -1177,6 +1189,36 @@ async function privateInit(){
     BetterDiscord.init()
 
     events.emit("ready")
+
+
+    let reactDevToolsPath = "";
+    if (process.platform === "win32") reactDevToolsPath = path.resolve(process.env.LOCALAPPDATA, "Google/Chrome/User Data");
+    else if (process.platform === "linux") reactDevToolsPath = path.resolve(process.env.HOME, ".config/google-chrome");
+    else if (process.platform === "darwin") reactDevToolsPath = path.resolve(process.env.HOME, "Library/Application Support/Google/Chrome");
+    else reactDevToolsPath = path.resolve(process.env.HOME, ".config/chromium");
+    reactDevToolsPath += "/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/";
+    if (fs.existsSync(reactDevToolsPath)) {
+        const versions = fs.readdirSync(reactDevToolsPath);
+        reactDevToolsPath = path.resolve(reactDevToolsPath, versions[versions.length - 1]);
+    }
+    if (!fs.existsSync(reactDevToolsPath), true){
+        reactDevToolsPath = path.join(__dirname, "../../../../react_devtools")
+    }
+    if(fs.existsSync(reactDevToolsPath)){
+        const webContents = remote.getCurrentWebContents()
+        const BrowserWindow = remote.BrowserWindow
+        setImmediate(() => webContents.on("devtools-opened", devToolsListener));
+        if (webContents.isDevToolsOpened()) devToolsListener();
+
+        function devToolsListener(){
+            if (!this.isExtensionInstalled) return;
+            BrowserWindow.removeDevToolsExtension("React Developer Tools");
+            const didInstall = BrowserWindow.addDevToolsExtension(reactDevToolsPath);
+    
+            if (didInstall) Utils.log("React DevTools", "Successfully installed react devtools.");
+            else Utils.err("React DevTools", "Couldn't find react devtools.");
+        }
+    }
 }
 
 require.extensions[".css"] = (m, filename) => {
@@ -1196,6 +1238,7 @@ require.extensions[".css"] = (m, filename) => {
 
 let zlib = require("zlib")
 let tmp = require("tmp")
+const { remote } = require("electron")
 
 require.extensions[".jsbr"] = (m, filename) => {
     if(!zlib)zlib = require("zlib")

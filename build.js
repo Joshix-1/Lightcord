@@ -4,7 +4,7 @@ const terser = require("terser")
 const util = require("util")
 
 /** Super noisy if production is on. */
-const production = false
+const production = true
 
 let fs = require("fs")
 
@@ -23,7 +23,7 @@ async function main(){
     await fs.promises.mkdir(__dirname+"/distApp/dist", {"recursive": true})
     
     console.info("Executing command `npm run compile`")
-    console.log(child_process.execSync("npm run compile", {encoding: "binary"}))
+    //console.log(child_process.execSync("npm run compile", {encoding: "binary"}))
     
     let startDir = path.join(__dirname, "./dist")
     let newDir = path.join(__dirname, "./distApp/dist")
@@ -34,7 +34,7 @@ async function main(){
         for(let file of fs.readdirSync(folder, {withFileTypes: true})){
             if(file.isFile()){
                 let filepath = path.join(folder, file.name)
-                if(predicate(filepath)){
+                if(predicate(filepath) && filepath.split(/[\\/]+/).reverse()[1] !== "js"){
                     await compile(filepath, path.join(filepath.replace(folders.startDir, folders.newDir)), "..")
                 }else{
                     await fs.promises.copyFile(filepath, filepath.replace(folders.startDir, folders.newDir))
@@ -85,6 +85,20 @@ async function main(){
     await fs.promises.rmdir(path.join(__dirname, "distApp", "LightcordApi", "src"), {"recursive": true})
     await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "webpack.config.js"))
     await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "tsconfig.json"))
+
+    await processNextDir(path.join(__dirname, "DiscordJS"), {
+        startDir: path.join(__dirname, "DiscordJS"),
+        newDir: path.join(__dirname, "distApp", "DiscordJS")
+    }, ((filepath) => filepath.endsWith(".js") && (!production ? !filepath.includes("node_modules") : true)), async (filepath, newpath) => {
+        console.info(`Minifying ${filepath} to ${newpath}`)
+        await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
+    }).then(() => {
+        console.info(`Copied files and minified them from ${path.join(__dirname, "DiscordJS")}.`)
+    })
+
+    await fs.promises.rmdir(path.join(__dirname, "distApp", "DiscordJS", "src"), {"recursive": true})
+    await fs.promises.unlink(path.join(__dirname, "distApp", "DiscordJS", "webpack.config.js"))
+    await fs.promises.unlink(path.join(__dirname, "distApp", "DiscordJS", "tsconfig.json"))
     
     fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "js"), {recursive: true})
     fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "css"), {recursive: true})

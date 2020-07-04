@@ -9,9 +9,11 @@ import SettingsTitle from "./general/SettingsTitle"
 import Tabs, { Tab } from "./general/Tabs"
 import SettingSubTitle from "./general/SettingSubTitle"
 import CodeBlock from "./general/CodeBlock"
+import cloneNullProto from "../modules/cloneNullProto"
+import Tooltip from "./general/Tooltip"
 
-export default {
-    inputs: {
+export default cloneNullProto({
+    inputs: cloneNullProto({
         Button: DiscordButton,
         Switch: Switch,
         Choices: RadioGroup,
@@ -19,12 +21,13 @@ export default {
         TextArea: TextArea,
         TextInput: TextInput,
         Dropdown: Dropdown
-    },
-    general: {
+    }),
+    general: cloneNullProto({
         Title: Title,
         SettingsTitle: SettingsTitle,
         SettingSubTitle: SettingSubTitle,
         Tabs: Tabs,
-        CodeBlock: CodeBlock
-    }
-}
+        CodeBlock: CodeBlock,
+        Tooltip: Tooltip
+    })
+})

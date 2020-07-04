@@ -33,7 +33,7 @@ export default class ApiPreview extends React.PureComponent {
                 </formModule.FormText>
                 <MarginTop></MarginTop>
                 <Lightcord.Api.Components.inputs.Button color="brand" look="outlined" size="medium" hoverColor="green" onClick={() => {
-                    remote.shell.openExternal("https://github.com/lightcord/lightcord/wiki/apis")
+                    remote.shell.openExternal("https://github.com/lightcord/lightcord/wiki/Apis")
                 }} wrapper={false}>
                     Documentation
                 </Lightcord.Api.Components.inputs.Button>
@@ -71,7 +71,7 @@ export default class ApiPreview extends React.PureComponent {
                     return final
                 }
                 let renderPreview = () => {
-                    return <div style={{marginTop: "20px", marginBottom: "20px"}}>
+                    return <div style={{margin: "20px"}}>
                         <div style={{
                             backgroundColor: "var(--background-primary)", 
                             padding: "30px 30px", 
@@ -82,7 +82,7 @@ export default class ApiPreview extends React.PureComponent {
                     </div>
                 }
                 let renderCode = () => {
-                    return <div style={{marginTop: "20px", marginBottom: "20px"}}>
+                    return <div style={{margin: "20px"}}>
                         <div style={{
                             backgroundColor: "var(--background-primary)", 
                             padding: "30px 30px", 
@@ -100,7 +100,7 @@ export default class ApiPreview extends React.PureComponent {
                         </div>
                     </div>
                 }
-                let getStrForProp = (value) => {
+                let getStrForProp = (value, compPath, lang) => {
                     if(typeof value === "string"){
                         return value
                     }else if(typeof value === "boolean"){
@@ -109,6 +109,33 @@ export default class ApiPreview extends React.PureComponent {
                         return value.toString()
                     }else if(typeof value === "object"){
                         if(value && value.$$typeof && (value.$$typeof === Symbol.for("react.element") || value.$$typeof === 0xeac7)){
+                            if(compPath === "Lightcord.Api.Components.general.Tabs"){
+                                if(lang === "react"){
+                                    return `React.createElement("div", {style: {
+    marginTop: "20px", marginBottom: "20px"
+}},
+    React.createElement("div", {style: {
+        backgroundColor: "var(--background-primary)",
+        padding: "30px 30px",
+        borderRadius: "8px"
+    }, className: "lc-tab-box-shadow" },
+        React.createElement(Lightcord.Api.Components.general.Title, null, "Preview tabs")
+    )
+)`
+                                }else if(lang === "jsx"){
+                                    return `<div style={{
+        marginTop: "20px", marginBottom: "20px"
+    }}>
+        <div style={{
+            backgroundColor: "var(--background-primary)", 
+            padding: "30px 30px", 
+            borderRadius: "8px"
+        }} className="lc-tab-box-shadow">
+            <Lightcord.Api.Components.general.Title>Preview tabs</Lightcord.Api.Components.general.Title>
+        </div>
+    </div>`
+                                }
+                            }
                             return "Your components here."
                         }
                         return JSON.stringify(value, null, "    ")
@@ -129,13 +156,13 @@ export default class ApiPreview extends React.PureComponent {
                         let childrenProp = null
                         Object.keys(props).forEach(key => {
                             if(key == "children"){
-                                childrenProp = getStrForProp(props[key])
+                                childrenProp = getStrForProp(props[key], compPath, lang)
                             }else{
                                 let str = key+"="
                                 if(typeof props[key] === "string"){
                                     str += JSON.stringify(props[key])
                                 }else{
-                                    str += `{${getStrForProp(props[key])}}`
+                                    str += `{${getStrForProp(props[key], compPath, lang)}}`
                                 }
                                 propStrings.push(str)
                             }
@@ -153,7 +180,7 @@ export default class ApiPreview extends React.PureComponent {
                         let children = props.children || null
                         delete props.children
                         if(children && children.$$typeof && (children.$$typeof === Symbol.for("react.element") || children.$$typeof === 0xeac7)){
-                            children = "Your components here."
+                            children = getStrForProp(children, compPath, lang)
                         }
                         let propStrings = []
                         Object.keys(props).forEach(key => {
@@ -162,7 +189,7 @@ export default class ApiPreview extends React.PureComponent {
                             if(typeof props[key] === "string"){
                                 str += JSON.stringify(props[key])
                             }else{
-                                str += getStrForProp(props[key]).split("\n").map((str, i) => {
+                                str += getStrForProp(props[key], compPath, lang).split("\n").map((str, i) => {
                                     if(i === 0)return str
                                     return "    " + str
                                 }).join("\n")
@@ -186,7 +213,8 @@ export default class ApiPreview extends React.PureComponent {
                         }else{
                             propObject += "}"
                         }
-                        return `React.createElement(${compPath}, ${propObject}, ${JSON.stringify(children)})`
+                        let childrenData = typeof children === "string" && children.startsWith("React.createElement") ? children : JSON.stringify(children)
+                        return `React.createElement(${compPath}, ${propObject}, ${childrenData})`
                     }
                 }
                 return (<div>

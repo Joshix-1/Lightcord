@@ -563,7 +563,7 @@
   font-weight: 500;
 }
 
-#pubslayer #bd-settings-sidebar .ui-tab-bar-separator {
+#pubslayer .ui-tab-bar-separator {
   background-color: hsla(218,5%,47%,.3);
   margin-left: 10px;
   margin-right: 10px;
@@ -899,7 +899,7 @@ body .ace_closeButton:active {
   margin-left: 10px;
 }
 
-#bd-settings-sidebar .ui-tab-bar-item {
+.ui-tab-bar-item {
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -912,33 +912,33 @@ body .ace_closeButton:active {
   position: relative;
   overflow: hidden;
 }
-#bd-settings-sidebar .ui-tab-bar-item.selected {
+.ui-tab-bar-item.selected {
   cursor: default;
 }
-.theme-dark #bd-settings-sidebar .ui-tab-bar-item {
+.theme-dark .ui-tab-bar-item {
   color: #b9bbbe;
 }
-.theme-dark #bd-settings-sidebar .ui-tab-bar-item:hover {
+.theme-dark .ui-tab-bar-item:hover {
   background-color: var(--background-modifier-hover);
   color: var(--interactive-hover);
 }
-.theme-dark #bd-settings-sidebar .ui-tab-bar-item.selected {
+.theme-dark .ui-tab-bar-item.selected {
   background-color: var(--background-modifier-selected);
   color: #fff;
 }
-.theme-light #bd-settings-sidebar .ui-tab-bar-item {
+.theme-light .ui-tab-bar-item {
   color: #72767d;
 }
-.theme-light #bd-settings-sidebar .ui-tab-bar-item:hover {
+.theme-light .ui-tab-bar-item:hover {
   background-color: var(--background-modifier-hover);
   color: var(--interactive-hover);
 }
-.theme-light #bd-settings-sidebar .ui-tab-bar-item.selected {
+.theme-light .ui-tab-bar-item.selected {
   background-color: var(--background-modifier-selected);
   color: #fff;
 }
 
-#bd-settings-sidebar .ui-tab-bar-header {
+.ui-tab-bar-header {
   font-size: 12px;
   font-weight: 700;
   line-height: 16px;
@@ -949,37 +949,33 @@ body .ace_closeButton:active {
   padding: 6px 10px;
   overflow: hidden;
 
-  display: flex;
-    justify-content: space-between;
+  justify-content: space-between;
 }
-.theme-dark #bd-settings-sidebar .ui-tab-bar-header {
+
+.theme-dark .ui-tab-bar-header .bd-changelog-button {
   color: #72767d;
 }
-.theme-light #bd-settings-sidebar .ui-tab-bar-header {
+.theme-light .ui-tab-bar-header .bd-changelog-button {
   color: #b9bbbe;
 }
 
-#bd-settings-sidebar .ui-tab-bar-header .bd-changelog-button {
-    height: 16px;
-}
-
-#bd-settings-sidebar .ui-tab-bar-header .bd-icon {
+.ui-tab-bar-header .bd-icon {
     cursor: pointer;
     fill: #72767d;
 }
 
-#bd-settings-sidebar .ui-tab-bar-header .bd-icon:hover {
+.ui-tab-bar-header .bd-icon:hover {
     fill: #fff;
 }
 
-#bd-settings-sidebar .ui-tab-bar-separator {
+.ui-tab-bar-separator {
   height: 1px;
   margin: 8px 10px;
 }
-.theme-dark #bd-settings-sidebar .ui-tab-bar-separator {
+.theme-dark .ui-tab-bar-separator {
   background-color: rgba(114,118,125,.3);
 }
-.theme-light #bd-settings-sidebar .ui-tab-bar-separator {
+.theme-light .ui-tab-bar-separator {
   background-color: rgba(185,187,190,.3);
 }
 

@@ -11,6 +11,7 @@ export default new class V2_PublicServers {
 
     constructor() {
         this._appendButton = this._appendButton.bind(this);
+        window.Lightcord.BetterDiscord.V2_PublicServers = this
     }
 
     get component() {

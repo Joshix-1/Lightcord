@@ -12,6 +12,7 @@ export default new class DataStore {
     constructor() {
         this.data = {settings: {stable: {}, canary: {}, ptb: {}}};
         this.pluginData = {};
+        window.Lightcord.BetterDiscord.DataStore = this
     }
 
     initialize() {

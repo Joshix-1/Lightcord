@@ -60,7 +60,7 @@ module.exports = {
                 parallel: true,
                 sourceMap: true, 
                 terserOptions: {
-                    mangle: true,
+                    mangle: false,
                     keep_classnames: true,
                     keep_fnames: true
                 }

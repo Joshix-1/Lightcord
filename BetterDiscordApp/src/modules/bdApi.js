@@ -250,3 +250,5 @@ BdApi.Plugins = makeAddonAPI(pluginCookie, bdplugins, pluginModule);
 BdApi.Themes = makeAddonAPI(themeCookie, bdthemes, themeModule);
 
 export default BdApi;
+
+window.Lightcord.BetterDiscord.BdApi = BdApi

@@ -5,6 +5,9 @@ import BDEvents from "./bdEvents";
 import Utils from "./utils";
 
 class PluginModule {
+    constructor(){
+        window.Lightcord.BetterDiscord.PluginModule = this
+    }
     get folder() {return ContentManager.pluginsFolder;}
 }
 

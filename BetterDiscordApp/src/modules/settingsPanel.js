@@ -1,13 +1,11 @@
-import {settings, settingsCookie, bdplugins, bdthemes, settingsRPC} from "../0globals";
+import {settings, settingsCookie, settingsRPC} from "../0globals";
 import DataStore from "./dataStore";
 import V2_SettingsPanel_Sidebar from "./settingsPanelSidebar";
 import Utils from "./utils";
 import BDV2 from "./v2";
 import ContentManager from "./contentManager";
-import BDEvents from "./bdEvents";
 import coloredText from "./coloredText";
 import tfHour from "./24hour";
-import reactDevTools from "./reactDevTools";
 import DOM from "./domtools";
 
 import publicServersModule from "./publicServers";
@@ -15,10 +13,7 @@ import voiceMode from "./voiceMode";
 import ClassNormalizer from "./classNormalizer";
 import dMode from "./devMode";
 
-import Tools from "../ui/tools";
-import Scroller from "../ui/scroller";
 import SectionedSettingsPanel from "../ui/sectionedSettingsPanel";
-import SettingsPanel from "../ui/settingsPanel";
 import CssEditor from "../ui/cssEditor";
 import CardList from "../ui/addonlist";
 import V2C_PresenceSettings from "../ui/presenceSettings";
@@ -29,9 +24,28 @@ import AntiAdDM from "./AntiAdDM";
 import blurPrivate from "./blurPrivate";
 import disableTyping from "./disableTyping";
 import ApiPreview from "../ui/ApiPreview";
-import V2C_SettingsTitle from "../ui/settingsTitle";
 import Switch from "../ui/switch";
 import MarginTop from "../ui/margintop";
+import webpackModules from "./webpackModules";
+import tooltipWrap from "../ui/tooltipWrap";
+import History from "../ui/icons/history";
+
+class BDSidebarHeader extends React.PureComponent {
+    render(){
+        let sidebarComponents = webpackModules.find(e => e.Separator && e.Header && e.Item)
+
+        const changelogButton = React.createElement(tooltipWrap, {color: "black", side: "top", text: "Changelog"}, 
+            React.createElement("span", {style: {float: "right", cursor: "pointer"}, className: "bd-changelog-button", onClick: () => {Utils.showChangelogModal(bbdChangelog);}},
+                React.createElement(History, {className: "bd-icon", size: "16px"})
+            )
+        );
+        let rendered = new sidebarComponents.Header({
+            children: React.createElement("span", null, "Bandaged BD", changelogButton),
+            className: "ui-tab-bar-header"
+        })
+        return rendered
+    }
+}
 
 export default new class V2_SettingsPanel {
 
@@ -51,6 +65,9 @@ export default new class V2_SettingsPanel {
         this.sidebar.register("lcapipreview", makeComponent(this.ApiPreviewComponent.bind(this)))
 
         /* Bandaged BD */
+        this.sidebar.register("BDChangelogTitle", makeComponent(() => {
+            return new BDSidebarHeader().render()
+        }))
         this.sidebar.register("core", makeComponent(this.coreComponent.bind(this)))
         this.sidebar.register("customcss", makeComponent(this.customCssComponent.bind(this)))
         this.sidebar.register("plugins", makeComponent(this.renderAddonPane("plugins")))
@@ -192,10 +209,10 @@ export default new class V2_SettingsPanel {
             else dMode.stopCopySelector();
         }
 
-        if (id === "reactDevTools") {
+        /*if (id === "reactDevTools") {
             if (enabled) reactDevTools.start();
             else reactDevTools.stop();
-        }
+        }*/
         if (id === "lightcord-1") {
             if (enabled) window.Lightcord.Settings.devMode = true
             else window.Lightcord.Settings.devMode = false
@@ -246,7 +263,7 @@ export default new class V2_SettingsPanel {
     }
 
     async initializeSettings() {
-        if (settingsCookie.reactDevTools) reactDevTools.start();
+        //if (settingsCookie.reactDevTools) reactDevTools.start();
         if (settingsCookie["bda-gs-2"]) DOM.addClass(document.body, "bd-minimal");
         if (settingsCookie["bda-gs-3"]) DOM.addClass(document.body, "bd-minimal-chan");
         if (settingsCookie["bda-gs-1"]) publicServersModule.addButton();
@@ -305,13 +322,20 @@ export default new class V2_SettingsPanel {
                     })
                 ]
             }), 
-            BDV2.react.createElement(window.Lightcord.Api.Components.inputs.Button, {color: "yellow", onClick(){
-                console.log("Should relaunch")
-                remote.app.relaunch({
-                    args: remote.process.argv.slice(1).concat(["--disable-betterdiscord"])
-                })
-                remote.app.quit()
-            }}, "Relaunch without BetterDiscord")
+            BDV2.react.createElement(window.Lightcord.Api.Components.inputs.Button, {
+                color: "yellow",
+                look: "ghost",
+                size: "medium",
+                hoverColor: "red",
+                onClick(){
+                    console.log("Should relaunch")
+                    remote.app.relaunch({
+                        args: remote.process.argv.slice(1).concat(["--disable-betterdiscord"])
+                    })
+                    remote.app.quit()
+                },
+                wrapper: true
+            }, "Relaunch without BetterDiscord")
         ]
     }
 
@@ -368,6 +392,10 @@ export default new class V2_SettingsPanel {
         }
     }
 };
+
+/**
+ * No need to export settingsPanel on window
+ */
 
 function makeComponent(children){
     class SettingComponent extends React.Component {

@@ -7,6 +7,7 @@ process.on("uncaughtException", console.error)
 
 const ipcRenderer = require('./discord_native/ipc');
 const electron = require("electron")
+electron.remote.getCurrentWindow().setBackgroundColor("#2f3136")
 
 const TRACK_ANALYTICS_EVENT = 'TRACK_ANALYTICS_EVENT';
 const TRACK_ANALYTICS_EVENT_COMMIT = 'TRACK_ANALYTICS_EVENT_COMMIT';
@@ -82,7 +83,6 @@ process.once('loaded', () => {
     }catch(e){}
     setTimeout(() => {
       electron.remote.getCurrentWindow().setBackgroundColor("#00000000")
-      electron.remote.getCurrentWindow().center()
     }, 500);
   })
 

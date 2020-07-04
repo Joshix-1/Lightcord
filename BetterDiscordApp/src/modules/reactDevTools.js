@@ -45,4 +45,4 @@ export default new class reactDevTools {
     stop() {
         webContents.removeListener("devtools-opened", this.listener);
     }
-};  
+};

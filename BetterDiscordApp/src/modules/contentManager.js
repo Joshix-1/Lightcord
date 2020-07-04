@@ -1,8 +1,11 @@
-import {bdConfig, bdplugins, bdthemes} from "../0globals";
+import {bdConfig, bdplugins, bdthemes, settingsCookie} from "../0globals";
 import pluginModule from "./pluginModule";
 import themeModule from "./themeModule";
 import Utils from "./utils";
 import * as crypto from "crypto"
+import dataStore from "./dataStore";
+import pluginCertifier, { encryptSettingsCache, decryptSettingsCache, processFile } from "./pluginCertifier";
+import { captureRejectionSymbol } from "events";
 
 const path = require("path");
 const fs = require("fs");
@@ -19,6 +22,7 @@ const originalCSSRequire = Module._extensions[".css"] ? Module._extensions[".css
 const splitRegex = /[^\S\r\n]*?(?:\r\n|\n)[^\S\r\n]*?\*[^\S\r\n]?/;
 const escapedAtRegex = /^\\@/;
 
+export let addonCache = {}
 
 export default new class ContentManager {
 
@@ -31,6 +35,50 @@ export default new class ContentManager {
 
     get pluginsFolder() {return this._pluginsFolder || (this._pluginsFolder = fs.realpathSync(path.resolve(bdConfig.dataPath + "plugins/")));}
     get themesFolder() {return this._themesFolder || (this._themesFolder = fs.realpathSync(path.resolve(bdConfig.dataPath + "themes/")));}
+
+    loadAddonCertifierCache(){
+        if(typeof dataStore.getSettingGroup("PluginCertifierHashes") !== "string"){
+            dataStore.setSettingGroup("PluginCertifierHashes", encryptSettingsCache("{}"))
+        }else{
+            try{
+                addonCache = JSON.parse(decryptSettingsCache(dataStore.getSettingGroup("PluginCertifierHashes")))
+            }catch(e){
+                dataStore.setSettingGroup("PluginCertifierHashes", encryptSettingsCache("{}"))
+                addonCache = {}
+            }
+        }
+        Object.keys(addonCache)
+        .forEach(key => {
+            let value = addonCache[key]
+            if(!value || typeof value !== "object" || Array.isArray(value))return delete addonCache[key]
+
+            let props = [{
+                key: "timestamp",
+                type: "number"
+            }, {
+                key: "result",
+                type: "object"
+            }, {
+                key: "hash",
+                type: "string"
+            }]
+            for(let prop of props){
+                if(!(prop.key in value) || typeof value[prop.key] !== prop.type){
+                    delete addonCache[key]
+                    return
+                }
+            }
+            if(value.hash !== key){
+                delete addonCache[key]
+                return
+            }
+        })
+        this.saveAddonCache()
+    }
+
+    saveAddonCache(){
+        dataStore.setSettingGroup("PluginCertifierHashes", encryptSettingsCache(JSON.stringify(addonCache)))
+    }
 
     watchContent(contentType) {
         if (this.watchers[contentType]) return;
@@ -171,6 +219,39 @@ export default new class ContentManager {
         if (typeof(filename) === "undefined" || typeof(type) === "undefined") return;
         const isPlugin = type === "plugin";
         const baseFolder = isPlugin ? this.pluginsFolder : this.themesFolder;
+
+        if(settingsCookie["fork-ps-6"]){
+            let result = await new Promise(resolve => {
+                processFile(path.resolve(baseFolder, filename), (result) => {
+                    console.log(result)
+                    resolve(result)
+                }, (hash) => {
+                    resolve({
+                        suspect: false,
+                        hash: hash,
+                        filename: filename,
+                        name: filename
+                    })
+                }, true)
+            })
+            if(result){
+                addonCache[result.hash] = {
+                    timestamp: Date.now(),
+                    hash: result.hash,
+                    result: result
+                }
+                this.saveAddonCache()
+                if(result.suspect){
+                    return {
+                        name: filename,
+                        file: filename,
+                        message: "This plugin might be dangerous ("+result.harm+").",
+                        error: new Error("This plugin might be dangerous ("+result.harm+").")
+                    }
+                }
+            }
+        }
+
         try {window.require(path.resolve(baseFolder, filename));}
         catch (error) {return {name: filename, file: filename, message: "Could not be compiled.", error: {message: error.message, stack: error.stack}};}
         const content = window.require(path.resolve(baseFolder, filename));
@@ -245,3 +326,7 @@ export default new class ContentManager {
     loadPlugins() {return this.loadAllContent("plugin");}
     loadThemes() {return this.loadAllContent("theme");}
 };
+
+/**
+ * Don't expose contentManager - could be dangerous for now
+ */

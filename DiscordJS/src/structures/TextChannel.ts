@@ -3,7 +3,7 @@ import GuildChannel from "./GuildChannel";
 import { DiscordChannel } from "../util/DiscordToModules";
 import { ChannelTypes } from "../util/Constants";
 
-export class TextChannel extends GuildChannel/* implements TextBasedChannel*/ {
+export default class TextChannel extends GuildChannel/* implements TextBasedChannel*/ {
     constructor(data:DiscordChannel){
         super(data)
     }

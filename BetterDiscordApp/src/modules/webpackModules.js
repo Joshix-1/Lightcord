@@ -29,4 +29,7 @@ const findByProps = (...propNames) => find(module => propNames.every(prop => mod
 const findByPrototypes = (...protoNames) => find(module => module.prototype && protoNames.every(protoProp => module.prototype[protoProp] !== undefined));
 const findByDisplayName = (displayName) => find(module => module.displayName === displayName);
 
-export default {find, findAll, findByProps, findByPrototypes, findByDisplayName};
+let mod =  {find, findAll, findByProps, findByPrototypes, findByDisplayName};
+export default mod
+
+window.Lightcord.BetterDiscord.WebpackModules = mod

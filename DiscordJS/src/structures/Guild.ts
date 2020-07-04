@@ -1,7 +1,7 @@
 import { Snowflake, Channel } from ".."
 import { DiscordGuild, channelsModule, guildModule, UserSettingsModule, ConstantsModule, CdnModule, AckModule } from "../util/DiscordToModules"
 import BaseStructure from "./BaseStructure"
-import { createChannel, createGuildMember, createRole, UserResolvable, resolveUserID } from "../util/util"
+import { createChannel, createGuildMember, createRole, UserResolvable, resolveUserID, ChannelData, ChannelCreationOverwrites, PermissionOverwrites } from "../util/util"
 import Collection from "@discordjs/collection"
 import SnowflakeUtil from "../util/Snowflake"
 import GuildMember from "./GuildMember"
@@ -271,17 +271,39 @@ export default class Guild extends BaseStructure {
         }).then(() => this)
     }
 
-    ban(user:UserResolvable, {
+    async ban(user:UserResolvable, {
         days = 0,
         reason = null
     }: {
         days?: number,
         reason?: string
-    }){
+    } = {}):Promise<Snowflake>{ // always returning a snowflake
         let id = resolveUserID(user)
         if(!id)return Promise.reject(new DiscordJSError("Given user could not be resolved to an user ID."))
         
-        
+        let result = await guildModule.banUser(this.id, id, days, reason).catch(err => err)
+        if(result instanceof Error || result.status !== 204){
+            let message = result.body
+            if(Array.isArray(message)){
+                message = message[0]
+            }else{
+                if(message.user_id){
+                    message = "User: "+ message.user_id[0]
+                }else if(message.delete_message_days){
+                    message = "Days: "+ message.delete_message_days[0]
+                }else if(message.reason){
+                    message = "Reason: "+ message.reason[0]
+                }else{
+                    message = result.text
+                }
+            }
+            throw new DiscordJSError(message)
+        }
+        return id
+    }
+
+    createChannel(name:string, typeOrOptions:string|ChannelData = 'text', permissionOverwrites?: ChannelCreationOverwrites[] | Collection<Snowflake, PermissionOverwrites>, reason?: string){
+
     }
 
     fetch():Promise<Guild>{ // Guild is synced by Discord. Only refreshing from cache.

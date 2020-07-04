@@ -1,24 +1,27 @@
-import { ReactNode } from "react"
+import { ReactNode, CSSProperties } from "react"
 import NOOP from "../../modules/noop"
 import Title from "./Title"
 
-
-export default class Tabs extends React.Component<{
+type TabsProps = {
     children?: ReactNode,
     tabs: {label: string, id: string}[],
     active?: string
-    onChange?: (tab: string) => void
-}, {
+    onChange?: (tab: string) => void,
+    style?: CSSProperties
+}
+
+export default class Tabs extends React.Component<TabsProps, {
     active: string
 }> {
-    static defaultProps = {
+    static defaultProps:TabsProps = {
         children: null,
-        tabs: {label: "No tabs was passed to <Tabs>.", id: "none"},
+        tabs: [{label: "No tabs was passed to <Tabs>.", id: "none"}],
         active: null,
-        onChange: NOOP
+        onChange: NOOP,
+        style: {}
     }
     
-    constructor(props){
+    constructor(props:TabsProps){
         super(props)
         this.state = {
             active: this.props.active || null
@@ -41,7 +44,7 @@ export default class Tabs extends React.Component<{
     }
 
     render(){
-        return (<div className="lc-tabWrapper">
+        return (<div className="lc-tabWrapper" style={this.props.style}>
             <div className="lc-tabnav" style={{flex: "0 1 auto"}}>
                 {this.tabs.map(tab => {
                     return React.createElement(Tab, {TabContainer: this, title: tab.label, id: tab.id, key: btoa(tab.label+":"+tab.id)})

@@ -70,6 +70,7 @@ export default new class V2 {
             reactDom: this.WebpackModules.findByUniqueProperties(["findDOMNode"])
         };
         this.getInternalInstance = e => e[Object.keys(e).find(k => k.startsWith("__reactInternalInstance"))];
+        window.Lightcord.BetterDiscord.V2 = this
     }
 
     initialize() {

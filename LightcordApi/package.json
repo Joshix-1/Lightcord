@@ -7,7 +7,9 @@
     "build": "webpack --progress --colors",
     "watch": "webpack --progress --colors --watch",
     "build-prod": "webpack --progress --colors --mode production -o js/main.min.js --devtool none",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch-prod": "webpack --progress --colors --watch --mode production -o js/main.min.js --devtool none",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "typedoc --plugin ./node_modules/typedoc-plugin-markdown --out ../../LightcordApiDocs ./src"
   },
   "author": "",
   "license": "ISC",
@@ -22,6 +24,7 @@
     "babel-loader": "^8.0.6",
     "terser-webpack-plugin": "^3.0.6",
     "ts-loader": "^7.0.5",
+    "typedoc": "^0.17.8",
     "typescript": "^3.9.5",
     "uuid": "^8.1.0",
     "webpack": "^4.43.0",

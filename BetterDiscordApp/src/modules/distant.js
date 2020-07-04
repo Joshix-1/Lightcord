@@ -21,6 +21,7 @@ export default new class DistantServer {
 
             }
         }
+        window.Lightcord.BetterDiscord.DistantServer = this
     }
 
     get cache(){
@@ -140,7 +141,7 @@ class LightcordError extends Error {
 }
 
 export const Constants = {
-    SERVER_URL: "http://127.0.0.1",
+    SERVER_URL: "https://lightcord.deroku.xyz/",
     badges: [ // TODO: 
         /*{
             name: "Lightcord User",
@@ -159,22 +160,22 @@ export const Constants = {
             ],
             scopes: [],
             component: BugHunterBadge,
-            href: "https://github.com/lightcord/lightcord/wiki/badges/bug_hunter"
+            href: "https://github.com/lightcord/lightcord/wiki/badges#bug_hunter"
         }, {
             name: "Buffoon",
             id: "06904d31-65b4-41ec-a50c-8658bbd1af96",
             defaultUsers: [
                 "389016895543705602",
-                "664600134528663565"
+                "664600134528663565",
+                "625350657829896224"
             ],
             scopes: [],
             component: Circus,
-            href: "https://www.youtube.com/watch?v=EJtb6z-dlT8"
+            href: "https://youtu.be/EJtb6z-dlT8?t=145"
         }
     ]
 }
 
 export const Routes = {
-    badges: `/users/badges`,
-    delete: `/delete`
+    badges: `/users/badges`
 }

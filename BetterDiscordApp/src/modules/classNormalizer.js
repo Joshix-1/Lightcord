@@ -4,7 +4,9 @@ const normalizedPrefix = "da";
 const randClass = new RegExp(`^(?!${normalizedPrefix}-)((?:[A-Za-z]|[0-9]|-)+)-(?:[A-Za-z]|[0-9]|-|_){6}$`);
 
 export default new class ClassNormalizer {
-
+    constructor(){
+        window.Lightcord.BetterDiscord.BDEvents = this
+    }
     stop() {
         if (!this.hasPatched) return;
         this.unpatchClassModules(WebpackModules.findAll(this.moduleFilter.bind(this)));

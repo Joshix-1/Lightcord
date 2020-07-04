@@ -1,8 +1,5 @@
-import {bdConfig, settingsCookie} from "../0globals";
-import DataStore from "./dataStore";
 import BDV2 from "./v2";
 import Utils from "./utils";
-//import DiscordCrypt from "./DiscordCrypt";
 
 const Constants = {
     EmojiRegex: /<a?\.(\w+)\.(\d+)>/g
@@ -19,7 +16,7 @@ let emojiSearch = BDModules.get(e => e.default && e.default.getDisambiguatedEmoj
 
 export default new class EmojiModule {
     constructor(){
-        this.init()
+        this.init().catch(err => Utils.err("EmojiModule", "An error occured", err)) // better logging
     }
 
     async init(){
@@ -30,6 +27,7 @@ export default new class EmojiModule {
         if(!Messages)Messages = await window.Lightcord.Api.ensureExported(e => e.default && e.default.Messages && e.default.Messages.EMOJI_MATCHING)
         if(!guildModule)guildModule = await window.Lightcord.Api.ensureExported(e => e.default && e.default.getGuild && e.default.getGuilds && !e.default.isFetching)
         if(!emojiSearch)emojiSearch = await window.Lightcord.Api.ensureExported(e => e.default && e.default.getDisambiguatedEmojiContext)
+
         if(AutocompleteModule && AutoCompletionTemplates && EmojiModuleQuery && Messages && guildModule && emojiSearch){
             console.log(`Patching getAutocompleteOptions of AutoCompletionTemplates`, AutoCompletionTemplates)
             const getAutocompleteOptions = AutoCompletionTemplates.getAutocompleteOptions
@@ -80,14 +78,13 @@ export default new class EmojiModule {
 
         /** Emoji display */
         while (!BDV2.MessageComponent) await new Promise(resolve => setTimeout(resolve, 100));
-        if (!this.cancelEmojiRender){
+
+        if (!this.cancelEmojiRender){ // TODO: Proper emoji formatting / rendering
             this.cancelEmoteRender = Utils.monkeyPatch(BDV2.MessageComponent, "default", {before: (data) => {
                 const message = Utils.getNestedProp(data.methodArguments[0], "childrenMessageContent.props.message")
                 if(!message)return
                 const content = Utils.getNestedProp(data.methodArguments[0], "childrenMessageContent.props.content")
                 if(!content || !content.length)return
-    
-                // content = DiscordCrypt.decryptContent(content)
     
                 /**
                  * @type {{

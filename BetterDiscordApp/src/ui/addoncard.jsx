@@ -191,19 +191,26 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
         const {authorId, authorLink} = this.props.addon;
 
         const style = {}
-        if(!this.isScanning){
-            this.isScanning = true
-            processFile(resolve(this.props.addon.filename.endsWith(".plugin.js") ? contentManager.pluginsFolder : contentManager.themesFolder, this.props.addon.filename), (result) => {
-                if(this.unmounted)return
-                this.setState({
-                    isTrusted: !result.suspect
-                })
-            }, () => {})
-        }else{
-            if(this.state.isTrusted){
-                style.borderColor = "#4087ed"
+        if(settingsCookie["fork-ps-6"]){
+            if(!this.isScanning){
+                this.isScanning = true
+                processFile(resolve(this.props.addon.filename.endsWith(".plugin.js") ? contentManager.pluginsFolder : contentManager.themesFolder, this.props.addon.filename), (result) => {
+                    if(this.unmounted)return
+    
+                    this.setState({
+                        isTrusted: result.suspect ? "suspect" : true
+                    })
+                }, () => {})
+            }else{
+                if(this.state.isTrusted === true){
+                    style.borderColor = "#4087ed"
+                }
+                if(this.state.isTrusted === "suspect"){
+                    style.borderColor = "rgb(240, 71, 71)"
+                }
             }
         }
+        
         return BDV2.react.createElement("div", {className: "bd-card bd-addon-card settings-closed ui-switch-item", style},
             BDV2.react.createElement("div", {className: "bd-addon-header bda-header"},
                     BDV2.react.createElement("div", {className: "bd-card-title bda-header-title"}, this.buildTitle(this.name, this.version, {name: this.author, id: authorId, link: authorLink})),

@@ -1,7 +1,3 @@
-/**
- * How the fuck did I do this
- */
-
 import BDV2 from "../modules/v2";
 import V2C_SettingsTitle from "./settingsTitle";
 import V2C_SettingsGroup from "./settingsGroup";
@@ -556,7 +552,7 @@ class Tab extends React.Component {
 }
 
 let popoutModule
-class Popout extends React.Component {
+class Popout extends React.Component { // TODO: Probably use internal Components instead of making it from scratch.
     get modules(){
         return popoutModule || (popoutModule = [
             BDModules.get(e => e.userPopout)[0],
@@ -722,7 +718,7 @@ class Status extends React.Component {
 let timestampClass = ""
 
 let ProfileModules
-class Profile extends React.Component {
+class Profile extends React.Component { // TODO: Probably use internal Components instead of making it from scratch.
     get modules(){
         return ProfileModules || (ProfileModules = [
             BDModules.get(e => e.flex && e._horizontal)[0],

@@ -18,6 +18,7 @@ import EmojiModule from "./emojiModule"
 import {remote as electron} from "electron"
 import v2 from "./v2";
 import webpackModules from "./webpackModules";
+import contentManager from "./contentManager";
 
 function Core() {
     // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
@@ -80,6 +81,9 @@ Core.prototype.init = async function() {
     BDV2.initialize();
     Utils.log("Startup", "Updating Settings");
     settingsPanel.initializeSettings();
+
+    Utils.log("Startup", "Loading Addons Cache")
+    await contentManager.loadAddonCertifierCache()
 
     Utils.log("Startup", "Loading Plugins");
     await pluginModule.loadPlugins();
@@ -147,16 +151,61 @@ Core.prototype.patchAttributes = async function() {
 
     while(!v2.MessageComponent)await new Promise(resolve => setTimeout(resolve, 100))
     
-    window.Lightcord.Api.ensureExported(e => e.default && e.default.displayName && e.default.displayName.includes("UserPopout"))
-    .then(UserPopout => {
-        console.log(UserPopout)
-        const render = UserPopout.default.prototype.render
-        UserPopout.default.prototype.render = function(){
-            const returnValue = render.call(this, ...arguments)
-            console.log(returnValue, this.props)
-            return returnValue
+    // TODO: try to patch correctly the user popout on a next update
+    const Anchor = WebpackModules.find(m => m.displayName == "Anchor");
+    ensureExported(e => e.default && e.default.displayName === "DiscordTag")
+    .then(DiscordTag => {
+        let DiscordTagComp = DiscordTag.default
+        DiscordTag.default = function(props){
+            let returnValue = DiscordTagComp(props)
+
+            let id = uuidv4()
+
+            let badgeDiv = BDV2.React.createElement("div", {
+                style: {
+                    display: "inline",
+                    marginTop: "5px"
+                }
+            }, BDV2.React.createElement("span", {
+                id: "badges-"+id,
+                key: "badges-"+id,
+                style: {
+                    display: "inherit"
+                }
+            }))
+
+            let children = [returnValue]
+
+            if (props.user.id === "249746236008169473") { // Rauenzi: BandagedBD Developer
+                children.push(
+                    BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "BandagedBD Developer"},
+                        BDV2.React.createElement(Anchor, {className: "bd-chat-badge", href: "https://github.com/rauenzi/BetterDiscordApp", title: "BandagedBD", target: "_blank"},
+                            BDV2.React.createElement(BDLogo, {size: "16px", className: "bd-logo"})
+                        )
+                    )
+                );
+            } else if (props.user.id === "696481194443014174" || props.user.id === "696003456611385396"){ // Not Thomiz: Lightcord Developer, Phorcys: Lightcord Developer
+                children.push(
+                    BDV2.React.createElement(TooltipWrap, {color: "black", side: "top", text: "Lightcord Developer"},
+                        BDV2.React.createElement(Anchor, {className: "bd-chat-badge", href: "https://github.com/Lightcord/Lightcord", title: "Lightcord", target: "_blank"},
+                            BDV2.React.createElement(LightcordLogo, {size: "16px", className: "bd-logo"})
+                        )
+                    )
+                );
+            }
+
+            children.push(badgeDiv)
+            let div = BDV2.React.createElement("div", {
+                style: {
+                    display: "block"
+                }
+            }, children)
+            applyBadges(id, props.user, false)
+
+            return div
         }
     })
+
     attribsPatchs.push(Utils.monkeyPatch(v2.MessageComponent, "default", {after: (data) => {
         if(data.methodArguments[0].childrenMessageContent.props.message){ // this can be a blocked message (not opened)
             data.returnValue.props["data-message-id"] = data.methodArguments[0].childrenMessageContent.props.message.id
@@ -414,6 +463,7 @@ Core.prototype.patchAttachment = function() {
     const Anchor = WebpackModules.find(m => m.displayName == "Anchor");
     if (!Anchor || !Attachment || !Attachment.default) return;
     this.AttachmentPatch = Utils.monkeyPatch(Attachment, "default", {after: (data) => {
+        if(!settingsCookie["fork-ps-6"])return
         const attachment = data.methodArguments[0] || null
         const children = Utils.getNestedProp(data.returnValue, "props.children");
 
@@ -421,7 +471,7 @@ Core.prototype.patchAttachment = function() {
         if (!Array.isArray(children)) return;
 
         const id = uuidv4()
-        children.push(BDV2.react.createElement("div", {
+        children.push(BDV2.react.createElement("span", {
             id: "certified-"+id
         }))
         PluginCertifier.patch(attachment, "certified-"+id)
@@ -645,3 +695,7 @@ Core.prototype.updateInjector = async function() {
 };
 
 export default new Core();
+
+/**
+ * Don't expose core - could be dangerous for now
+ */

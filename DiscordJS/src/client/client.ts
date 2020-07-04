@@ -78,10 +78,10 @@ export default class Client extends EventEmitter {
 
     /** Warnings and overrides for functions that are not compatible. */
     async login():Promise<never>{
-        throw new DiscordJSError("Client#login is not supported. DiscordJS on lightcord will use the connected account.")
+        throw new DiscordJSError("Client#login is not supported. DiscordJS on lightcord will use the logged in account.")
     }
 
     get token():never{
-        throw new DiscordJSError("Client#token is not supported. DiscordJS on lightcord will use the connected account.")
+        throw new DiscordJSError("Client#token is not supported. DiscordJS on lightcord will use the logged in account.")
     }
 }

@@ -1,4 +1,5 @@
 import {settings} from "../0globals";
+import themeModule from "./themeModule";
 
 export default new class V2 {
 
@@ -15,10 +16,13 @@ export default new class V2 {
                 return false;
             };
 
-            const protect = theModule => {
-                if (theModule.remove && theModule.set && theModule.clear && theModule.get && !theModule.sort) return null;
-                if (!theModule.getToken && !theModule.getEmail && !theModule.showToken) return theModule;
-                const proxy = new Proxy(theModule, {
+            const protect = (theModule, isDefault) => {
+                let mod = !isDefault ? theModule.default : theModule
+                if(!mod)return theModule
+                if (mod.remove && mod.set && mod.clear && mod.get && !mod.sort) return null;
+                if (!mod.getToken && !mod.getEmail && !mod.showToken) return mod;
+
+                const proxy = new Proxy(mod, {
                     getOwnPropertyDescriptor: function(obj, prop) {
                         if (prop === "getToken" || prop === "getEmail" || prop === "showToken") return undefined;
                         return Object.getOwnPropertyDescriptor(obj, prop);
@@ -31,6 +35,11 @@ export default new class V2 {
                         return obj[func];
                     }
                 });
+
+                if(!isDefault){
+                    return Object.assign({}, theModule, {default: proxy})
+                }
+
                 return proxy;
             };
 
@@ -38,8 +47,8 @@ export default new class V2 {
                 for (const i in req.c) {
                     if (req.c.hasOwnProperty(i)) {
                         const m = req.c[i].exports;
-                        if (m && m.__esModule && m.default && filter(m.default)) return protect(m.default);
-                        if (m && filter(m))	return protect(m);
+                        if (m && m.__esModule && m.default && filter(m.default)) return protect(m.default, true);
+                        if (m && filter(m))	return protect(m, false);
                     }
                 }
                 // console.warn("Cannot find loaded module in cache");
@@ -51,8 +60,8 @@ export default new class V2 {
                 for (const i in req.c) {
                     if (req.c.hasOwnProperty(i)) {
                         const m = req.c[i].exports;
-                        if (m && m.__esModule && m.default && filter(m.default)) modules.push(protect(m.default));
-                        else if (m && filter(m)) modules.push(protect(m));
+                        if (m && m.__esModule && m.default && filter(m.default)) modules.push(protect(m.default, true));
+                        else if (m && filter(m)) modules.push(protect(m, false));
                     }
                 }
                 return modules;

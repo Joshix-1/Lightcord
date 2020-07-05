@@ -67,12 +67,24 @@ export default class V2C_AccountInfos extends React.Component {
          */
         const createdAt = user.createdAt
 
+        let avatarURL = user.avatarURL
+        if(user.avatar && user.avatar.startsWith("a_")){
+            avatarURL = user.getAvatarURL("gif")
+        }
+
+        if(avatarURL.startsWith("/")){
+            avatarURL = "https://discord.com"+avatarURL
+        }
+        if(avatarURL.endsWith("?size=128")){
+            avatarURL = avatarURL.replace("?size=128", "?size=4096")
+        }
+
         return `+ Username: ${user.username}
 + Discriminator: ${user.discriminator}
 + Tag: ${user.tag}
 + ID: ${user.id}
 + Avatar: ${user.avatar}
-+ Avatar URL: https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=4096
++ Avatar URL: ${avatarURL}
 + Creation Date: ${(createdAt.getDate()).toString().padStart(2, "0")}/${(createdAt.getMonth()+1).toString().padStart(2, "0")}/${(createdAt.getFullYear()).toString().padStart(2, "0")} ${createdAt.getHours().toString().padStart(2, "0")}h ${createdAt.getMinutes().toString().padStart(2, "0")}min ${createdAt.getSeconds()}s
 + Flags: ${user.flags}
 + Has Nitro: ${user.hasPremiumSubscription ? "Yes" : "No"}

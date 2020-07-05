@@ -2,7 +2,6 @@ import { remote } from "electron";
 import BDV2 from "./modules/v2";
 import WebpackModules from "./modules/webpackModules";
 
-// var settingsPanel, voiceMode, pluginModule, themeModule, dMode, publicServersModule, mainCore, BDV2;
 export const minimumDiscordVersion = "0.0.306";
 export const currentDiscordVersion = (window.DiscordNative && window.DiscordNative.remoteApp && window.DiscordNative.remoteApp.getVersion && window.DiscordNative.remoteApp.getVersion()) || "0.0.306";
 export const minSupportedVersion = "0.3.0";

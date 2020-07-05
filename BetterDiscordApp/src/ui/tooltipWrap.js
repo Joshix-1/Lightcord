@@ -1,7 +1,7 @@
 import BDV2 from "../modules/v2";
 import Tooltip from "./tooltip";
 
-export default class extends BDV2.reactComponent {
+export default class extends React.Component {
     constructor(props) {
         super(props);
     }

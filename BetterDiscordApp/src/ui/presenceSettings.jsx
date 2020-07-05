@@ -590,7 +590,10 @@ class Popout extends React.Component { // TODO: Probably use internal Components
             userModule1
         ] = this.modules
         let user = userModule1.getCurrentUser()
-        let avatarURL = user.getAvatarURL(user.avatar.startsWith("a_") ? "gif" : "png")
+        let avatarURL = user.avatarURL
+        if(user.avatar && user.avatar.startsWith("a_")){
+            avatarURL = user.getAvatarURL("gif")
+        }
 
         let data = Object.assign({}, defaultRPC, this.props.preview.props.settings.state.data)
         timestampClass = timestampClass || activityModule1.timestamp
@@ -737,7 +740,10 @@ class Profile extends React.Component { // TODO: Probably use internal Component
 
     render(){
         let user = BDModules.get(e => e.default && e.default.getCurrentUser)[0].default.getCurrentUser()
-        let avatarURL = user.getAvatarURL(user.avatar.startsWith("a_") ? "gif" : "png")
+        let avatarURL = user.avatarURL
+        if(user.avatar && user.avatar.startsWith("a_")){
+            avatarURL = user.getAvatarURL("gif")
+        }
         let [
             flexModule1,
             stylingModule1,

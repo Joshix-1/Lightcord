@@ -169,7 +169,6 @@ function setWindowVisible(isVisible, andUnminimize) {
   if (isVisible) {
     if (andUnminimize || !mainWindow.isMinimized()) {
       mainWindow.show();
-      mainWindow.focus();
       webContentsSend('MAIN_WINDOW_FOCUS');
     }
   } else {
@@ -706,6 +705,7 @@ function handleSingleInstance(args) {
       webContentsSend('MAIN_WINDOW_PATH', appPath);
     }
     setWindowVisible(true, false);
+    console.log("Focusing from singleInstance", args)
     mainWindow.focus();
   }
 }

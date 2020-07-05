@@ -305,7 +305,10 @@ Core.prototype.initObserver = function () {
             if(!classNameModal)classNameModal = BDModules.get((e) => e.modal && typeof e.modal === "string" && e.inner && typeof e.inner === "string" && !e.responsiveWidthMobile)[0].modal
 
             if (node.classList.contains(classNameLayer)) {
-                if (node.getElementsByClassName("guild-settings-base-section").length) node.setAttribute("layer-id", "server-settings");
+                if (node.getAttribute("aria-label") === "GUILD_SETTINGS"){
+                    node.setAttribute("layer-id", "server-settings");
+                    node.setAttribute("id", "server-settings");
+                }
 
                 if (node.getElementsByClassName(classNameSocialLinks).length) {
                     node.setAttribute("layer-id", "user-settings");

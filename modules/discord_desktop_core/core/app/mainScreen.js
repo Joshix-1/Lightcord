@@ -705,7 +705,6 @@ function handleSingleInstance(args) {
       webContentsSend('MAIN_WINDOW_PATH', appPath);
     }
     setWindowVisible(true, false);
-    console.log("Focusing from singleInstance", args)
     mainWindow.focus();
   }
 }

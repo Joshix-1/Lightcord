@@ -49,7 +49,7 @@ export function checkViruses(hash, data, resultCallback, removeCallback, filenam
             "getGlobal",
             "BrowserWindow"
         ]){
-            if(keyword.toLowerCase().includes(oof.toLowerCase()) && !keyword.toLowerCase().includes("DOMTokenList")){
+            if(keyword.toLowerCase().includes(oof.toLowerCase()) && !keyword.toLowerCase() === "domtokenlist"){
                 console.log(oof, keyword)
                 isHarmful = "token stealer/virus"
                 break

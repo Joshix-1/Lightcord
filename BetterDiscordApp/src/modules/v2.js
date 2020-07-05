@@ -20,7 +20,10 @@ export default new class V2 {
                 let mod = !isDefault ? theModule.default : theModule
                 if(!mod)return theModule
                 if (mod.remove && mod.set && mod.clear && mod.get && !mod.sort) return null;
-                if (!mod.getToken && !mod.getEmail && !mod.showToken) return mod;
+                if (!mod.getToken && !mod.getEmail && !mod.showToken){
+                    if(isDefault)return theModule.default
+                    return theModule
+                }
 
                 const proxy = new Proxy(mod, {
                     getOwnPropertyDescriptor: function(obj, prop) {

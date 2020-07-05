@@ -18,7 +18,7 @@
     "lcid": "1.0.0",
     "locate-path": "2.0.0",
     "lru-cache": "4.1.5",
-    "mem": "1.1.0",
+    "mem": "4.0.0",
     "mimic-fn": "1.2.0",
     "npm-run-path": "2.0.2",
     "number-is-nan": "1.0.1",

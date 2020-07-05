@@ -83,7 +83,7 @@ export default new class DistantServer {
                         })
                     }
                     const responseBody = await res.json()
-                    console.log(responseBody)
+                    
                     for(let user of responseBody){
                         let promise = users.find(promise => promise[0] === user.user_id)
                         promise[1](user.badges)
@@ -116,10 +116,8 @@ export default new class DistantServer {
 
 const handleRequest = function(route, method, data){
     if(!settingsCookie["lightcord-5"]){
-        console.warn(`Canceling request on ${route} with method ${method} and body`, data, "because of settings.")
         return Promise.reject(new LightcordError("The current settings blocked the request."))
     }
-    console.log(`Sending request on ${route} with method ${method} and body`, data)
     return nodeFetch(`${Constants.SERVER_URL}/api/v1${route}`, {
         method,
         headers: {
@@ -136,7 +134,6 @@ class LightcordError extends Error {
     constructor(){
         super(...arguments)
         this.name = "LightcordError"
-        
     }
 }
 

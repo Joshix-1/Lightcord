@@ -168,8 +168,31 @@ export default new class EmojiModule {
                     data.methodArguments[0].childrenMessageContent.props.content.push(newContent.shift())
                 }
             }});
-        }
+        }/*
+        let userModule
+        window.Lightcord.Api.ensureExported(e => e.default && e.default.displayName === "EmojiPickerListRow")
+        .then(EmojiPickerListRow => {
+            let classs = EmojiPickerListRow.default
+            EmojiPickerListRow.default = class EmojiPickerListRow extends React.Component {
+                constructor(props){
+                    super(props)
+                }
 
+                render(){
+                    if(!userModule)userModule = BDModules.get(e => e.default && e.default.getCurrentUser)[0]
+                    if(!userModule)return React.createElement(classs, this.props)
+                    let user = userModule.default.getCurrentUser()
+                    if(!user.hasPremiumSubscription)return React.createElement(classs, this.props)
+
+                    return React.createElement(classs, Object.assign({}, this.props, {
+                        emojiDescriptors: this.props.emojiDescriptors.map(e => {
+                            e.isDisabled = false
+                        })
+                    }))                    
+                }
+            }
+            EmojiPickerListRow.default.displayName = "EmojiPickerListRow"
+        })*/
     }
 
     disable(){

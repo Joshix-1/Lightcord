@@ -72,6 +72,10 @@ export default new class ContentManager {
                 delete addonCache[key]
                 return
             }
+            if(value.result.suspect){ // refetch from remote to be sure you're up to date.
+                delete addonCache[key]
+                return
+            }
         })
         this.saveAddonCache()
     }

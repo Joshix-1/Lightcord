@@ -538,7 +538,7 @@ async function privateInit(){
         }else{
             logger.warn(new Error("Couldn't find module here"))
         }
-        const getTokenModule = BDModules.get(e => e.default && e.default.getToken)[0]
+        const getTokenModule = ModuleLoader.get(e => e.default && e.default.getToken)[0]
         if(getTokenModule){
             const getToken = getTokenModule.default.getToken
             getTokenModule.default.getToken = function(){

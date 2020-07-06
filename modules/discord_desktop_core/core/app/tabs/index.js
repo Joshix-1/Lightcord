@@ -3,6 +3,9 @@ const { join } = require("path")
 const { pathToFileURL } = require("url")
 const { remote } = require("electron")
 
+let webviews = new Map()
+window.webviews = webviews
+
 window.onload = () => {
     const ChromeTabs = require("chrome-tabs")
     require("chrome-tabs/css/chrome-tabs.css")
@@ -12,9 +15,6 @@ window.onload = () => {
     let tabs = document.querySelector(".chrome-tabs")
     let chromeTabs = new ChromeTabs()
     chromeTabs.init(tabs)
-
-    let webviews = new Map()
-    window.webviews = webviews
 
     tabs.addEventListener('activeTabChange', ({detail}) => {
         let webview = webviews.get(detail.tabEl)
@@ -34,6 +34,7 @@ window.onload = () => {
         webview.classList.add("discord-webview")
         webview.classList.add("webview-active")
         webview.setAttribute("preload", pathToFileURL(join(__dirname, "../mainScreenPreload.js")))
+        webview.shadowRoot.childNodes.item(1).style.height = "100%"
         webviews.set(detail.tabEl, webview)
         document.querySelector(".documentFull").appendChild(webview)
         webview.addEventListener("dom-ready", () => {
@@ -80,3 +81,10 @@ require.extensions[".css"] = (m, filename) => {
 }
 
 const faviconURL = pathToFileURL(join(__dirname, "../images/discord.png"))
+
+window.onbeforeunload = (ev) => {
+    if(!webviews)return
+    webviews.forEach(webview => {
+        webview.src = 'about:blank'
+    })
+}

@@ -8,5 +8,5 @@ var _electron = require('electron');
 
 const menu = require('./' + process.platform);
 
-exports.default = _electron.Menu.buildFromTemplate(menu);
+exports.default = menu
 module.exports = exports.default;

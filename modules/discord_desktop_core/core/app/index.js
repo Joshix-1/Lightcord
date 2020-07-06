@@ -7,7 +7,6 @@ exports.startup = startup;
 exports.handleSingleInstance = handleSingleInstance;
 exports.setMainWindowVisible = setMainWindowVisible;
 const { Menu, BrowserWindow } = require('electron');
-const yauzl = require("yauzl")
 const fetch = require("node-fetch").default
 
 let mainScreen;
@@ -68,8 +67,51 @@ function startup(bootstrapModules) {
   global.mainWindowId = Constants.DEFAULT_MAIN_WINDOW_ID;
   global.moduleUpdater = moduleUpdater;
 
-  const applicationMenu = require('./applicationMenu');
-  Menu.setApplicationMenu(applicationMenu);
+  let applicationMenu = require('./applicationMenu');
+
+  if(appSettings().get("isTabs", false)){
+    console.log(`Patching applicationMenu`)
+    applicationMenu = applicationMenu.map(e => {
+      if(["View", "&View"].includes(e.label)){
+        console.log(`Patching Tabs`)
+        e.submenu.push({
+          type: "separator"
+        }, {
+          label: "New Tab",
+          click: () => {
+            mainScreen.webContentsSend("NEW_TAB")
+          },
+          accelerator: "Command+T"
+        }, {
+          label: "Close Current Tab",
+          click: () => {
+            mainScreen.webContentsSend("CLOSE_TAB")
+          },
+          accelerator: "Command+W"
+        })
+      }
+      e.submenu = e.submenu.map(e => {
+        if(["Command+r", "Control+R"].includes(e.accelerator)){
+          console.log(`Patching Refresh`)
+          e.click = function(){
+            mainScreen.webContentsSend("RELOAD")
+          }
+        }
+        console.log(e.accelerator)
+        if(["&Developer", "Developer"].includes(e.label)){
+          console.log(`Patching devtools`)
+          e.submenu[0].click = () => {
+            mainScreen.webContentsSend("OPEN_DEVTOOLS")
+          }
+        }
+        return e
+      })
+      return e
+    })
+    Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenu));
+  }else{
+    Menu.setApplicationMenu(applicationMenu);
+  }
 
   mainScreen = require('./mainScreen');
 

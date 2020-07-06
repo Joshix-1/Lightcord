@@ -18,6 +18,12 @@ ipcRenderer.on(TRACK_ANALYTICS_EVENT, e => {
   e.sender.send(TRACK_ANALYTICS_EVENT_COMMIT);
 });
 
+global.isTab = false
+ipcRenderer.on("IS_TAB", (ev) => {
+  global.isTab = true
+})
+
+
 const DiscordNative = {
   isRenderer: process.type === 'renderer',
 

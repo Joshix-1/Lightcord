@@ -1,10 +1,59 @@
 const fs = require("fs")
 const { join } = require("path")
 const { pathToFileURL } = require("url")
-const { remote } = require("electron")
+const ipc = require("../discord_native/ipc")
 
 let webviews = new Map()
 window.webviews = webviews
+
+function forwardToCurrentWebview(event){
+    return [event, (...args) => {
+        let webview = webviews.get(document.querySelector(".chrome-tab[active]"))
+        if(!webview)return
+        webview.send(event, ...args.slice(1))
+    }]
+}
+
+ipc.on(...forwardToCurrentWebview("MAIN_WINDOW_FOCUS"))
+ipc.on(...forwardToCurrentWebview("MAIN_WINDOW_BLUR"))
+ipc.on(...forwardToCurrentWebview("SYSTEM_TRAY_OPEN_VOICE_SETTINGS"))
+ipc.on(...forwardToCurrentWebview("SYSTEM_TRAY_TOGGLE_MUTE"))
+ipc.on(...forwardToCurrentWebview("SYSTEM_TRAY_TOGGLE_DEAFEN"))
+ipc.on(...forwardToCurrentWebview("LAUNCH_APPLICATION"))
+ipc.on(...forwardToCurrentWebview("UPDATE_ERROR"))
+ipc.on(...forwardToCurrentWebview("UPDATE_NOT_AVAILABLE"))
+ipc.on(...forwardToCurrentWebview("UPDATE_MANUALLY"))
+ipc.on(...forwardToCurrentWebview("UPDATE_AVAILABLE"))
+ipc.on(...forwardToCurrentWebview("MODULE_INSTALL_PROGRESS"))
+ipc.on(...forwardToCurrentWebview("UPDATE_DOWNLOADED"))
+ipc.on(...forwardToCurrentWebview("MODULE_INSTALLED"))
+ipc.on(...forwardToCurrentWebview("CHECKING_FOR_UPDATES"))
+ipc.on(...forwardToCurrentWebview("UPDATER_HISTORY_RESPONSE"))
+ipc.on(...forwardToCurrentWebview("ACCESSIBILITY_SUPPORT_CHANGED"))
+ipc.on(...forwardToCurrentWebview("HELP_OPEN"))
+ipc.on(...forwardToCurrentWebview("USER_SETTINGS_OPEN"))
+ipc.on(...forwardToCurrentWebview("MAIN_WINDOW_PATH"))
+ipc.on("RELOAD", () => {
+    let webview = webviews.get(document.querySelector(".chrome-tab[active]"))
+    if(!webview)return
+    webview.reload()
+})
+ipc.on("NEW_TAB", () => {
+    chromeTabs.addTab({
+        title: 'Lightcord',
+        favicon: faviconURL
+    })
+})
+ipc.on("CLOSE_TAB", () => {
+    let active = document.querySelector("div.chrome-tab[active]")
+    if(!active)return
+    chromeTabs.removeTab(active)
+})
+ipc.on("OPEN_DEVTOOLS", () => {
+    let webview = webviews.get(document.querySelector(".chrome-tab[active]"))
+    if(!webview)return
+    webview.openDevTools()
+})
 
 window.onload = () => {
     const ChromeTabs = require("chrome-tabs")
@@ -27,26 +76,49 @@ window.onload = () => {
         webview.classList.add("active-webview")
     })
     tabs.addEventListener('tabAdd', ({detail}) => {
-        console.log('Tab added', detail.tabEl)
-        detail.tabEl.querySelector(".chrome-tab-title").innerText = "Lightcord Loading..."
+        chromeTabs.updateTab(detail.tabEl, {
+            title: "Lightcord Loading...",
+            favicon: faviconURL
+        })
         let webview = document.createElement("webview")
         webview.src = "https://discord.com/app"
         webview.classList.add("discord-webview")
         webview.classList.add("webview-active")
         webview.setAttribute("preload", pathToFileURL(join(__dirname, "../mainScreenPreload.js")))
         webview.shadowRoot.childNodes.item(1).style.height = "100%"
+        webview.enableremotemodule = true
+        webview.nodeintegration = false
+        webview.webpreferences = "nativeWindowOpen=yes"
+        webview.enableblinkfeatures = "EnumerateDevices,AudioOutputDevices"
+        webview.addEventListener("ipc-message", function(...ev){
+            ipc.send(ev[0].channel.replace("DISCORD_", ""))
+        })
+        webview.addEventListener('page-title-updated', () => {
+            let el = Array.from(webviews.entries()).find(e => e[1] === webview)[0]
+            if(!el)return
+            chromeTabs.updateTab(el, {
+                favicon: faviconURL,
+                title: webview.getTitle()
+            })
+        })
         webviews.set(detail.tabEl, webview)
         document.querySelector(".documentFull").appendChild(webview)
         webview.addEventListener("dom-ready", () => {
-            remote.webContents.fromId(webview.getWebContentsId()).openDevTools()
+            webview.send("DISCORD_IS_TAB")
+        })
+        webview.addEventListener("will-navigate", (e) => {
+            e.preventDefault()
+            console.log(e, e.url)
         })
     })
     tabs.addEventListener('tabRemove', ({detail}) => {
-        console.log('Tab removed', detail.tabEl)
         let webview = webviews.get(detail.tabEl)
         if(!webview)return
         webview.remove()
         webviews.delete(detail.tabEl)
+        if(document.querySelector(".chrome-tabs-content").childNodes.length === 0){
+            window.close()
+        }
     })
 
     window.addEventListener('keydown', (event) => {
@@ -62,6 +134,12 @@ window.onload = () => {
                 chromeTabs.removeTab(active)
             }
         }
+    })
+    setImmediate(() => {
+        chromeTabs.addTab({
+          title: 'Lightcord Loading...',
+          favicon: faviconURL
+        })
     })
 }
 
@@ -81,10 +159,3 @@ require.extensions[".css"] = (m, filename) => {
 }
 
 const faviconURL = pathToFileURL(join(__dirname, "../images/discord.png"))
-
-window.onbeforeunload = (ev) => {
-    if(!webviews)return
-    webviews.forEach(webview => {
-        webview.src = 'about:blank'
-    })
-}

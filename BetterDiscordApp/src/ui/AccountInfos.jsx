@@ -47,6 +47,7 @@ export default class V2C_AccountInfos extends React.Component {
     getSessionValue(){
         const sessionsRaw = sessionModule.getSessions()
         const sessions = Object.keys(sessionsRaw).filter(e => e !== "all").map(e => sessionsRaw[e])
+        let session = sessionsRaw.all
 
         if(sessions.length === 0)return "- No session detected. Please try in a few seconds"
         
@@ -55,7 +56,7 @@ export default class V2C_AccountInfos extends React.Component {
 + os: ${e.clientInfo.os[0].toUpperCase()+e.clientInfo.os.slice(1)}
 + client: ${e.clientInfo.client}
 + status: ${e.status}
-+ active: ${e.active ? "Yes" : "No"}
++ active: ${session.sessionId === e.sessionId}
 + Activities: ${e.activities.length}`
         }).join("\n"+"-".repeat(38)+"\n")
     }

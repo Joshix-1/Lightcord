@@ -68,9 +68,9 @@ const connectionBackoff = new _Backoff2.default(1000, 20000);
 const events = exports.events = new EventEmitter()
 const DISCORD_NAMESPACE = 'DISCORD_';
 
-let isTabs = true
+let isTabs = false
 const getWebappEndpoint = () => {
-  //isTabs = settings.get("isTabs", false)
+  isTabs = settings.get("isTabs", false)
   if(!isTabs){
     let endpoint = settings.get('WEBAPP_ENDPOINT');
     if (!endpoint) {
@@ -433,7 +433,7 @@ function launchMainAppWindow(isVisible) {
     }
 
     webContentsSend(mainWindow != null && mainWindow.isFocused() ? 'MAIN_WINDOW_FOCUS' : 'MAIN_WINDOW_BLUR');
-    
+    webContentsSend("test", "sdasd", "sltsv")
     if (!lastPageLoadFailed) {
       connectionBackoff.succeed();
     }

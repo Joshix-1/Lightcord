@@ -105,7 +105,7 @@ function startup(bootstrapModules) {
     })
     Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenu));
   }else{
-    Menu.setApplicationMenu(applicationMenu);
+    Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenu));
   }
 
   mainScreen = require('./mainScreen');

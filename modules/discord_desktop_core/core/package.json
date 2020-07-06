@@ -4,6 +4,7 @@
   "main": "app/index.js",
   "private": true,
   "dependencies": {
+    "chrome-tabs": "^5.4.0",
     "discordrpcgenerator": "^1.2.0",
     "invariant": "2.2.4",
     "lodash": "4.17.13",

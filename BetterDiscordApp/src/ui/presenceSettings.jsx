@@ -116,7 +116,6 @@ export default class V2C_PresenceSettings extends React.Component {
     }
 
     render() {
-        console.log("Rerendering rpc manager")
         let [
             marginModule
         ] = this.modules

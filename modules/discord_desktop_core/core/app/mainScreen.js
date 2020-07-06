@@ -15,11 +15,7 @@ var electron = require('electron');
 
 var _path = require('path');
 
-var _path2 = _interopRequireDefault(_path);
-
 var _url = require('url');
-
-var _url2 = _interopRequireDefault(_url);
 
 var _Backoff = require('../common/Backoff');
 
@@ -72,16 +68,22 @@ const connectionBackoff = new _Backoff2.default(1000, 20000);
 const events = exports.events = new EventEmitter()
 const DISCORD_NAMESPACE = 'DISCORD_';
 
+let isTabs = true
 const getWebappEndpoint = () => {
-  let endpoint = settings.get('WEBAPP_ENDPOINT');
-  if (!endpoint) {
-    if (_buildInfo2.default.releaseChannel === 'stable') {
-      endpoint = 'https://discord.com';
-    } else {
-      endpoint = `https://${_buildInfo2.default.releaseChannel}.discord.com`;
+  //isTabs = settings.get("isTabs", false)
+  if(!isTabs){
+    let endpoint = settings.get('WEBAPP_ENDPOINT');
+    if (!endpoint) {
+      if (_buildInfo2.default.releaseChannel === 'stable') {
+        endpoint = 'https://discord.com';
+      } else {
+        endpoint = `https://${_buildInfo2.default.releaseChannel}.discord.com`;
+      }
     }
+    return endpoint;
+  }else{
+    return "file://"+_path.join(__dirname, "tabs", "index.html")
   }
-  return endpoint;
 };
 
 const WEBAPP_ENDPOINT = getWebappEndpoint();
@@ -90,13 +92,13 @@ function getSanitizedPath(path) {
   // using the whatwg URL api, get a sanitized pathname from given path
   // this is because url.parse's `path` may not always have a slash
   // in front of it
-  return new _url2.default.URL(path, WEBAPP_ENDPOINT).pathname;
+  return new _url.URL(path, WEBAPP_ENDPOINT).pathname;
 }
 
 function extractPathFromArgs(args, fallbackPath) {
   if (args.length === 3 && args[0] === '--url' && args[1] === '--') {
     try {
-      const parsedURL = _url2.default.parse(args[2]);
+      const parsedURL = _url.parse(args[2]);
       if (parsedURL.protocol === 'discord:') {
         return getSanitizedPath(parsedURL.path);
       }
@@ -108,7 +110,7 @@ function extractPathFromArgs(args, fallbackPath) {
 // TODO: These should probably be thrown in constants.
 const INITIAL_PATH = extractPathFromArgs(process.argv.slice(1), '/app');
 const WEBAPP_PATH = settings.get('WEBAPP_PATH', `${INITIAL_PATH}?_=${Date.now()}`);
-const URL_TO_LOAD = `${WEBAPP_ENDPOINT}${WEBAPP_PATH}`;
+const URL_TO_LOAD = isTabs ? WEBAPP_ENDPOINT : `${WEBAPP_ENDPOINT}${WEBAPP_PATH}`;
 const MIN_WIDTH = settings.get('MIN_WIDTH', 940);
 const MIN_HEIGHT = settings.get('MIN_HEIGHT', 500);
 const DEFAULT_WIDTH = 1280;
@@ -347,12 +349,18 @@ function launchMainAppWindow(isVisible) {
     show: isVisible,
     webPreferences: {
       blinkFeatures: 'EnumerateDevices,AudioOutputDevices',
-      nodeIntegration: false,
-      preload: _path2.default.join(__dirname, 'mainScreenPreload.js'),
       nativeWindowOpen: true,
-      enableRemoteModule: true // canary shit, just enable it
+      enableRemoteModule: true,
+      ...(isTabs ? {
+        nodeIntegration: true,
+        webviewTag: true
+      } : {
+        nodeIntegration: false,
+        webviewTag: false,
+        preload: _path.join(__dirname, 'mainScreenPreload.js')
+      })
     },
-    icon: _path2.default.join(__dirname, 'discord.png')
+    icon: _path.join(__dirname, 'discord.png')
   };
 
   if (process.platform === 'linux') {

@@ -42,7 +42,6 @@ export function checkViruses(hash, data, resultCallback, removeCallback, filenam
             "phone",
             "MFA",
             "2fa",
-            "process",
             "child_process",
             "localStorage",
             "eval",
@@ -78,7 +77,7 @@ export function checkViruses(hash, data, resultCallback, removeCallback, filenam
             ]
             for(let regex of regexps){
                 if(isHarmful)break
-                isHarmful = regex.test(no_comments) ? "obfuscation/hidden code" : false
+                if(regex.test(no_comments))isHarmful = "obfuscation/hidden code"
             }
         }
     }

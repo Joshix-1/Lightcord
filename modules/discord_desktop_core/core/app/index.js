@@ -70,10 +70,8 @@ function startup(bootstrapModules) {
   let applicationMenu = require('./applicationMenu');
 
   if(appSettings().get("isTabs", false)){
-    console.log(`Patching applicationMenu`)
     applicationMenu = applicationMenu.map(e => {
       if(["View", "&View"].includes(e.label)){
-        console.log(`Patching Tabs`)
         e.submenu.push({
           type: "separator"
         }, {
@@ -92,14 +90,11 @@ function startup(bootstrapModules) {
       }
       e.submenu = e.submenu.map(e => {
         if(["Command+r", "Control+R"].includes(e.accelerator)){
-          console.log(`Patching Refresh`)
           e.click = function(){
             mainScreen.webContentsSend("RELOAD")
           }
         }
-        console.log(e.accelerator)
         if(["&Developer", "Developer"].includes(e.label)){
-          console.log(`Patching devtools`)
           e.submenu[0].click = () => {
             mainScreen.webContentsSend("OPEN_DEVTOOLS")
           }

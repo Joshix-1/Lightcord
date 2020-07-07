@@ -7,9 +7,10 @@ let webviews = new Map()
 window.webviews = webviews
 
 function forwardToCurrentWebview(event){
-    return [event, (...args) => {
+    return [event, async (...args) => {
         let webview = webviews.get(document.querySelector(".chrome-tab[active]"))
         if(!webview)return
+        await webview.ready
         webview.send(event, ...args.slice(1))
     }]
 }
@@ -90,8 +91,16 @@ window.onload = () => {
         webview.nodeintegration = false
         webview.webpreferences = "nativeWindowOpen=yes"
         webview.enableblinkfeatures = "EnumerateDevices,AudioOutputDevices"
-        webview.addEventListener("ipc-message", function(...ev){
-            ipc.send(ev[0].channel.replace("DISCORD_", ""))
+        webview.addEventListener("ipc-message", function(...ev){ // TODO: Why don't we receive Ipc Messages, but they get processed anyway (notification, etc) ?
+            console.log(ev[0].channel)
+            if(ev[0].channel === "DISCORD_NEW_TAB"){
+                chromeTabs.addTab({
+                    title: 'Lightcord',
+                    favicon: faviconURL
+                })
+                return
+            }
+            ipc.send(ev[0].channel.replace("DISCORD_", ""), ev.slice(1))
         })
         webview.addEventListener('page-title-updated', () => {
             let el = Array.from(webviews.entries()).find(e => e[1] === webview)[0]
@@ -103,7 +112,10 @@ window.onload = () => {
         })
         webviews.set(detail.tabEl, webview)
         document.querySelector(".documentFull").appendChild(webview)
+        let r
+        webview.ready = new Promise(resolve => (r = resolve))
         webview.addEventListener("dom-ready", () => {
+            r()
             webview.send("DISCORD_IS_TAB")
         })
         webview.addEventListener("will-navigate", (e) => {

@@ -24,11 +24,17 @@ const escapedAtRegex = /^\\@/;
 
 export let addonCache = {}
 
+let hasPatched = false
 export default new class ContentManager {
 
     constructor() {
         this.timeCache = {};
         this.watchers = {};
+    }
+
+    patchExtensions(){
+        if(hasPatched)return
+        hasPatched = true
         Module._extensions[".js"] = this.getContentRequire("plugin");
         Module._extensions[".css"] = this.getContentRequire("theme");
     }
@@ -312,6 +318,7 @@ export default new class ContentManager {
     }
 
     async loadAllContent(type) {
+        this.patchExtensions()
         const isPlugin = type === "plugin";
         const fileEnding = isPlugin ? ".plugin.js" : ".theme.css";
         const basedir = isPlugin ? this.pluginsFolder : this.themesFolder;

@@ -108,6 +108,11 @@ function startup(bootstrapModules) {
     Menu.setApplicationMenu(Menu.buildFromTemplate(applicationMenu));
   }
 
+  const ipc = require("./ipcMain") // TODO: Fix NEW_TAB
+  ipc.on("NEW_TAB", () => {
+    mainScreen.webContentsSend("NEW_TAB")
+  })
+
   mainScreen = require('./mainScreen');
 
   let version = bootstrapModules.Constants.version

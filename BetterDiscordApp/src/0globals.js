@@ -1,4 +1,4 @@
-import { remote } from "electron";
+import { remote } from "electron"
 import BDV2 from "./modules/v2";
 import WebpackModules from "./modules/webpackModules";
 
@@ -95,6 +95,7 @@ export const settings = {
     "Ad Block":                   {id: "lightcord-4", info: "Block any BOT that dms you with an invite link. Even in an embed.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Enable Lightcord Servers":   {id: "lightcord-5", info: "Enable Lightcord's servers. Disabling this will disable custom badges.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Disable typing":             {id: "lightcord-7", info: "Don't let other see you're typing.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+    "Lightcord Tabs":             {id: "lightcord-8", info: "Allows you to launch multiple instances of Lightcord in the same window (EXPERIMENTAL).", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
 
     /** Lightcord Window */
     "Always-on-Top":              {id: "lightcord-3", info: "Enable window's Always-on-Top mode, where Lightcord stays on top of other applications.", implemented: true, hidden: false, cat: "lightcord", category: "Window"},

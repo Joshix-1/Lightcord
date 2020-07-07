@@ -1,6 +1,9 @@
 const ipcRenderer = require("../discord_native/ipc")
 
+
 if(process.platform === "win32"){
+    let useShim = false
+
     const originalNotification = window.Notification
 
     ipcRenderer.send("NOTIFICATIONS_CLEAR")
@@ -13,7 +16,7 @@ if(process.platform === "win32"){
             notification.close()
         }
     })
-    window.Notification = class LightcordNotification {
+    class LightcordNotification {
         constructor(title, data){
             this.id = LightcordNotification._id++
             this.onshow = function() {}
@@ -40,8 +43,6 @@ if(process.platform === "win32"){
         static requestPermission(callback){
             callback()
         }
-
-        static permission = "granted"
         
         close(){
             if(!notifications[this.id])return
@@ -51,9 +52,45 @@ if(process.platform === "win32"){
             this.onclose()
         }
     }
+
+    LightcordNotification.permission = "granted"
+
+    function Notification(){
+        if(useShim)return new LightcordNotification(...arguments)
+        return new originalNotification(...arguments)
+    }
+    Object.defineProperties(Notification, {
+        permission: {
+            get(){
+                if(useShim)return LightcordNotification.permission
+                return originalNotification.permission
+            }
+        },
+        requestPermission: {
+            get(){
+                if(useShim)return LightcordNotification.requestPermission
+                return originalNotification.requestPermission
+            }
+        },
+        _id: {
+            get(){
+                if(useShim)return LightcordNotification._id
+                return originalNotification._id
+            }
+        }
+    })
+    window.Notification = Notification
+
+
+    module.exports = {
+        useShim(use){
+            useShim = !!use
+        }
+    }
 }
 
 let settingStore
+
 ensureExported((e => e.default && e.default.theme))
 .then(themeStore => {
     settingStore = themeStore

@@ -79,13 +79,13 @@ function startup(bootstrapModules) {
           click: () => {
             mainScreen.webContentsSend("NEW_TAB")
           },
-          accelerator: "Command+T"
+          accelerator: "CmdOrCtrl+T"
         }, {
           label: "Close Current Tab",
           click: () => {
             mainScreen.webContentsSend("CLOSE_TAB")
           },
-          accelerator: "Command+W"
+          accelerator: "CmdOrCtrl+W"
         })
       }
       e.submenu = e.submenu.map(e => {

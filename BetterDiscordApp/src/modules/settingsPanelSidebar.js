@@ -8,8 +8,8 @@ export default class V2_SettingsPanel_Sidebar {
         this.panels[panel] = component
     }
 
-    getComponent(panel){
-        return this.panels[panel]
+    getComponent(panel, sidebar){
+        return this.panels[panel](sidebar)
     }
 
     get items() {
@@ -48,7 +48,7 @@ export default class V2_SettingsPanel_Sidebar {
         return items
     }
 
-    render() {
+    render(sidebar) {
         return [
             {
                 section: "HEADER",
@@ -58,7 +58,7 @@ export default class V2_SettingsPanel_Sidebar {
                 return {
                     section: e.id,
                     label: e.text,
-                    element: this.getComponent(e.id)
+                    element: this.getComponent(e.id, sidebar)
                 }
             }),
             {
@@ -72,7 +72,7 @@ export default class V2_SettingsPanel_Sidebar {
                 return {
                     section: e.id,
                     label: e.text,
-                    element: this.getComponent(e.id)
+                    element: this.getComponent(e.id, sidebar)
                 }
             }),
             {

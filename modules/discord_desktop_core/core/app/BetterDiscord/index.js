@@ -18,7 +18,7 @@ exports.init = function(){
         console.warn(new Error("Lightcord has already inited."))
         return
     }
-    require("./patchNotifications")
+    
     hasInit = true
     let readyInterval = setInterval(()=>{
         events.emit("debug", `[INIT] try ${tries++} loading Lightcord`)
@@ -178,7 +178,6 @@ async function privateInit(){
         if(user.hasFlag(constants.UserFlags.HYPESQUAD_ONLINE_HOUSE_3))return "3"
         return undefined
     }
-
     
     window.$ = window.jQuery = require("./jquery.min.js")
     require("./ace.js")
@@ -1298,6 +1297,8 @@ var ensureExported = global.ensureExported = function ensureExported(filter, max
         }, 100);
     })
 }
+let Notifications = require("./patchNotifications")
+Notifications.useShim(true)
 
 function getGuildClasses() {
     const guildsWrapper = ModuleLoader.get(e => e.wrapper && e.unreadMentionsBar)[0];

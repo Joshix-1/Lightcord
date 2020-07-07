@@ -273,7 +273,7 @@ Core.prototype.initSettings = function () {
                 poped.push(result.pop())
                 poped.push(result.pop())
 
-                result.push(...settingsPanel.renderSidebar())
+                result.push(...settingsPanel.renderSidebar(this))
 
                 while(poped[0]){
                     result.push(poped.pop())

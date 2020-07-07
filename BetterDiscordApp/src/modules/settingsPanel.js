@@ -137,11 +137,11 @@ export default new class V2_SettingsPanel {
 
     onClick() {}
 
-    onChange(id, checked) {
-        this.updateSettings(id, checked);
+    onChange(id, checked, sidebar) {
+        this.updateSettings(id, checked, sidebar);
     }
 
-    updateSettings(id, enabled) {
+    updateSettings(id, enabled, sidebar) {
         settingsCookie[id] = enabled;
 
         if (id == "bda-gs-2") {
@@ -216,6 +216,7 @@ export default new class V2_SettingsPanel {
         if (id === "lightcord-1") {
             if (enabled) window.Lightcord.Settings.devMode = true
             else window.Lightcord.Settings.devMode = false
+            sidebar.forceUpdate()
         }
         if (id === "lightcord-2") {
             if (enabled) window.Lightcord.Settings.callRingingBeat = true
@@ -301,15 +302,15 @@ export default new class V2_SettingsPanel {
         Object.assign(settingsRPC, DataStore.getSettingGroup("rpc"));
     }
 
-    renderSidebar() {
-        return this.sidebar.render();
+    renderSidebar(sidebar) {
+        return this.sidebar.render(sidebar);
     }
 
     coreComponent() {
         return BDV2.react.createElement(SectionedSettingsPanel, {key: "cspanel", onChange: this.onChange, sections: this.coreSettings})
     }
 
-    lightcordComponent() {
+    lightcordComponent(sidebar) {
         return [
             this.lightcordSettings.map((section, i) => {
                 return [
@@ -317,7 +318,7 @@ export default new class V2_SettingsPanel {
                     BDV2.react.createElement("h2", {className: "ui-form-title h2 margin-reset margin-bottom-20"}, section.title),
                     section.settings.map(setting => {
                         return BDV2.react.createElement(Switch, {id: setting.id, key: setting.id, data: setting, checked: settingsCookie[setting.id], onChange: (id, checked) => {
-                            this.onChange(id, checked);
+                            this.onChange(id, checked, sidebar);
                         }})
                     })
                 ]
@@ -400,8 +401,12 @@ export default new class V2_SettingsPanel {
 function makeComponent(children){
     class SettingComponent extends React.Component {
         render(){
-            return children()
+            return children(sidebar)
         }
     }
-    return SettingComponent
+    let sidebar
+    return (s) => {
+        sidebar = s
+        return SettingComponent
+    }
 }

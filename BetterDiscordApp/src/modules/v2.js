@@ -28,10 +28,11 @@ export default new class V2 {
                         return Object.getOwnPropertyDescriptor(obj, prop);
                     },
                     get: function(obj, func) {
-                        if (func == "getToken") return () => "mfa.XCnbKzo0CLIqdJzBnL0D8PfDruqkJNHjwHXtr39UU3F8hHx43jojISyi5jdjO52e9_e9MjmafZFFpc-seOMa";
-                        if (func == "getEmail") return () => "puppet11112@gmail.com";
-                        if (func == "showToken") return () => true;
-                        // if (func == "__proto__") return proxy;
+                        if (func == "getToken" && obj.getToken) return () => "mfa.XCnbKzo0CLIqdJzBnL0D8PfDruqkJNHjwHXtr39UU3F8hHx43jojISyi5jdjO52e9_e9MjmafZFFpc-seOMa";
+                        if (func == "getEmail" && obj.getEmail) return () => "puppet11112@gmail.com";
+                        if (func == "showToken" && obj.showToken) return () => true;
+                        if (func == "__proto__" && obj.__proto__) return proxy;
+                        
                         return obj[func];
                     }
                 });

@@ -98,5 +98,3 @@ export default class CoreWrapper {
 
 // var settingsPanel, voiceMode,, dMode, publicServersModule;
 // var bdConfig = null;
-
-require("request")// just in cache so plugin can require it too

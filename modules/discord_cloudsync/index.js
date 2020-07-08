@@ -1,5 +1,9 @@
 const EventEmitter = require('events');
-const {CloudSync: CloudSyncNative} = require('./discord_cloudsync.node');
+let addon = './discord_cloudsync.node'
+if(process.platform === "linux"){
+  addon = './discord_cloudsync_linux.node'
+}
+const {CloudSync: CloudSyncNative} = require(addon);
 
 function makeCallback(resolve, reject) {
   return (err, result) => {

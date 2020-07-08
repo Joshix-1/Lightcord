@@ -87,6 +87,10 @@ if(process.platform === "win32"){
             useShim = !!use
         }
     }
+}else{
+    module.exports = {
+        useShim(){}
+    }
 }
 
 let settingStore

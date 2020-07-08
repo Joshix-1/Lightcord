@@ -1,7 +1,12 @@
 const execa = require('execa');
 const superagent = require('superagent');
 
-module.exports = require('./discord_utils.node');
+let addon = './discord_utils.node'
+if(process.platform === "linux"){
+  addon = './discord_utils_linux.node'
+}
+
+module.exports = require(addon);
 module.exports.clearCandidateGamesCallback = module.exports.setCandidateGamesCallback;
 
 function parseNvidiaSmiOutput(result) {

@@ -15,7 +15,7 @@
 A simple - customizable - Discord Client
 
 ## What's this ?
-Lightcord is a simple and customizable client for Discord.
+[Lightcord](https://lightcord.github.io) is a simple and customizable client for Discord.
 It includes [BandagedBD](https://github.com/rauenzi/BetterDiscordApp), [Glasscord](https://github.com/AryToNeX/Glasscord) and a discord.js like api.
 
 ## Informations
@@ -41,13 +41,14 @@ Then everytime you want to launch it just type in
 ```sh
 npm run run
 ```
+*You can find an experimental linux tutorial in our Discord*
 
 ## Features
 * **BetterDiscord** Themes/Plugins
 * **Native** Custom RPC (No ban chance)
 * Blocking Discord's **trackers**
 * **Free emotes** (normal emotes) to use everywhere for Lightcord users
-* **Login with token** (user/bot) [Make calls with bots]
+* **Login with token** (user/bot) [Make **server** calls with bots]
 * DM Adverts blocker (**AdBlock**) [Even in embeds]
 * File certification/approval (tells you if a **file is safe or not**)
 * Prevent **malicious** plugins [File scanner]
@@ -56,6 +57,9 @@ npm run run
 * Great scripting API
 * Account information section
 * Developer mode / experiments (get discord features before anyone else without updating)
+* Experimental tabs
+* Select your HypeSquad (manually/without doing the quizz)
+* Badges (Lightcord owners have badges so you know who to trust)
 
 ### Soon
 * Username history

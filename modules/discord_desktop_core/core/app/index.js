@@ -117,7 +117,7 @@ function startup(bootstrapModules) {
 
   let version = bootstrapModules.Constants.version
 
-  bootstrapModules.splashScreen.events.on("APP_SHOULD_SHOW", () => {
+  bootstrapModules.splashScreen.events.once("APP_SHOULD_SHOW", () => {
     mainScreen.setMainWindowVisible(true)
   })
   bootstrapModules.splashScreen.events.on("APP_SHOULD_LAUNCH", () => {
@@ -129,7 +129,7 @@ function startup(bootstrapModules) {
     });
   })
 
-  mainScreen.events.on("ready", () => {
+  mainScreen.events.once("ready", () => {
     if(initByUpdate){
       bootstrapModules.splashScreen.pageReady()
     }else{

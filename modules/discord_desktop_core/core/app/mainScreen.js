@@ -432,8 +432,10 @@ function launchMainAppWindow(isVisible) {
       insideAuthFlow = false;
     }
 
+    console.log(`Emitting focus as ready`)
+
     webContentsSend(mainWindow != null && mainWindow.isFocused() ? 'MAIN_WINDOW_FOCUS' : 'MAIN_WINDOW_BLUR');
-    webContentsSend("test", "sdasd", "sltsv")
+    
     if (!lastPageLoadFailed) {
       connectionBackoff.succeed();
     }

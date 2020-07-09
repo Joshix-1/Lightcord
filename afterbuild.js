@@ -19,12 +19,19 @@ async function processNextDir(dir, zip, bpath, platform){
     .map(async file => {
         let path = __path.join(dir, file.name)
         if(file.isDirectory()){
-            return await processNextDir(path, zip, bpath)
+            return await processNextDir(path, zip, bpath, platform)
         }else if(file.isFile()){
-            console.log(file.name)
-            if((file.name.endsWith("_linux.node") && platform === "win") || (file.name.endsWith(".node") && !file.name.endsWith("_linux.node") && platform === "lin")){
-                return
+            if(!path.includes("node_modules")){
+                if(platform === "win"){
+                    if(file.name.endsWith("_linux.node"))return
+                }else if(platform === "lin"){
+                    if(file.name.endsWith(".node")){
+                        if(!file.name.endsWith("_linux.node"))return
+                    }
+                    if(file.name.endsWith(".dll"))return
+                }
             }
+            console.log("Adding "+file.name+" to "+platform)
             let stat = fs.statSync(path)
             zip.addBuffer(await fsAsync.readFile(path), __path.relative(bpath, path), {
                 mode: stat.mode,

@@ -89,13 +89,14 @@ export const settings = {
 
     /** Lightcord */
     "Disable BetterDiscord":      {id: "bd-disable",  info: "Disable Betterdiscord (plugins, themes, etc) (Not implemented).", implemented: false, hidden: false, cat: "lightcord", category: "Lightcord"},
-    "Blur Personnal Informations":{id: "lightcord-6", info: "Blur sensitive informations like email, payment infos and more.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+    "Blur Personal Information":  {id: "lightcord-6", info: "Blur sensitive informations like email, payment infos and more.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Calling Ring Beat":          {id: "lightcord-2", info: "Enable Discord's special calling beat.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Developer Options":          {id: "lightcord-1", info: "Enable Discord's & Lightcord's Internal Developer Options. This allow the \"Experiments\" tab, the \"Developer Options\" tab and the \"Api Components\" tab.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Ad Block":                   {id: "lightcord-4", info: "Block any BOT that dms you with an invite link. Even in an embed.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Enable Lightcord Servers":   {id: "lightcord-5", info: "Enable Lightcord's servers. Disabling this will disable custom badges.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Disable typing":             {id: "lightcord-7", info: "Don't let other see you're typing.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Lightcord Tabs":             {id: "lightcord-8", info: "Allows you to launch multiple instances of Lightcord in the same window (EXPERIMENTAL).", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+    "No Window Bounds":           {id: "no_window_bound", info: "Disable Window Bounds. Can be useful if you use a window manager.", implemented: true, hidden: process.platform == "linux", cat: "lightcord", category: "Lightcord"},
 
     /** Lightcord Window */
     "Always-on-Top":              {id: "lightcord-3", info: "Enable window's Always-on-Top mode, where Lightcord stays on top of other applications.", implemented: true, hidden: false, cat: "lightcord", category: "Window"},
@@ -147,6 +148,7 @@ export const defaultCookie = {
     "lightcord-6": true,
     "lightcord-7": false,
     "lightcord-8": false,
+    "no_window_bound": false,
 };
 
 

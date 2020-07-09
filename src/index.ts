@@ -81,6 +81,11 @@ commit: ${buildInfo.commit}`)
           electron.app.quit();
           return;
         }
+
+        if(args.length === 1 && args[0] === "--overlay-host"){ // this is a patch for Lightcord that focus itself
+          //console.warn("OVERLAY HOST DÉTECTÉ. EVENNEMENT IGNORÉ MAIS POURRAIT CAUSER UN PROBLÈME.")
+          return
+        }
   
         if (coreModule) {
             coreModule.handleSingleInstance(args);

@@ -3,7 +3,6 @@ const path = require("path")
 const terser = require("terser")
 const util = require("util")
 
-/** Super noisy if production is on. */
 const production = true
 
 let fs = require("fs")
@@ -23,14 +22,15 @@ async function main(){
     await fs.promises.mkdir(__dirname+"/distApp/dist", {"recursive": true})
     
     console.info("Executing command `npm run compile`")
-    //console.log(child_process.execSync("npm run compile", {encoding: "binary"}))
+    console.log(child_process.execSync("npm run compile", {encoding: "binary"}))
     
     let startDir = path.join(__dirname, "./dist")
     let newDir = path.join(__dirname, "./distApp/dist")
     console.info("No error detected. Copying files from "+startDir+".")
     await fs.promises.mkdir(startDir, {recursive: true})
     
-    async function processNextDir(folder, folders, predicate, compile){
+    async function processNextDir(folder, folders, predicate, compile, ignoreModules){
+        if(typeof ignoreModules === "undefined")ignoreModules = false
         for(let file of fs.readdirSync(folder, {withFileTypes: true})){
             if(file.isFile()){
                 let filepath = path.join(folder, file.name)
@@ -40,6 +40,7 @@ async function main(){
                     await fs.promises.copyFile(filepath, filepath.replace(folders.startDir, folders.newDir))
                 }
             }else if(file.isDirectory()){
+                if(ignoreModules && file.name === "node_modules")continue
                 await fs.promises.mkdir(path.join(folder, file.name).replace(folders.startDir, folders.newDir), {recursive: true})
                 await processNextDir(path.join(folder, file.name), ...Array.from(arguments).slice(1))
             }
@@ -66,16 +67,36 @@ async function main(){
         startDir: path.join(__dirname, "modules"),
         newDir: path.join(__dirname, "distApp", "modules")
     }, ((filepath) => filepath.endsWith(".js") && (!production ? !filepath.includes("node_modules") : true)), async (filepath, newpath) => {
+        if(filepath.includes("node_modules"))return // don't minify node_modules, and don't include them at all. Installing later
         console.info(`Minifying ${filepath} to ${newpath}`)
         await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
-    }).then(() => {
+    }, true).then(() => {
         console.info(`Copied files and minified them from ${path.join(__dirname, "modules")}.`)
     })
+
+    await Promise.all((await fs.promises.readdir(path.join(__dirname, "distApp", "modules"))).map(async mdl => {
+        let dir = path.join(__dirname, "distApp", "modules", mdl)
+
+        if(!fs.existsSync(path.join(dir, "package.json"))){
+            if(mdl === "discord_desktop_core"){
+                dir = path.join(dir, "core")
+            }else{
+                return
+            }
+        }
+    
+        console.info(`Installing modules for ${mdl}`)
+        console.log(child_process.execSync("npm install --only=prod", {
+            encoding: "binary",
+            cwd: dir
+        }))
+    }))
 
     await processNextDir(path.join(__dirname, "LightcordApi"), {
         startDir: path.join(__dirname, "LightcordApi"),
         newDir: path.join(__dirname, "distApp", "LightcordApi")
     }, ((filepath) => filepath.endsWith(".js") && (!production ? !filepath.includes("node_modules") : true)), async (filepath, newpath) => {
+        if(filepath.includes("node_modules"))return // don't minify node_modules, and don't include them at all. Installing later
         console.info(`Minifying ${filepath} to ${newpath}`)
         await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {
@@ -83,13 +104,20 @@ async function main(){
     })
 
     await fs.promises.rmdir(path.join(__dirname, "distApp", "LightcordApi", "src"), {"recursive": true})
+    await fs.promises.rmdir(path.join(__dirname, "distApp", "LightcordApi", "dist"), {"recursive": true})
     await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "webpack.config.js"))
     await fs.promises.unlink(path.join(__dirname, "distApp", "LightcordApi", "tsconfig.json"))
+    
+    console.log(child_process.execSync("npm install --only=prod", {
+        encoding: "binary",
+        cwd: path.join(__dirname, "distApp", "LightcordApi")
+    }))
 
     await processNextDir(path.join(__dirname, "DiscordJS"), {
         startDir: path.join(__dirname, "DiscordJS"),
         newDir: path.join(__dirname, "distApp", "DiscordJS")
     }, ((filepath) => filepath.endsWith(".js") && (!production ? !filepath.includes("node_modules") : true)), async (filepath, newpath) => {
+        if(filepath.includes("node_modules"))return // don't minify node_modules, and don't include them at all
         console.info(`Minifying ${filepath} to ${newpath}`)
         await fs.promises.writeFile(newpath, terser.minify(await fs.promises.readFile(filepath, "utf8")).code, "utf8")
     }).then(() => {
@@ -99,6 +127,11 @@ async function main(){
     await fs.promises.rmdir(path.join(__dirname, "distApp", "DiscordJS", "src"), {"recursive": true})
     await fs.promises.unlink(path.join(__dirname, "distApp", "DiscordJS", "webpack.config.js"))
     await fs.promises.unlink(path.join(__dirname, "distApp", "DiscordJS", "tsconfig.json"))
+    
+    console.log(child_process.execSync("npm install --only=prod", {
+        encoding: "binary",
+        cwd: path.join(__dirname, "distApp", "LightcordApi")
+    }))
     
     fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "js"), {recursive: true})
     fs.mkdirSync(path.join(__dirname, "distApp", "BetterDiscordApp", "css"), {recursive: true})
@@ -122,22 +155,14 @@ async function main(){
     }).then(() => {
         console.info(`Copied files and minified them from ${path.join(__dirname, "splash")}.`)
     })
-
-    /*
-    await processNextDir(startDir, {
-        startDir,
-        newDir
-    }, ((filepath) => false), ()=>{}).then(() => {
-        console.info(`Copied files and minified them from ${startDir}.`)
-    }).catch(console.error)*/
     
     let packageJSON = require("./package.json")
     packageJSON.scripts.build = packageJSON.scripts.build.replace("./distApp", ".")
     
     fs.writeFileSync(path.join(__dirname, "distApp", "package.json"), JSON.stringify(packageJSON), "utf8")
     
-    console.info(`Installing ${Object.keys(packageJSON.dependencies).length + Object.keys(packageJSON.devDependencies).length} packages...`)
-    console.log(child_process.execSync("npm i", {
+    console.info(`Installing ${Object.keys(packageJSON.dependencies).length} packages...`)
+    console.log(child_process.execSync("npm install --only=prod", {
         encoding: "binary",
         cwd: path.join(__dirname, "distApp")
     }))

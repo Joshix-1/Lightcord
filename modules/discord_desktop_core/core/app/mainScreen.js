@@ -369,7 +369,7 @@ function launchMainAppWindow(isVisible) {
     mainWindowOptions.frame = false;
   }
 
-  applyWindowBoundsToConfig(mainWindowOptions);
+  if(!settings.get("NO_WINDOWS_BOUND", false))applyWindowBoundsToConfig(mainWindowOptions);
 
   mainWindow = new electron.BrowserWindow(mainWindowOptions);
   mainWindowId = mainWindow.id;
@@ -389,12 +389,14 @@ function launchMainAppWindow(isVisible) {
 
   mainWindow.setMenuBarVisibility(false);
 
-  if (settings.get('IS_MAXIMIZED')) {
-    mainWindow.maximize();
-  }
-
-  if (settings.get('IS_MINIMIZED')) {
-    mainWindow.minimize();
+  if(!settings.get("NO_WINDOWS_BOUND", false)){
+    if (settings.get('IS_MAXIMIZED')) {
+      mainWindow.maximize();
+    }
+  
+    if (settings.get('IS_MINIMIZED')) {
+      mainWindow.minimize();
+    }
   }
 
   mainWindow.webContents.on('new-window', (e, windowURL, frameName, disposition, options) => {

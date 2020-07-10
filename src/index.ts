@@ -1,11 +1,16 @@
+/** settings */
+import appSettings from "./appSettings"
+let settings = appSettings.getSettings()
+
 /** Glasstron */
-import * as glasstron from "glasstron"
-glasstron.init()
+if(settings.get("GLASSTRON", true)){
+  const glasstron = require("glasstron")
+  glasstron.init()
+}
 
 /** Modules */
 import * as electron from "electron"
 import requireNativeDiscordModule from "./requireNative";
-import appSettings from "./appSettings"
 import autoStart from "./autoStart"
 import * as buildInfo from "./buildInfo"
 import * as Constants from "./Constants"

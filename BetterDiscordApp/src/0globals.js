@@ -44,7 +44,7 @@ export const bbdChangelog = {
             title: "What's New?",
             items: [
                 "**Lightcord** is now using BandagedBD. That means all plugins you were using can be used too !",
-                "**Window Transparency** changes were made to more compatible with external window managers and addons like Glasscord.",
+                "**Window Transparency** changes were made to more compatible with external window managers and addons like Glasstron.",
                 "Initialization sequence has once again been changed slightly to hopefully improve loading times."
             ]
         },
@@ -95,11 +95,12 @@ export const settings = {
     "Ad Block":                   {id: "lightcord-4", info: "Block any BOT that dms you with an invite link. Even in an embed.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Enable Lightcord Servers":   {id: "lightcord-5", info: "Enable Lightcord's servers. Disabling this will disable custom badges.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Disable typing":             {id: "lightcord-7", info: "Don't let other see you're typing.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
-    "Lightcord Tabs":             {id: "lightcord-8", info: "Allows you to launch multiple instances of Lightcord in the same window (EXPERIMENTAL).", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
-    "No Window Bounds":           {id: "no_window_bound", info: "Disable Window Bounds. Can be useful if you use a window manager.", implemented: true, hidden: process.platform == "linux", cat: "lightcord", category: "Lightcord"},
+    "Lightcord Tabs":             {id: "lightcord-8", info: "Allows you to launch multiple instances of Lightcord in the same window.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord", experimental: true},
 
     /** Lightcord Window */
-    "Always-on-Top":              {id: "lightcord-3", info: "Enable window's Always-on-Top mode, where Lightcord stays on top of other applications.", implemented: true, hidden: false, cat: "lightcord", category: "Window"},
+    "Always-on-Top":              {id: "lightcord-3", info: "Enable the window's Always-on-Top mode, where Lightcord stays on top of other applications.", implemented: true, hidden: false, cat: "lightcord", category: "Window"},
+    "No Window Bounds":           {id: "no_window_bound", info: "Disable Window Bounds. Can be useful if you use a window manager.", implemented: true, hidden: process.platform !== "linux", cat: "lightcord", category: "Window"},
+    "Enable Glasstron":           {id: "enable_glasstron", info: "Enable Glasstron. If you're not using transparent themes, this can reduce lag.", implemented: true, hidden: false, cat: "lightcord", category: "Window"},
     
     /** RichPresence */
     "Enable":                     {id: "lightcord-presence-1", info: "Enable RichPresence below.", implemented: true, hidden: false, cat: "status"}

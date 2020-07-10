@@ -374,11 +374,13 @@ function launchMainAppWindow(isVisible) {
   mainWindow = new electron.BrowserWindow(mainWindowOptions);
   mainWindowId = mainWindow.id;
   global.mainWindowId = mainWindowId;
-	glasstron.update(mainWindow, {
-		windows: {blurType: 'blurbehind'},
-		macos: {vibrancy: 'fullscreen-ui'},
-		linux: {requestBlur: true} // KWin
-	});
+  if(settings.get("GLASSTRON", true)){
+    glasstron.update(mainWindow, {
+      windows: {blurType: 'blurbehind'},
+      macos: {vibrancy: 'fullscreen-ui'},
+      linux: {requestBlur: true} // KWin
+    });
+  }
   
   mainWindow.webContents.session.webRequest.onHeadersReceived(function(details, callback) {
     if (!details.responseHeaders["content-security-policy-report-only"] && !details.responseHeaders["content-security-policy"]) return callback({cancel: false});
@@ -433,8 +435,6 @@ function launchMainAppWindow(isVisible) {
     if (insideAuthFlow && mainWindow.webContents && mainWindow.webContents.getURL().startsWith(WEBAPP_ENDPOINT)) {
       insideAuthFlow = false;
     }
-
-    console.log(`Emitting focus as ready`)
 
     webContentsSend(mainWindow != null && mainWindow.isFocused() ? 'MAIN_WINDOW_FOCUS' : 'MAIN_WINDOW_BLUR');
     

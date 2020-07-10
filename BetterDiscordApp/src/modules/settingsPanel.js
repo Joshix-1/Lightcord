@@ -142,7 +142,7 @@ export default new class V2_SettingsPanel {
     }
 
     updateSettings(id, enabled, sidebar) {
-        if(!["lightcord-8", "no_window_bound"].includes(id))settingsCookie[id] = enabled;
+        if(!["lightcord-8", "no_window_bound", "enable_glasstron"].includes(id))settingsCookie[id] = enabled;
 
         if (id == "bda-gs-2") {
             if (enabled) DOM.addClass(document.body, "bd-minimal");
@@ -273,6 +273,13 @@ export default new class V2_SettingsPanel {
             remote.app.relaunch()
             remote.app.exit()
         }
+        if (id === "enable_glasstron"){
+            let appSettings = remote.getGlobal("appSettings")
+            appSettings.set("GLASSTRON", enabled)
+            appSettings.save()
+            remote.app.relaunch()
+            remote.app.exit()
+        }
 
         this.saveSettings();
     }
@@ -335,24 +342,27 @@ export default new class V2_SettingsPanel {
                         let isChecked = settingsCookie[setting.id]
                         if(setting.id === "lightcord-8")isChecked = appSettings.get("isTabs", false);
                         if(setting.id === "no_window_bound")isChecked = appSettings.get("NO_WINDOWS_BOUND", false)
+                        if(setting.id === "enable_glasstron")isChecked = appSettings.get("GLASSTRON", true)
                         let returnValue = BDV2.react.createElement(Switch, {id: setting.id, key: setting.id, data: setting, checked: isChecked, onChange: (id, checked) => {
                             this.onChange(id, checked, sidebar);
                         }})
-                        if(setting.id !== "lightcord-8" || !isChecked)return returnValue
-                        return [
-                            returnValue,
-                            React.createElement(Lightcord.Api.Components.inputs.Button, {
-                                color: "green",
-                                look: "outlined",
-                                size: "small",
-                                hoverColor: "brand",
-                                onClick: () => {
-                                    DiscordNative.ipc.send("NEW_TAB")
-                                },
-                                wrapper: false,
-                                disabled: false
-                            }, "Open a new Tab")
-                        ]
+                        if(setting.id == "lightcord-8" && isChecked){
+                            return [
+                                returnValue,
+                                React.createElement(Lightcord.Api.Components.inputs.Button, {
+                                    color: "green",
+                                    look: "outlined",
+                                    size: "small",
+                                    hoverColor: "brand",
+                                    onClick: () => {
+                                        DiscordNative.ipc.send("NEW_TAB")
+                                    },
+                                    wrapper: false,
+                                    disabled: false
+                                }, "Open a new Tab")
+                            ]
+                        }
+                        return returnValue
                     })
                 ]
             }), 

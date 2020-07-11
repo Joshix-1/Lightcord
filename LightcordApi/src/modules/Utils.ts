@@ -20,4 +20,15 @@ export default new class Utils {
         }
         return obj
     }
+
+    DecimalColorToHex(color:number):string{
+        return "#"+color.toString(16)
+    }
+
+    HexColorToDecimal(color:string):number{
+        color = color.replace(/[#;]/g, "")
+        let res = parseInt(color, 16)
+        if(isNaN(res))throw new Error(`Invalid color: ${color}`)
+        return res
+    }
 }

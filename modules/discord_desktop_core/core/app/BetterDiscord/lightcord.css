@@ -143,3 +143,45 @@
 .lc-link-disabled-span:hover {
   cursor: pointer;
 }
+
+/** Alert Box */
+.lc-alert-box {
+  margin: 20px 0;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 22px;
+}
+.lc-alert-box strong {
+  font-weight: 900
+}
+.lc-alert-box span {
+  color: hsla(0,0%,100%,.9);
+  margin: 0!important
+}
+.lc-alert-box.lc-alert-box-warn {
+  background: rgba(250,166,26,.1);
+  border: 2px solid rgba(250,166,26,.5);
+}
+.lc-alert-box.lc-alert-box-info {
+  background: rgba(114,137,218,.1);
+  border: 2px solid rgba(114,137,218,.5);
+}
+.lc-alert-box.lc-alert-box-danger {
+  background: rgba(240,71,71,.1);
+  border: 2px solid rgba(240,71,71,.5);
+}
+.lc-alert-box.lc-alert-box-error {
+  background: rgba(240,71,71,.1);
+  border: 2px solid rgba(240,71,71,.5);
+}
+.lc-alert-box.lc-alert-box-success {
+  background: rgba(67,181,129,.1);
+  border: 2px solid rgba(67,181,129,.5)
+}
+
+
+.lc-blockquote > div {
+  margin-bottom: 0!important;
+}

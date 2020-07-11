@@ -159,5 +159,9 @@ export default class TextArea extends React.Component<TextAreaProps, {value: str
             return AllPreviews
         })()
     }
+
+    static help = {
+        warn: "This should be used for multi line inputs."
+    }
 }
 let AllPreviews

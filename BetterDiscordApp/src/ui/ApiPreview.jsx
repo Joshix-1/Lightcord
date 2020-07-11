@@ -217,10 +217,31 @@ export default class ApiPreview extends React.PureComponent {
                         return `React.createElement(${compPath}, ${propObject}, ${childrenData})`
                     }
                 }
+                let help = comp.help || {}
+                let info = help.info ? <window.Lightcord.Api.Components.general.AlertBox type="info">
+                    {help.info}
+                </window.Lightcord.Api.Components.general.AlertBox> : null
+                let warn = help.warn ? <window.Lightcord.Api.Components.general.AlertBox type="warn">
+                    {help.warn}
+                </window.Lightcord.Api.Components.general.AlertBox> : null
+                let danger = help.danger ? <window.Lightcord.Api.Components.general.AlertBox type="danger">
+                    {help.danger}
+                </window.Lightcord.Api.Components.general.AlertBox> : null
+                let error = help.error ? <window.Lightcord.Api.Components.general.AlertBox type="error">
+                    {help.error}
+                </window.Lightcord.Api.Components.general.AlertBox> : null
+                let success = help.success ? <window.Lightcord.Api.Components.general.AlertBox type="success">
+                    {help.success}
+                </window.Lightcord.Api.Components.general.AlertBox> : null
                 return (<div>
                     <window.Lightcord.Api.Components.general.SettingsTitle>
                         {comp.displayName || comp.name}
                     </window.Lightcord.Api.Components.general.SettingsTitle>
+                    {info}
+                    {success}
+                    {warn}
+                    {error}
+                    {danger}
                     {AllPreviews.map(category => {
                         if(category[0].onClick)return null
                         if(category[0].text)return null

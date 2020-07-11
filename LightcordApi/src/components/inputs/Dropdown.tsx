@@ -1,8 +1,6 @@
 import NOOP from "../../modules/noop"
 import WebpackLoader from "../../modules/WebpackLoader"
 import { ReactNode, CSSProperties } from "react"
-import Utils from "../../modules/Utils"
-import unfreeze from "../../modules/Unfreeze"
 
 type DropdownProps = {
     className?: string,

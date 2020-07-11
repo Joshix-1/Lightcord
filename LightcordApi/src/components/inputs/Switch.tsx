@@ -94,5 +94,9 @@ export default class Switch extends React.Component<SwitchProps, {value: boolean
             return AllPreviews
         })()
     }
+
+    static help = {
+        error: "The `clear` option doesn't work well on light theme."
+    }
 }
 let AllPreviews

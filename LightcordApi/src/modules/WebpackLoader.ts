@@ -7,7 +7,11 @@ export default new class WebpackLoader {
         return BDModules.get(id)
     }
     find(filter: (mod:any) => boolean):any{
-        return BDModules.get(filter)[0]
+        let result = BDModules.get(filter)[0]
+        if(!result){
+            console.warn(filter, "couldn't find the module.")
+        }
+        return result
     }
     findByUniqueProperties(props:(string|number)[]):any{
         return BDModules.get((mod) => {

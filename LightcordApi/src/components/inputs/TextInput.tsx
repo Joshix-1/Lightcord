@@ -129,5 +129,9 @@ export default class TextInput extends React.PureComponent<TextInputProps, {valu
             return AllPreviews
         })()
     }
+
+    static help = {
+        warn: "This should be used for single line inputs."
+    }
 }
 let AllPreviews

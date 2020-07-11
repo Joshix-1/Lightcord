@@ -11,6 +11,8 @@ import SettingSubTitle from "./general/SettingSubTitle"
 import CodeBlock from "./general/CodeBlock"
 import cloneNullProto from "../modules/cloneNullProto"
 import Tooltip from "./general/Tooltip"
+import ColorPicker from "./inputs/ColorPicker"
+import AlertBox from "./general/AlertBox"
 
 export default cloneNullProto({
     inputs: cloneNullProto({
@@ -20,7 +22,8 @@ export default cloneNullProto({
         RadioGroup: RadioGroup,
         TextArea: TextArea,
         TextInput: TextInput,
-        Dropdown: Dropdown
+        Dropdown: Dropdown,
+        ColorPicker: ColorPicker
     }),
     general: cloneNullProto({
         Title: Title,
@@ -28,6 +31,7 @@ export default cloneNullProto({
         SettingSubTitle: SettingSubTitle,
         Tabs: Tabs,
         CodeBlock: CodeBlock,
-        Tooltip: Tooltip
+        Tooltip: Tooltip,
+        AlertBox: AlertBox
     })
 })

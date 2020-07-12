@@ -29,7 +29,7 @@ class DangerousWebpackloader {
             return ids.map(id => this.get(id, modules))
         }else{
             modules = modules || this.modules
-            let module = modules.find(e => e.i === ids)
+            let module = modules.filter(e => !!e).find(e => e.i === ids)
             if(!module)return undefined
             return module.exports
         }
@@ -94,7 +94,7 @@ class Webpackloader {
             return ids.map(id => this.get(id, modules))
         }else{
             modules = modules || this.modules
-            let module = modules.find(e => e.i === ids)
+            let module = modules.filter(e => !!e).find(e => e.i === ids)
             if(!module)return undefined
             return module.exports
         }

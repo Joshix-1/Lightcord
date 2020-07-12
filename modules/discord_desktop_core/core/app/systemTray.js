@@ -121,13 +121,13 @@ function initializeMenuItems() {
     type: 'normal',
     visible: voiceConnected,
     click: onOpenVoiceSettings
-  };
+  };/*
   menuItems[MenuItems.CHECK_UPDATE] = {
     label: 'Check for Updates...',
     type: 'normal',
     visible: process.platform !== 'darwin',
     click: onCheckForUpdates
-  };
+  };*/
   menuItems[MenuItems.QUIT] = {
     label: `Quit ${_Constants.APP_NAME}`,
     role: 'quit'
@@ -144,7 +144,7 @@ function buildContextMenu() {
   const separator = { type: 'separator' };
   const hasApplications = applications != null && applications.length > 0;
 
-  contextMenu = [menuItems[MenuItems.SECRET], separator, ...(hasApplications ? [...applications, separator] : []), menuItems[MenuItems.OPEN], menuItems[MenuItems.MUTE], menuItems[MenuItems.DEAFEN], menuItems[MenuItems.VOICE_SETTINGS], menuItems[MenuItems.CHECK_UPDATE], menuItems[MenuItems.ACKNOWLEDGEMENTS], separator, menuItems[MenuItems.QUIT]];
+  contextMenu = [menuItems[MenuItems.SECRET], separator, ...(hasApplications ? [...applications, separator] : []), menuItems[MenuItems.OPEN], menuItems[MenuItems.MUTE], menuItems[MenuItems.DEAFEN], menuItems[MenuItems.VOICE_SETTINGS], /*menuItems[MenuItems.CHECK_UPDATE], */menuItems[MenuItems.ACKNOWLEDGEMENTS], separator, menuItems[MenuItems.QUIT]];
 }
 
 function setTrayIcon(icon) {

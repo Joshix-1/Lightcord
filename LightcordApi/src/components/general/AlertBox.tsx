@@ -44,7 +44,7 @@ export default class AlertBox extends React.Component<AlertBoxProps> {
             children = this.props.children
         }
         wrap.props.children = <div className={"lc-alert-box lc-alert-box-"+this.props.type}>
-            <blockquote style={{color: "#dcddde"}} className="lc-blockquote">
+            <blockquote className="lc-blockquote">
                 {children}
             </blockquote>
         </div>
@@ -60,16 +60,16 @@ export default class AlertBox extends React.Component<AlertBoxProps> {
                 }
             ], [
                 {
-                    type: "warn"
-                },
-                {
                     type: "info"
                 },
                 {
-                    type: "error"
+                    type: "success"
                 },
                 {
-                    type: "success"
+                    type: "warn"
+                },
+                {
+                    type: "error"
                 }
             ])
             return AllPreviews

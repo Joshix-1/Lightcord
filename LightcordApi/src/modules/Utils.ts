@@ -22,7 +22,7 @@ export default new class Utils {
     }
 
     DecimalColorToHex(color:number):string{
-        return "#"+color.toString(16)
+        return "#"+color.toString(16).toUpperCase()
     }
 
     HexColorToDecimal(color:string):number{

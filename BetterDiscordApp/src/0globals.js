@@ -6,6 +6,7 @@ export const minimumDiscordVersion = "0.0.306";
 export const currentDiscordVersion = (window.DiscordNative && window.DiscordNative.remoteApp && window.DiscordNative.remoteApp.getVersion && window.DiscordNative.remoteApp.getVersion()) || "0.0.306";
 export const minSupportedVersion = "0.3.0";
 export const bbdVersion = "0.3.4";
+/*
 export const LCChanelog = {
     description: "Lightcord's changelog",
     changes: [
@@ -36,7 +37,7 @@ export const LCChanelog = {
         const supportLink = Anchor ? BDV2.React.createElement(Anchor, {onClick: joinSupportServer}, "Join our Discord Server.") : BDV2.React.createElement("a", {className: `${AnchorClasses.anchor} ${AnchorClasses.anchorUnderlineOnHover}`, onClick: joinSupportServer}, "Join our Discord Server.");
         return BDV2.React.createElement(TextElement, {size: TextElement.Sizes.SMALL, color: TextElement.Colors.STANDARD}, "Need support? ", supportLink);
     })()
-}
+}*/
 export const bbdChangelog = {
     description: "BBD's changelog.",
     changes: [
@@ -91,7 +92,7 @@ export const settings = {
     "Disable BetterDiscord":      {id: "bd-disable",  info: "Disable Betterdiscord (plugins, themes, etc) (Not implemented).", implemented: false, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Blur Personal Information":  {id: "lightcord-6", info: "Blur sensitive informations like email, payment infos and more.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Calling Ring Beat":          {id: "lightcord-2", info: "Enable Discord's special calling beat.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
-    "Developer Options":          {id: "lightcord-1", info: "Enable Discord's & Lightcord's Internal Developer Options. This allow the \"Experiments\" tab, the \"Developer Options\" tab and the \"Api Components\" tab.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
+    "Developer Options":          {id: "lightcord-1", info: "Enable Discord's & Lightcord's Internal Developer Options. This allow the \"Experiments\" tab, the \"Developer Options\" tab and the \"Lightcord Api\" section.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Ad Block":                   {id: "lightcord-4", info: "Block any BOT that dms you with an invite link. Even in an embed.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Enable Lightcord Servers":   {id: "lightcord-5", info: "Enable Lightcord's servers. Disabling this will disable custom badges.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},
     "Disable typing":             {id: "lightcord-7", info: "Don't let other see you're typing.", implemented: true, hidden: false, cat: "lightcord", category: "Lightcord"},

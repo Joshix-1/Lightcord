@@ -25,8 +25,14 @@ function Core() {
     // this.init();
 }
 
+let methods
+
 Core.prototype.setConfig = function(config) {
     Object.assign(bdConfig, config);
+};
+
+Core.prototype.setMethods = function(m) {
+    methods = m
 };
 
 Core.prototype.init = async function() {

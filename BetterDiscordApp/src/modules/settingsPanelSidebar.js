@@ -41,10 +41,25 @@ export default class V2_SettingsPanel_Sidebar {
                 id: "accountinfo"
             }
         ]
-        if(window.Lightcord.Settings.devMode)items.push({
-            text: "Api Components Preview",
-            id: "lcapipreview"
-        })
+        return items
+    }
+
+    get LCDevItems(){
+        let items = []
+        if(!window.Lightcord.Settings.devMode)return items
+        items.push(...[
+            {
+                section: "DIVIDER"
+            },
+            {
+                section: "HEADER",
+                label: "Lightcord Api"
+            },
+            {
+                text: "Components Preview",
+                id: "lcapipreview"
+            }
+        ])
         return items
     }
 
@@ -55,6 +70,14 @@ export default class V2_SettingsPanel_Sidebar {
                 label: "Lightcord"
             },
             ...this.LCitems.map(e => {
+                return {
+                    section: e.id,
+                    label: e.text,
+                    element: this.getComponent(e.id, sidebar)
+                }
+            }),
+            ...this.LCDevItems.map(e => {
+                if(e.section)return e
                 return {
                     section: e.id,
                     label: e.text,

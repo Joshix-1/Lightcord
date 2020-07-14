@@ -47,22 +47,11 @@ async function privateInit(){
     ModuleLoader.get(e => e.getCurrentHub)[0].getCurrentHub().getClient().getOptions().enabled = false
 
     // setting react in require cache
-    try{
-        window.React = require("react")
-    }catch(e){
-        const React = ModuleLoader.get(e => !["Component", "PureComponent", "Children", "createElement", "cloneElement"].map(c => !!e[c]).includes(false))[0]
-        window.React = React
-        require.cache["react"] = React
-    }
+    const React = ModuleLoader.get(e => !["Component", "PureComponent", "Children", "createElement", "cloneElement"].map(c => !!e[c]).includes(false))[0]
+    window.React = React
 
-
-    try{
-        window.ReactDOM = require("react-dom")
-    }catch(e){
-        const ReactDOM = ModuleLoader.get(e => e.findDOMNode)[0]
-        window.ReactDOM = ReactDOM
-        require.cache["react-dom"] = ReactDOM
-    }
+    const ReactDOM = ModuleLoader.get(e => e.findDOMNode)[0]
+    window.ReactDOM = ReactDOM
 
     //stop here if betterdiscord is disabled.
     if(electron.remote.process.argv.includes("--disable-betterdiscord")){
@@ -290,7 +279,7 @@ async function privateInit(){
         DiscordNative.ipc.send("UPDATE_THEME", data.settings.theme)
     })
 
-    require("../../../../../LightcordApi/js/main.js")
+    require("lightcordapi/js/main.js")
 
     /*
     if(shouldShowPrompt){
@@ -363,7 +352,7 @@ async function privateInit(){
         dispatcher.subscribe(constants.ActionTypes.CONNECTION_OPEN || "CONNECTION_OPEN", onConn)
     }*/
 
-    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.js").default)(BetterDiscordConfig)
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.js").default)(BetterDiscordConfig, require("./betterdiscord"))
 
     const Utils = window.Lightcord.BetterDiscord.Utils
     const DOMTools = window.Lightcord.BetterDiscord.DOM
@@ -1247,6 +1236,10 @@ require.extensions[".jsbr"] = (m, filename) => {
     fs.writeFileSync(tmpFile.name+".js", zlib.brotliDecompressSync(fs.readFileSync(filename)))
     return require.extensions[".js"](m, tmpFile.name+".js")
 }
+require.extensions[".txt"] = (m, filename) => {
+    m.exports = fs.readFileSync(filename, "utf8")
+    return m.exports
+}
 
 const LightcordBDFolder = path.join(electron.remote.app.getPath("appData"), "Lightcord_BD")
 
@@ -1337,7 +1330,7 @@ path.originalResolve = originalResolve
 
 let blacklist
 function isBlacklisted(id){
-    if(!blacklist)blacklist = fs.readFileSync(path.join(__dirname, "blacklist.txt"), "utf8").split(/[\n\r]+/g).map((line, index, lines) => {
+    if(!blacklist)blacklist = require("./blacklist.txt").split(/[\n\r]+/g).map((line, index, lines) => {
         let id = ""
         let comment = ""
         line.split("#").forEach((idOrComment, index, array) => {

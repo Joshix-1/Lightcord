@@ -40,8 +40,6 @@
     "@types/yauzl": "^2.9.1",
     "cross-spawn": "^7.0.3",
     "electron": "^8.4.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
     "terser": "^4.7.0",
     "yazl": "^2.5.1"
   }

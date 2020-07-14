@@ -1593,10 +1593,18 @@ h2.ui-form-title {
 
 /* Messages */
 /* message divider */
-.bd-minimal .divider-32i8lo {opacity: 0;}
+/*.bd-minimal .divider-32i8lo {opacity: 0;} 
+
+There's no message divider anymore ??*/
+
+/* message */
+.bd-minimal .message-2qnXI6 {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 
 /* message avatars */
-.bd-minimal .large-3ChYtB {
+.bd-minimal .message-2qnXI6 > .contents-2mQqc9 > .avatar-1BDn8e {
   max-width: 20px;
   max-height: 20px;
   background-size: 100%;
@@ -1606,23 +1614,34 @@ h2.ui-form-title {
 }
 
 /* message content */
-.bd-minimal .content-3dzVd8 {
+.bd-minimal .contents-2mQqc9 {
   border-left: 2px solid #EBEBEB;
-  padding-left: 2px;
+  padding-left: 4px;
+  margin-left: -30px;
 }
-.bd-minimal .theme-dark .content-3dzVd8 {
+.bd-minimal .theme-dark .contents-2mQqc9 {
   border-left: 2px solid #303030;
 }
 
 /* message username */
-.bd-minimal .username-_4ZSMR {
+.bd-minimal .username-1A8OIy {
   font-size: small;
 }
 
-/* message group */
-.bd-minimal .container-1YxwTf {
-  padding: 5px;
+/* message timestamp */
+.bd-minimal .timestamp-3ZCmNB.timestampVisibleOnHover-2bQeI4 {
+  margin-left: -20px
 }
+
+/* message group */
+/*.bd-minimal .container-1YxwTf {
+  padding: 5px;
+} 
+
+Can't separate Message group as they're not marked anymore, instead add padding on the top.*/
+.bd-minimal .groupStart-23k01U {
+  padding-top: 5px;
+} 
 
 /* message embed */
 .bd-minimal .embed-IeVjo6 {
@@ -1635,27 +1654,43 @@ h2.ui-form-title {
   min-width: 0px;
 }
 
+/* member list */
+.bd-minimal .members-1998pB {
+  width: 180px;
+}
+
+/* member group */
+.bd-minimal .membersGroup-v9BXpm {
+  padding: 0;
+  height: auto;
+}
+
 /* member list avatars */
-.bd-minimal .members-1998pB .small-5Os1Bb {
+/*.bd-minimal foreignObject[mask="url(#svg-mask-avatar-status-round-32)"] > img.avatar-VxgULZ {
   max-width: 15px;
   max-height: 15px;
   background-size: 15px 15px;
-}
+}*/
 
 /* member list avatars */
-.bd-minimal .members-1998pB .small-5Os1Bb .status-oxiHuE {
-  height: 5px;
-  width: 5px;
+.bd-minimal .member-3-YXUe > div > div.avatar-3uk_u9 > div > svg {
+  width: 30px;
+  height: 30px;
 }
-
-/* member list list item */
-.bd-minimal .members-1998pB .member-3W1lQa {
-  padding: 5px;
+.bd-minimal .member-3-YXUe > div > div.avatar-3uk_u9 > div {
+  width: 30px!important;
+  height: 30px!important;
 }
 
 /* member list item inner */
-.bd-minimal .members-1998pB .memberInner-2CPc3V {
+.bd-minimal .members-1998pB .member-3-YXUe {
   transform: scale(0.9);
+  padding: 0;
+  margin: 0;
+  max-width: 200px;
+}
+.bd-minimal .member-3-YXUe > .layout-2DM8Md > .content-3QAtGj {
+  margin-left: -15px;
 }
 
 /* member list role label */
@@ -1667,17 +1702,20 @@ h2.ui-form-title {
 
 /* Channel List */
 /* Hide Channel Mode */
-.bd-minimal.bd-minimal-chan .channels-Ie2l6A {
+.bd-minimal.bd-minimal-chan #channels {
   display: none;
 }
 
 /* channel list guild name */
-.bd-minimal .channels-Ie2l6A header span {
+/*
+.bd-minimal .container-2Rl01u:has(#channels) > header > h1 {
   font-size: 12px;
 }
 
+:has() does not exist in css3. If we do not add a class from JS, we can't select it.*/
+
 /* channel list */
-.bd-minimal .channels-Ie2l6A {
+.bd-minimal #channels {
   width: 160px;
 }
 
@@ -1837,7 +1875,7 @@ h2.ui-form-title {
 
 /* add/create server */
 .bda-dark .theme-dark .root-1gCeng,
-.bda-dark .theme-dark .theme-light .slide-2pHaq5 {
+.bda-dark .slide-2pHaq5 {
   background: #36393f;
 }
 

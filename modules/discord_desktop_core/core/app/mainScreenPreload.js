@@ -7,7 +7,15 @@ process.on("uncaughtException", console.error)
 
 const ipcRenderer = require('./discord_native/ipc');
 const electron = require("electron")
+const moduleAlias = require("./BetterDiscord/loaders/module-alias")
+const path = require("path")
+
 electron.remote.getCurrentWindow().setBackgroundColor("#2f3136")
+
+moduleAlias.setMain(module)
+moduleAlias.addAlias("@lightcord/api", path.join(__dirname, "../../../../LightcordApi"))
+moduleAlias.addAlias("lightcordapi", path.join(__dirname, "../../../../LightcordApi"))
+moduleAlias.addPath(path.join(__dirname, "BetterDiscord", "modules"))
 
 const TRACK_ANALYTICS_EVENT = 'TRACK_ANALYTICS_EVENT';
 const TRACK_ANALYTICS_EVENT_COMMIT = 'TRACK_ANALYTICS_EVENT_COMMIT';

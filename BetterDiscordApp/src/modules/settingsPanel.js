@@ -47,6 +47,8 @@ class BDSidebarHeader extends React.PureComponent {
     }
 }
 
+let isClearingCache = false
+
 export default new class V2_SettingsPanel {
 
     constructor() {
@@ -331,7 +333,7 @@ export default new class V2_SettingsPanel {
         return BDV2.react.createElement(SectionedSettingsPanel, {key: "cspanel", onChange: this.onChange, sections: this.coreSettings})
     }
 
-    lightcordComponent(sidebar) {
+    lightcordComponent(sidebar, forceUpdate) {
         let appSettings = remote.getGlobal("appSettings")
         return [
             this.lightcordSettings.map((section, i) => {
@@ -379,7 +381,38 @@ export default new class V2_SettingsPanel {
                     remote.app.quit()
                 },
                 wrapper: true
-            }, "Relaunch without BetterDiscord")
+            }, "Relaunch without BetterDiscord"),
+            React.createElement(Lightcord.Api.Components.inputs.Button, {
+                color: "yellow",
+                look: "ghost",
+                size: "medium",
+                hoverColor: "red",
+                onClick: () => {
+                    if(isClearingCache)return
+                    isClearingCache = true
+                    Utils.showToast("Clearing cache...", {
+                        type: "info"
+                    })
+                    forceUpdate()
+                    remote.getCurrentWebContents().session.clearCache()
+                    .then(() => {
+                        Utils.showToast("Cache is cleared !", {
+                            type: "success"
+                        })
+                        isClearingCache = false
+                        forceUpdate()
+                    }).catch(err => {
+                        console.error(err)
+                        Utils.showToast("An error occured. Check console for more informations.", {
+                            type: "error"
+                        })
+                        isClearingCache = false
+                        forceUpdate()
+                    })
+                },
+                wrapper: true,
+                disabled: isClearingCache
+            }, "Clear cache")
         ]
     }
 
@@ -444,7 +477,7 @@ export default new class V2_SettingsPanel {
 function makeComponent(children){
     class SettingComponent extends React.Component {
         render(){
-            return children(sidebar)
+            return children(sidebar, () => this.forceUpdate())
         }
     }
     let sidebar

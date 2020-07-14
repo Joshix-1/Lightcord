@@ -54,8 +54,9 @@ window.BdApi = BdApi;
 import Core from "./modules/core";
 deprecateGlobal("mainCore", Core);
 export default class CoreWrapper {
-    constructor(bdConfig) {
+    constructor(bdConfig, methods) {
         Core.setConfig(bdConfig);
+        Core.setMethods(methods);
     }
 
     init() {

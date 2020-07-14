@@ -40,6 +40,11 @@ type ColorPickerProps = {
 
 let ColorPickerModules
 let isFetching = null
+
+/**
+ * This componennt needs to be loaded. As a result, you may experience 100-300ms loading the first time.
+ * Render will return `null` before loaded.
+ */
 export default class ColorPicker extends React.PureComponent<ColorPickerProps, {value?:string,lastColor:any}> {
     constructor(props:ColorPickerProps){
         super(props)
@@ -48,6 +53,13 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
             lastColor: this.props.value
         }
         this.onChange = this.onChange.bind(this)
+    }
+
+    /** Preload the component. */
+    static preload(){
+        if(ColorPicker.prototype.modules[0])return
+        if(isFetching)return
+        new ColorPicker({}).render()
     }
 
     onChange(val){
@@ -79,7 +91,10 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
         ] = this.modules
 
         if(!ColorPickerComponent){
-            if(isFetching)isFetching.then(e => this.forceUpdate()) // support for multiple color picker
+            if(isFetching){ // support for multiple color picker
+                isFetching.then(() => this.forceUpdate())
+                return null
+            }
             ColorPickerModules = null
             let resolve
             isFetching = new Promise(res => (resolve = res))
@@ -160,7 +175,8 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
     }
 
     static help = {
-        info: "To convert hex colors to decimal, you can do `Lightcord.Api.Utils.HexColorToDecimal('#yourcolor')` and go back with `Lightcord.Api.Utils.DecimalColorToHex(7506394)`"
+        info: "To convert hex colors to decimal, you can do `Lightcord.Api.Utils.HexColorToDecimal('#yourcolor')` and go back with `Lightcord.Api.Utils.DecimalColorToHex(7506394)`",
+        warn: "The component may not appear instantly. The component need to be loaded, so you could experience 50-300ms loading time depending on your internet connection."
     }
 }
 let AllPreviews

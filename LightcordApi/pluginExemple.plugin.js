@@ -23,17 +23,13 @@ module.exports = class LightcordApiExemple {
     observer(changes) {} // Observer for the `document`. Better documentation than I can provide is found here: <https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver>
 
     getSettingsPanel(){
-        let settings = [
-            {
-                component: "inputs.Button",
-                props: {
-                    children: [
-                        "sltsv"
-                    ],
-                    color: "red"
-                }
-            }
-        ]
-        return windows.Lightcord.Api.Utils.PluginUtils.renderSettings(settings)
+        const Markdown = BDModules.get(e => e.default && e.default.displayName === "Markdown")[0].default
+        let settings = Markdown.prototype.render.call({
+            props: Object.assign({
+                className: "",
+                children: "> warn\n> sltsv"
+            }, Markdown.defaultProps)
+        })
+        return window.Lightcord.Api.Utils.ReactToHTML(settings)
     }
 }

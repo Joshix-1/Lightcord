@@ -2,12 +2,16 @@ import WebpackLoader from "./modules/WebpackLoader"
 import Components from "./components/components"
 import uuid from "./modules/uuid"
 import Utils from "./modules/Utils"
+import DiscordTools from "./modules/DiscordTools"
+import * as patchers from "./modules/patchers"
+patchers.patch()
 
 const LightcordApi = {
     WebpackLoader: WebpackLoader,
     Components: Components,
     uuid: uuid,
-    Utils: Utils
+    Utils: Utils,
+    DiscordTools: DiscordTools
 }
 
 declare global {

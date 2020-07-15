@@ -5,7 +5,7 @@ const randClass = new RegExp(`^(?!${normalizedPrefix}-)((?:[A-Za-z]|[0-9]|-)+)-(
 
 export default new class ClassNormalizer {
     constructor(){
-        window.Lightcord.BetterDiscord.BDEvents = this
+        window.Lightcord.BetterDiscord.ClassNormalizer = this
     }
     stop() {
         if (!this.hasPatched) return;

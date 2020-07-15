@@ -77,11 +77,12 @@ export const settings = {
     "Normalize Classes":          {id: "fork-ps-4", info: "Adds stable classes to elements to help themes. (e.g. adds .da-channels to .channels-Ie2l6A)", implemented: true,  hidden: false, cat: "core", category: "modules"},
 
     /* Content */
-    "Content Error Modal":        {id: "fork-ps-1", info: "Shows a modal with plugin/theme errors", implemented: true,  hidden: false, cat: "core", category: "content manager"},
-    "Scan Plugins":               {id: "fork-ps-6", info: "Scan plugins for any threat that can be hidden inside.", implemented: true,  hidden: false, cat: "core", category: "content manager"},
-    "Show Toasts":                {id: "fork-ps-2", info: "Shows a small notification for important information", implemented: true,  hidden: false, cat: "core", category: "content manager"},
-    "Scroll To Settings":         {id: "fork-ps-3", info: "Auto-scrolls to a plugin's settings when the button is clicked (only if out of view)", implemented: true,  hidden: false, cat: "core", category: "content manager"},
-    "Automatic Loading":          {id: "fork-ps-5", info: "Automatically loads, reloads, and unloads plugins and themes", implemented: true,  hidden: false, cat: "core", category: "content manager"},
+    "Content Error Modal":        {id: "fork-ps-1", info: "Shows a modal with plugin/theme errors", implemented: true, hidden: false, cat: "core", category: "content manager"},
+    "Scan Plugins":               {id: "fork-ps-6", info: "Scan plugins for any threat that can be hidden inside.", implemented: true, hidden: false, cat: "core", category: "content manager"},
+    "Show Toasts":                {id: "fork-ps-2", info: "Shows a small notification for important information", implemented: true, hidden: false, cat: "core", category: "content manager"},
+    "Scroll To Settings":         {id: "fork-ps-3", info: "Auto-scrolls to a plugin's settings when the button is clicked (only if out of view)", implemented: true, hidden: false, cat: "core", category: "content manager"},
+    "Automatic Loading":          {id: "fork-ps-5", info: "Automatically loads, reloads, and unloads plugins and themes", implemented: true, hidden: false, cat: "core", category: "content manager"},
+    "Enable Edit Button":         {id: "fork-ps-7", info: "Enable an Edit Button on the plugin and theme panel.", implemented: true, hidden: false, cat: "core", category: "content manager"},
 
     /* Developer */
     "Developer Mode":         	  {id: "bda-gs-8", info: "Developer Mode Toggle", implemented: true, hidden: false, cat: "core", category: "developer settings"},
@@ -135,6 +136,7 @@ export const defaultCookie = {
     "fork-ps-4": true,
     "fork-ps-5": true,
     "fork-ps-6": true,
+    "fork-ps-7": false,
     "fork-es-2": false,
     "fork-es-3": true,
     "fork-wp-1": false,

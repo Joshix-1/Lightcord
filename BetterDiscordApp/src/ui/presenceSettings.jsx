@@ -731,7 +731,6 @@ class Profile extends React.Component {
             activity: activity
         })).render().props.children // bypass tracking
 
-        console.log(profile)
         profile.props.style = {
             width: "auto"
         }

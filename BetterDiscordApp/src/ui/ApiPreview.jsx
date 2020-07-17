@@ -73,7 +73,7 @@ export default class ApiPreview extends React.PureComponent {
                 let renderPreview = () => {
                     return <div style={{margin: "20px"}}>
                         <div style={{
-                            backgroundColor: "var(--background-primary)", 
+                            backgroundColor: "var(--background-secondary)", 
                             padding: "30px 30px", 
                             borderRadius: "8px"
                         }} className="lc-tab-box-shadow">
@@ -84,7 +84,7 @@ export default class ApiPreview extends React.PureComponent {
                 let renderCode = () => {
                     return <div style={{margin: "20px"}}>
                         <div style={{
-                            backgroundColor: "var(--background-primary)", 
+                            backgroundColor: "var(--background-secondary)", 
                             padding: "30px 30px", 
                             borderRadius: "8px"
                         }} className="lc-tab-box-shadow">
@@ -115,7 +115,7 @@ export default class ApiPreview extends React.PureComponent {
     marginTop: "20px", marginBottom: "20px"
 }},
     React.createElement("div", {style: {
-        backgroundColor: "var(--background-primary)",
+        backgroundColor: "var(--background-secondary)",
         padding: "30px 30px",
         borderRadius: "8px"
     }, className: "lc-tab-box-shadow" },
@@ -127,7 +127,7 @@ export default class ApiPreview extends React.PureComponent {
         marginTop: "20px", marginBottom: "20px"
     }}>
         <div style={{
-            backgroundColor: "var(--background-primary)", 
+            backgroundColor: "var(--background-secondary)", 
             padding: "30px 30px", 
             borderRadius: "8px"
         }} className="lc-tab-box-shadow">

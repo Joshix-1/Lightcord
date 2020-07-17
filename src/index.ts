@@ -19,6 +19,8 @@ import * as moduleUpdater from "./common/moduleUpdater"
 import * as paths from "./common/paths"
 import { create } from "./singleInstance";
 import * as splashScreen from "./splashScreen"
+import { join } from "path"
+import { homedir } from "os"
 
 if (process.platform === 'linux') {
     // Some people are reporting audio problems on Linux that are fixed by setting
@@ -55,6 +57,22 @@ function hasArgvFlag(flag) {
 //Transform main thread into async
 (async function Main(){
     await electron.app.whenReady()
+    
+    if(process.argv.includes("--should-create-shortcut")){
+      console.log(`Creating shortcuts.`)
+      if(process.platform === "win32"){
+        electron.shell.writeShortcutLink(join(homedir(), "Desktop", "Lightcord.lnk"), "create", {
+          "appUserModelId": Constants.APP_ID,
+          description: Constants.packageJSON.description,
+          target: process.execPath
+        })
+        electron.shell.writeShortcutLink(join(electron.app.getPath("appData"), "Microsoft", "Windows", "Start Menu", "Programs", "Lightcord.lnk"), "create", {
+          "appUserModelId": Constants.APP_ID,
+          description: Constants.packageJSON.description,
+          target: process.execPath
+        })
+      }
+    }
 
     console.log(`Initializing Lightcord.`)
     console.log(`Version: ${buildInfo.version}
@@ -82,14 +100,16 @@ commit: ${buildInfo.commit}`)
 
         coreModule.setMainWindowVisible(!startMinimized)
     }, (args) => {
-        if (args != null && args.length > 0 && args[0] === '--squirrel-uninstall') {
-          electron.app.quit();
-          return;
-        }
-
-        if(args.length === 1 && args[0] === "--overlay-host"){ // this is a patch for Lightcord that focus itself
-          //console.warn("OVERLAY HOST DÉTECTÉ. EVENNEMENT IGNORÉ MAIS POURRAIT CAUSER UN PROBLÈME.")
-          return
+        if(args && args.length > 0){
+          if(args.length > 0 && args[0] === '--squirrel-uninstall') {
+            electron.app.quit();
+            return;
+          }
+  
+          if(args && args.length === 1 && args[0] === "--overlay-host"){ // this is a patch for Lightcord that focus itself
+            //console.warn("OVERLAY HOST DÉTECTÉ. EVENNEMENT IGNORÉ MAIS POURRAIT CAUSER UN PROBLÈME.")
+            return
+          }
         }
   
         if (coreModule) {

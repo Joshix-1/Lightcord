@@ -4,7 +4,7 @@
 
 import { releaseChannel } from './buildInfo';
 import appSettings from './appSettings';
-const pak = require("../package.json")
+const pak = require("../package.json" as any) as any
 import * as path from "path"
 
 const settings = appSettings.getSettings();
@@ -22,3 +22,4 @@ export const UPDATE_ENDPOINT = settings.get('UPDATE_ENDPOINT') || API_ENDPOINT;
 export const mainAppDirname = path.join(__dirname, "..")
 
 export const version:string = pak.version
+export const packageJSON:any = pak

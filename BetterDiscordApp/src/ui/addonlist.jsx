@@ -1,9 +1,7 @@
 import ErrorBoundary from "./errorBoundary";
 import ContentColumn from "./contentColumn";
-import Tools from "./tools";
 import ReloadIcon from "./reloadIcon";
 import AddonCard from "./addoncard";
-import Scroller from "./scroller";
 import Dropdown from "./components/dropdown";
 import Search from "./components/search";
 
@@ -15,7 +13,8 @@ import themeModule from "../modules/themeModule";
 import WebpackModules from "../modules/webpackModules";
 import BdApi from "../modules/bdApi";
 import Utils from "../modules/utils";
-import tooltipWrap from "./tooltipWrap";
+import TooltipWrap from "./tooltipWrap";
+import bdEvents from "../modules/bdEvents";
 
 const Tooltip = WebpackModules.findByDisplayName("Tooltip");
 
@@ -32,6 +31,25 @@ export default class CardList extends BDV2.reactComponent {
         this.sort = this.sort.bind(this);
         this.reverse = this.reverse.bind(this);
         this.search = this.search.bind(this);
+
+        this.onAddonChanges = function(){
+            this.forceUpdate()
+        }
+        this.onAddonChanges = this.onAddonChanges.bind(this)
+    }
+
+    componentDidMount(){
+        const type = (this.isPlugins ? "plugin" : "theme") + "-"
+        bdEvents.on(`${type}loaded`, this.onAddonChanges)
+        bdEvents.on(`${type}unloaded`, this.onAddonChanges)
+        bdEvents.on(`${type}reloaded`, this.onAddonChanges)
+    }
+
+    componentWillUnmount(){
+        const type = (this.isPlugins ? "plugin" : "theme") + "-"
+        bdEvents.off(`${type}loaded`, this.onAddonChanges)
+        bdEvents.off(`${type}unloaded`, this.onAddonChanges)
+        bdEvents.off(`${type}reloaded`, this.onAddonChanges)
     }
 
     openFolder() {
@@ -154,7 +172,7 @@ export default class CardList extends BDV2.reactComponent {
         if(typeof window.PluginUpdates.checkAll !== "function")return null
         if(!this.isPlugins)return null
 
-        return <tooltipWrap text="Checks for updates of plugins that support this feature. Right-click for a list.">
+        return <TooltipWrap text="Checks for updates of plugins that support this feature. Right-click for a list.">
             <span style={{marginLeft: "10px"}}>
                 <Lightcord.Api.Components.inputs.Button color="brand" look="filled" size="min" hoverColor="default" onClick={() => {
                     try{
@@ -174,7 +192,7 @@ export default class CardList extends BDV2.reactComponent {
                     Check for Updates
                 </Lightcord.Api.Components.inputs.Button>
             </span>
-        </tooltipWrap>
+        </TooltipWrap>
     }
 
     render() {

@@ -38,7 +38,7 @@ export default new class Utils {
     }
 
     FindReact(dom:Element, traverseUp:number = 0):React.Component|React.PureComponent{
-        /** took from https://stackoverflow.com/questions/29321742/react-getting-a-component-from-a-dom-element-for-debugging */
+        // taken from https://stackoverflow.com/questions/29321742/react-getting-a-component-from-a-dom-element-for-debugging#39165137
         const key = Object.keys(dom).find(key=>key.startsWith("__reactInternalInstance$"));
         const domFiber = dom[key];
         if (domFiber == null) return null;

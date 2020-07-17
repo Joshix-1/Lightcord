@@ -47,7 +47,9 @@ export function patch(){
     })
     /** END NOTICE */
 
-    
+    /** START IN-APP NOTIFICATIONS */
+    //getModule(e => true)
+    /** END IN-APP NOTIFICATIONS */
 }
 
 function getModule(filter: (mod:any) => boolean):Promise<any>{

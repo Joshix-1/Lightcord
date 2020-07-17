@@ -4,6 +4,10 @@ import uuid from "./modules/uuid"
 import Utils from "./modules/Utils"
 import DiscordTools from "./modules/DiscordTools"
 import * as patchers from "./modules/patchers"
+import excludeProperties from "./modules/excludeProperties"
+import cloneNullProto from "./modules/cloneNullProto"
+import NOOP from "./modules/noop"
+import unfreeze from "./modules/Unfreeze"
 patchers.patch()
 
 const LightcordApi = {
@@ -11,7 +15,13 @@ const LightcordApi = {
     Components: Components,
     uuid: uuid,
     Utils: Utils,
-    DiscordTools: DiscordTools
+    DiscordTools: DiscordTools,
+    _: {
+        excludeProperties: excludeProperties,
+        cloneNullProto: cloneNullProto,
+        NOOP: NOOP,
+        unfreeze: unfreeze
+    }
 }
 
 declare global {
@@ -47,7 +57,11 @@ export interface LightcordGlobal {
         devMode: boolean,
         callRingingBeat: boolean
     },
-    Api: LightcordApiGlobal
+    Api: LightcordApiGlobal,
+    BetterDiscord: {
+        BdApi: typeof import("@bandagedbd/bdapi").BdApi,
+        [mod:string]:any
+    }
 }
 
 /**

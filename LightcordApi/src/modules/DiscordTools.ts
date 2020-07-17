@@ -43,10 +43,15 @@ export default new class DiscordTools {
         return notification
     }
 
-    playSound(sound:Sound){
+    createSound(sound:Sound){
         soundModule = soundModule || WebpackLoader.findByUniqueProperties(["createSound"])
         if(!soundModule)throw new WebpackLoaderError("Couldn't find soundModule here.")
         const created = soundModule.createSound(sound)
+        return created
+    }
+
+    playSound(sound:Sound){
+        const created = this.createSound(sound)
         created.play()
         return created
     }
@@ -100,6 +105,45 @@ export class Notice extends EventEmitter {
         this.on("removed", () => {
             noticeEvents.off("noticeUpdate", eventFunc)
         })
+    }
+
+    /**
+     * Will be called whem the notice is removed.
+     */
+    on(event: "removed", listener: () => void):this
+    /**
+     * Will be called when the notice is visible or not.
+     */
+    on(event: "showing", listener: (isShowing:boolean) => void):this
+    /**
+     * Will be called when the notice queue changes.
+     */
+    on(event: "index", listener: (index:number) => void):this
+    on(event: string, listener: (...args:any[]) => void){
+        return super.on(event, listener)
+    }
+
+    /**
+     * Will be called whem the notice is removed.
+     */
+    once(event: "removed", listener: () => void):this
+    /**
+     * Will be called when the notice is visible or not.
+     */
+    once(event: "showing", listener: (isShowing:boolean) => void):this
+    /**
+     * Will be called when the notice queue changes.
+     */
+    once(event: "index", listener: (index:number) => void):this
+    once(event: string, listener: (...args:any[]) => void){
+        return super.once(event, listener)
+    }
+
+    off(event: "removed", listener: () => void):this
+    off(event: "showing", listener: (isShowing:boolean) => void):this
+    off(event: "index", listener: (index:number) => void):this
+    off(event: string, listener: (...args:any[]) => void){
+        return super.off(event, listener)
     }
 
     state:{

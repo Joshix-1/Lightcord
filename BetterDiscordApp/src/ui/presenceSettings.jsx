@@ -7,7 +7,8 @@ import CustomRichPresence from "../modules/CustomRichPresence"
 import timestampRender from "./timestampRender"
 import { remote } from "electron";
 import MarginTop from "./margintop";
-
+import Utils from "../modules/utils";
+import { uuidv4 } from "../modules/distant";
 
 const React = BDV2.React;
 
@@ -496,16 +497,12 @@ class RpcPreview extends React.Component {
     }
 
     render(){
-        let preview = new this.preview({
-            preview: this
-        })
-        preview.setState(this.state.rpc)
         return (<div className="lc-tabWrapper">
             <div className="lc-tabnav" style={{flex: "0 1 auto"}}>
                 <Tab preview={this} title="Full Profile" id="profile"/>
                 <Tab preview={this} title="User Popout" id="popout"/>
             </div>
-            {preview.render()}
+            <PresenceErrorCatcher preview={this.preview} state={this.state.rpc} props={{preview: this}} key={this.state.active} />
         </div>)
     }   
 
@@ -550,6 +547,204 @@ class Tab extends React.Component {
     }
 }
 
+let emptyClasses
+class PresenceErrorCatcher extends React.Component {
+    componentDidCatch(err, errInfo){
+        console.error(err, errInfo)
+        this.setState({
+            error: true
+        })
+    }
+    render(){
+        if(!this.state){
+            this.state = {
+                error: false
+            }
+        }
+        if(!this.state.error){
+            try{
+                const preview = new this.props.preview(this.props.props)
+                preview.setState(this.props.state)
+                return preview.render()
+            }catch(err){
+                console.error(err)
+                this.state.error = true
+                return this.render()
+            }
+        }else{
+            emptyClasses = emptyClasses || BDV2.WebpackModules.find(e => e.emptyStateImage)
+            if(!emptyClasses){
+                Utils.showToast("An error occured. Please check the console for more informations.")
+                return null
+            }
+            return <div style={{
+                margin: "20px"
+            }}>
+                <div style={{
+                    backgroundColor: "var(--background-primary)", 
+                    padding: "30px 30px", 
+                    borderRadius: "8px"
+                }} className="lc-tab-box-shadow">
+                    <div className={emptyClasses.emptyStateImage} style={{
+                        marginTop: "20px"
+                    }}>
+
+                    </div>
+                    <div className={emptyClasses.emptyStateHeader}>An error occured</div>
+                    <p className={emptyClasses.emptyStateSubtext}>
+                        Please check the console for more informations. Join our ­
+                        <a className={`${BDV2.anchorClasses.anchor} ${BDV2.anchorClasses.anchorUnderlineOnHover}`} role="button" tabindex={0} onClick={() => {
+                            BDV2.joinLC()
+                        }}>
+                            support server
+                        </a>
+                        ­ for help.
+                    </p>
+                </div>
+            </div>
+        }
+    }
+}
+
+let popoutModules
+let UserPopoutComponent
+let PopoutProps
+class Popout extends React.Component {
+    get modules(){
+        return popoutModules || (popoutModules = [
+            BDV2.WebpackModules.find(e => e.default && e.default.displayName === "FluxContainer(ForwardRef(SubscribeGuildMembersContainer(UserPopout)))"),
+            BDV2.WebpackModules.find(e => e.default && e.default.getCurrentUser)
+        ])
+    }
+
+    render(){
+        let [
+            UserPopout,
+            userModule
+        ] = this.modules
+
+        const user = userModule.default.getCurrentUser()
+        if(!UserPopoutComponent){
+            if(!UserPopout)throw new Error(`Couldn't find the UserPopout component.`)
+            const render1 = new UserPopout.default({userId: user.id, guildId: null, channelId: null, disableUserProfileLink: true}).render()
+            PopoutProps = render1.props
+            const render2 = render1.type.render(PopoutProps, null)
+            const render3 = new render2.type(render2.props).render()
+            UserPopoutComponent = render3.type
+        }
+        if(!UserPopoutComponent)throw new Error(`Couldn't find the UserPopoutComponent component.`)
+
+        let data = Object.assign({}, defaultRPC, this.props.preview.props.settings.state.data)
+        const activity = (function(){
+            if(!this.game)return null
+            let game = {
+                name: this.game.name || defaultRPC.name,
+                application_id: this.game.application_id || defaultRPC.application_id,
+                details: this.game.details || undefined,
+                state: this.game.state || undefined,
+                timestamps: this.game["timestamps.start"] ? {
+                    start: this.game["timestamps.start"]
+                } : undefined,
+                assets: this.game["assets.large"] ? {
+                    large_image: this.game["assets.large"],
+                    small_image: this.game["assets.small"] || undefined
+                } : undefined,
+                type: 0
+            }
+            return game
+        }).call({
+            game: data
+        })
+
+        PopoutProps = new UserPopout.default({userId: user.id, guildId: null, channelId: null, disableUserProfileLink: true}).render().props
+        const popout = new UserPopoutComponent(Object.assign({}, PopoutProps, {
+            activity: activity
+        })).render().props.children // bypass tracking
+
+        // remove the stop propagation shit.
+        const container = <div {...window.Lightcord.Api._.excludeProperties(popout.props, ["onClick", "onContextMenu"])} />
+
+        return <div className="lc-userPopout lc-tab-box-shadow">
+            {container}
+        </div>
+    }
+}
+
+let profileModules
+let UserProfileComponent
+let ProfileProps
+let connectedProfileStore
+class Profile extends React.Component {
+    get modules(){
+        return profileModules || (profileModules = [
+            BDV2.WebpackModules.find(e => e.default && e.default.displayName === "UserProfile"),
+            BDV2.WebpackModules.find(e => e.default && e.default.getCurrentUser)
+        ])
+    }
+
+    render(){
+        let [
+            UserProfile,
+            userModule
+        ] = this.modules
+
+        const user = userModule.default.getCurrentUser()
+        if(!UserProfileComponent){
+            const render1 = new UserProfile.default({
+                user: user
+            }).render()
+            connectedProfileStore = render1.type
+            const render2 = new render1.type(render1.props).render()
+            const render3 = render2.type.render(render2.props, null)
+            const render4 = new render3.type(render3.props).render()
+            UserProfileComponent = render4.type
+        }
+        if(!UserProfileComponent)throw new Error(`Couldn't find the UserProfileComponent component.`)
+
+        let data = Object.assign({}, defaultRPC, this.props.preview.props.settings.state.data)
+        const activity = (function(){
+            if(!this.game)return null
+            let game = {
+                name: this.game.name || defaultRPC.name,
+                application_id: this.game.application_id || defaultRPC.application_id,
+                details: this.game.details || undefined,
+                state: this.game.state || undefined,
+                timestamps: this.game["timestamps.start"] ? {
+                    start: this.game["timestamps.start"]
+                } : undefined,
+                assets: this.game["assets.large"] ? {
+                    large_image: this.game["assets.large"],
+                    small_image: this.game["assets.small"] || undefined
+                } : undefined,
+                type: 0
+            }
+            return game
+        }).call({
+            game: data
+        })
+
+        ProfileProps = new connectedProfileStore({
+            user: user,
+            close: () => {}
+        }).render().props
+        const profile = new UserProfileComponent(Object.assign({}, ProfileProps, {
+            activity: activity
+        })).render().props.children // bypass tracking
+
+        console.log(profile)
+        profile.props.style = {
+            width: "auto"
+        }
+
+        return <div className="lc-tab lc-tab-box-shadow">
+            {profile}
+        </div>
+    }
+}
+
+
+
+/*
 let popoutModule
 class Popout extends React.Component { // TODO: Probably use internal Components instead of making it from scratch.
     get modules(){
@@ -979,4 +1174,4 @@ class Timestamp extends React.Component {
             {this.props.message}
         </div>
     }
-}
+}*/

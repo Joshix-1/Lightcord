@@ -176,7 +176,7 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
 
     static help = {
         info: "To convert hex colors to decimal, you can do `Lightcord.Api.Utils.HexColorToDecimal('#yourcolor')` and go back with `Lightcord.Api.Utils.DecimalColorToHex(7506394)`",
-        warn: "The component may not appear instantly. The component need to be loaded, so you could experience 50-300ms loading time depending on your internet connection."
+        warn: "The component may not appear instantly. The component needs to be loaded, so you could experience 50-300ms loading time depending on your internet connection."
     }
 }
 let AllPreviews

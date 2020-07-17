@@ -95,10 +95,10 @@ ThemeModule.prototype.unloadTheme = function(filenameOrName) {
 };
 
 ThemeModule.prototype.delete = function(filenameOrName) {
-    const bdplugin = Object.values(bdthemes).find(p => p.filename == filenameOrName) || bdthemes[filenameOrName];
-    if (!bdplugin) return;
-    this.unloadTheme(bdplugin.filename);
-    const fullPath = require("path").resolve(ContentManager.pluginsFolder, bdplugin.filename);
+    const bdtheme = Object.values(bdthemes).find(p => p.filename == filenameOrName) || bdthemes[filenameOrName];
+    if (!bdtheme) return;
+    this.unloadTheme(bdtheme.filename);
+    const fullPath = require("path").resolve(ContentManager.themesFolder, bdtheme.filename);
     require("fs").unlinkSync(fullPath);
 };
 

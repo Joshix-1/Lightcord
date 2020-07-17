@@ -1,7 +1,7 @@
 {
   "name": "lightcord",
   "version": "0.1.2",
-  "description": "",
+  "description": "A simple - customizable - Discord Client.",
   "main": "dist/index.js",
   "scripts": {
     "compile": "node compile.js",

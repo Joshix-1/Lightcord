@@ -952,20 +952,13 @@ body .ace_closeButton:active {
   justify-content: space-between;
 }
 
-.theme-dark .ui-tab-bar-header .bd-changelog-button {
-  color: #72767d;
-}
-.theme-light .ui-tab-bar-header .bd-changelog-button {
-  color: #b9bbbe;
-}
-
 .ui-tab-bar-header .bd-icon {
     cursor: pointer;
-    fill: #72767d;
+    fill: var(--text-muted);
 }
 
 .ui-tab-bar-header .bd-icon:hover {
-    fill: #fff;
+    fill: var(--text-normal);
 }
 
 .ui-tab-bar-separator {

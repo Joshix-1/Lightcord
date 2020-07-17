@@ -3,7 +3,7 @@ const path = require("path")
 const terser = require("terser")
 const util = require("util")
 
-const production = true
+const production = false
 
 let fs = require("fs")
 

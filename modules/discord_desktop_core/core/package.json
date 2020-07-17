@@ -7,7 +7,7 @@
     "chrome-tabs": "^5.4.0",
     "discordrpcgenerator": "^1.2.0",
     "invariant": "2.2.4",
-    "lodash": "4.17.13",
+    "lodash": "4.17.19",
     "mkdirp": "^1.0.4",
     "promise.allsettled": "^1.0.0",
     "request": "2.88.0",

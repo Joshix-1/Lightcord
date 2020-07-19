@@ -42,18 +42,11 @@ export const bbdChangelog = {
     description: "BBD's changelog.",
     changes: [
         {
-            title: "What's New?",
-            items: [
-                "**Lightcord** is now using BandagedBD. That means all plugins you were using can be used too !",
-                "**Window Transparency** changes were made to more compatible with external window managers and addons like Glasstron.",
-                "Initialization sequence has once again been changed slightly to hopefully improve loading times."
-            ]
-        },
-        {
             title: "Bug Fixes",
             type: "fixed",
             items: [
-                "Some fixes related to showing modals in the `BdApi`."
+                "Some fixes related to showing modals in the `BdApi`.",
+                "Fixed the open folder buttons for plugins and themes"
             ]
         }
     ]

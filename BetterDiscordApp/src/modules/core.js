@@ -17,8 +17,9 @@ import distant, { uuidv4 } from "./distant";
 import EmojiModule from "./emojiModule"
 import {remote as electron} from "electron"
 import v2 from "./v2";
-import webpackModules from "./webpackModules";
 import contentManager from "./contentManager";
+
+const {ipcRenderer} = require("electron");
 
 function Core() {
     // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
@@ -28,14 +29,19 @@ function Core() {
 let methods
 
 Core.prototype.setConfig = function(config) {
+    if (this.hasStarted) return;
     Object.assign(bdConfig, config);
 };
 
 Core.prototype.setMethods = function(m) {
+    if (this.hasStarted) return;
     methods = m
 };
 
 Core.prototype.init = async function() {
+    if (this.hasStarted) return;
+    this.hasStarted = true;
+
     if (!Array.prototype.flat) {
         Utils.alert("Not Supported", "BetterDiscord v" + bbdVersion + " does not support this old version (" + currentDiscordVersion + ") of Discord. Please update your Discord installation before proceeding.");
         return;

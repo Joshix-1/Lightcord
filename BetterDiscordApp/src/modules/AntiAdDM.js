@@ -67,14 +67,14 @@ function scanMessage(message){
     return false
 }
 function EmbedsContains(message, search){
-    let embeds = message.embeds
+    let embeds = message.embeds || []
     if(embeds.length === 0)return false
     return embeds.map(embed => {
         if(embed.type !== "rich")return false
         if((embed.title || "").includes(search))return true
         if((embed.description || "").includes(search))return true
         if(((embed.footer || "") && embed.footer.text || "").includes(search))return true
-        if(embed.fields.map(e => {
+        if((embed.fields || []).map(e => {
             return e.value.includes(search) || e.name.includes(search)
         }).includes(true))return true
         return false

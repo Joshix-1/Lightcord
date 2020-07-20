@@ -5,7 +5,7 @@ import AddonCard from "./addoncard";
 import Dropdown from "./components/dropdown";
 import Search from "./components/search";
 
-import {settingsCookie, pluginCookie, themeCookie} from "../0globals";
+import {settingsCookie, pluginCookie, themeCookie, bdplugins, bdthemes} from "../0globals";
 import ContentManager from "../modules/contentManager";
 import BDV2 from "../modules/v2";
 import pluginModule from "../modules/pluginModule";

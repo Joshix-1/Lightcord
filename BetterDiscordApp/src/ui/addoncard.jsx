@@ -59,6 +59,10 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
         if (!settingsCookie["fork-ps-3"]) return;
         setImmediate(() => {
             const isHidden = (container, element) => {
+                if(!container){
+                    console.error(new Error(`Container is undefined.`))
+                    return false
+                }
                 const cTop = container.scrollTop;
                 const cBottom = cTop + container.clientHeight;
                 const eTop = element.offsetTop;
@@ -67,7 +71,7 @@ export default class V2C_PluginCard extends BDV2.reactComponent {
             };
 
             const thisNode = this.refs.cardNode;
-            const container = thisNode.closest("div[class*=\"scroller-\"]")
+            const container = thisNode.closest("div[class*=\"contentRegionScroller-\"]")
             if (!isHidden(container, thisNode)) return;
             const thisNodeOffset = DOM.offset(thisNode);
             const containerOffset = DOM.offset(container);

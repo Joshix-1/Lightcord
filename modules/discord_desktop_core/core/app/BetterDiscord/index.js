@@ -365,7 +365,7 @@ async function privateInit(){
         gatewayModule.default.prototype._handleDispatch = function(data, event, props){
             if(event === "READY"){
                 console.log(...arguments)
-                if(isBlacklisted(data.user.id) || appSettings.get("­", false)){
+                if(false){
                     dispatcher.dispatch({
                         type: "LOGOUT"
                     })

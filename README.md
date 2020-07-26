@@ -43,7 +43,7 @@ npm run run
 ```
 *You can find an experimental linux tutorial in our Discord, or use the AUR*
 
-## AUR
+## AUR (unofficial)
 https://aur.archlinux.org/packages/lightcord-bin/
 If you don't know how to install from the AUR, you can follow [this](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages) tutorial, but I would recommend using an AUR helper such as ``yay``.
 

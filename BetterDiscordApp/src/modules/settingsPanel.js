@@ -29,6 +29,7 @@ import MarginTop from "../ui/margintop";
 import webpackModules from "./webpackModules";
 import tooltipWrap from "../ui/tooltipWrap";
 import History from "../ui/icons/history";
+import core from "./core";
 
 class BDSidebarHeader extends React.PureComponent {
     render(){
@@ -144,7 +145,7 @@ export default new class V2_SettingsPanel {
     }
 
     updateSettings(id, enabled, sidebar) {
-        if(!["lightcord-8", "no_window_bound", "enable_glasstron"].includes(id))settingsCookie[id] = enabled;
+        if(!["lightcord-8", "no_window_bound", "enable_glasstron", "lightcord-10"].includes(id))settingsCookie[id] = enabled;
 
         if (id == "bda-gs-2") {
             if (enabled) DOM.addClass(document.body, "bd-minimal");
@@ -268,6 +269,10 @@ export default new class V2_SettingsPanel {
             remote.app.relaunch()
             remote.app.exit()
         }
+        if (id === "lightcord-10"){
+            core.methods.NotificationsUseShim(enabled)
+            return
+        }
         if (id === "no_window_bound"){
             let appSettings = remote.getGlobal("appSettings")
             appSettings.set("NO_WINDOWS_BOUND", enabled)
@@ -345,6 +350,7 @@ export default new class V2_SettingsPanel {
                         if(setting.id === "lightcord-8")isChecked = appSettings.get("isTabs", false);
                         if(setting.id === "no_window_bound")isChecked = appSettings.get("NO_WINDOWS_BOUND", false)
                         if(setting.id === "enable_glasstron")isChecked = appSettings.get("GLASSTRON", true)
+                        if(setting.id === "lightcord-10")isChecked = !appSettings.get("DEFAULT_NOTIFICATIONS", true)
                         let returnValue = BDV2.react.createElement(Switch, {id: setting.id, key: setting.id, data: setting, checked: isChecked, onChange: (id, checked) => {
                             this.onChange(id, checked, sidebar);
                         }})

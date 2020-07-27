@@ -33,6 +33,12 @@ Core.prototype.setConfig = function(config) {
     Object.assign(bdConfig, config);
 };
 
+Object.defineProperty(Core.prototype, "methods", {
+    get(){
+        return methods
+    }
+})
+
 Core.prototype.setMethods = function(m) {
     if (this.hasStarted) return;
     methods = m

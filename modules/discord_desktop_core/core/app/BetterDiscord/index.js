@@ -9,6 +9,7 @@ const uuid = require("uuid/v4")
 
 const events = exports.events = new EventEmitter()
 const logger = exports.logger = new Logger("Lightcord")
+const appSettings = electron.remote.getGlobal("appSettings")
 
 let hasInit = false
 let tries = 0
@@ -229,8 +230,6 @@ async function privateInit(){
         console.error(err)
         DiscordJS = null
     }
-
-    const appSettings = electron.remote.getGlobal("appSettings")
     /*let Authorization = appSettings.get("LIGHTCORD_AUTH", false)
     let shouldShowPrompt = Authorization === false
 
@@ -1291,7 +1290,7 @@ var ensureExported = global.ensureExported = function ensureExported(filter, max
     })
 }
 let Notifications = require("./patchNotifications")
-Notifications.useShim(true)
+Notifications.useShim(!appSettings.get("DEFAULT_NOTIFICATIONS", true))
 
 function getGuildClasses() {
     const guildsWrapper = ModuleLoader.get(e => e.wrapper && e.unreadMentionsBar)[0];

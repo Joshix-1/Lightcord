@@ -12,8 +12,6 @@ var autoStart = _interopRequireWildcard(_autoStart);
 
 var _appSettings = require('./appSettings');
 
-var _appFeatures = require('./appFeatures');
-
 var _ipcMain = require('./ipcMain');
 
 var _ipcMain2 = _interopRequireDefault(_ipcMain);
@@ -22,8 +20,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-const settings = _appSettings();
-const features = (0, _appFeatures.getFeatures)();
+const settings = _appSettings.getSettings();
 const NOOP = () => {};
 
 let hasInit = exports.hasInit = false;
@@ -34,9 +31,6 @@ function init() {
     return;
   }
   exports.hasInit = hasInit = true;
-
-  // TODO remove on or after March 2018
-  features.declareSupported('app_configs');
 
   _ipcMain2.default.on('TOGGLE_MINIMIZE_TO_TRAY', (_event, value) => setMinimizeOnClose(value));
   _ipcMain2.default.on('TOGGLE_OPEN_ON_STARTUP', (_event, value) => toggleRunOnStartup(value));

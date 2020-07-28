@@ -10,10 +10,6 @@ var _Constants = require('../Constants');
 
 var Constants = _interopRequireWildcard(_Constants);
 
-function getBackgroundColor(){
-  return appSettings.get("BACKGROUND_COLOR", "#2f3136")
-}
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 const { MenuEvents } = Constants;
@@ -34,10 +30,7 @@ exports.default = [{
   label: '&View',
   submenu: [{
     label: '&Reload',
-    click: () => {
-      let window = _electron.BrowserWindow.getFocusedWindow()
-      window.webContents.reloadIgnoringCache()
-    },
+    click: () => _electron.BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache(),
     accelerator: 'Control+R'
   }, {
     label: 'Toggle &Full Screen',

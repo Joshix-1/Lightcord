@@ -90,7 +90,7 @@ exports.default = [{
     click: () => {
       const window = getWindow();
       if (window) {
-        window.webContents.reloadIgnoringCache()
+        window.webContents.reloadIgnoringCache();
       }
     },
     accelerator: 'Command+R'

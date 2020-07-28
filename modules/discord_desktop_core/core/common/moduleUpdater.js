@@ -136,7 +136,7 @@ let processDownloadQueue = (() => {
       finishModuleDownload(queuedModule.name, queuedModule.version, moduleZipPath, receivedBytes, response.statusCode === 200);
     } catch (err) {
       logger.log(`Failed fetching module ${queuedModule.name}@${queuedModule.version}: ${String(err)}`);
-      finishModuleDownload(queuedModule.name, queuedModule.version, null, false);
+      finishModuleDownload(queuedModule.name, queuedModule.version, null, receivedBytes, false);
     }
   });
 

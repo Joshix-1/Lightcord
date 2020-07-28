@@ -12,15 +12,11 @@ var _utils = require('./utils');
 
 var _mainScreen = require('./mainScreen');
 
-var _appFeatures = require('./appFeatures');
-
 var _ipcMain = require('./ipcMain');
 
 var _ipcMain2 = _interopRequireDefault(_ipcMain);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const features = (0, _appFeatures.getFeatures)();
 
 let hasInit = exports.hasInit = false;
 
@@ -48,9 +44,6 @@ function init() {
   for (let i = 1; i <= 11; i++) {
     appIcons.push(_utils.exposeModuleResource(resourcePath, `badge-${i}.ico`));
   }
-
-  // TODO: remove on or after April 2018
-  features.declareSupported('new_app_badge');
 
   _ipcMain2.default.on('APP_BADGE_SET', (_event, count) => setAppBadge(count));
 }

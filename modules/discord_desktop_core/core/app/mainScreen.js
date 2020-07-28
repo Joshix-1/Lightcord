@@ -325,6 +325,7 @@ function getBackgroundColor() {
 
 function setBackgroundColor(color) {
   settings.set(BACKGROUND_COLOR_KEY, color);
+  //mainWindow.setBackgroundColor(color);
   settings.save();
 }
 
@@ -351,6 +352,7 @@ function launchMainAppWindow(isVisible) {
       blinkFeatures: 'EnumerateDevices,AudioOutputDevices',
       nativeWindowOpen: true,
       enableRemoteModule: true,
+      spellcheck: true,
       ...(isTabs ? {
         nodeIntegration: true,
         webviewTag: true
@@ -365,8 +367,6 @@ function launchMainAppWindow(isVisible) {
 
   if (process.platform === 'linux') {
     mainWindowOptions.frame = true;
-  } else {
-    mainWindowOptions.frame = false;
   }
 
   if(!settings.get("NO_WINDOWS_BOUND", false))applyWindowBoundsToConfig(mainWindowOptions);
@@ -463,7 +463,7 @@ function launchMainAppWindow(isVisible) {
   });
 
   // Prevent navigation when links or files are dropping into the app, turning it into a browser.
-  // https://github.com/discordapp/discord/pull/278
+  // https://github.com/discord/discord/pull/278
   mainWindow.webContents.on('will-navigate', (evt, url) => {
     if (!insideAuthFlow && !url.startsWith(WEBAPP_ENDPOINT)) {
       evt.preventDefault();
@@ -475,6 +475,18 @@ function launchMainAppWindow(isVisible) {
     if (oldUrl.startsWith(WEBAPP_ENDPOINT) && newUrl.startsWith('https://accounts.google.com/')) {
       insideAuthFlow = true;
     }
+  });
+
+  mainWindow.webContents.on('context-menu', (_, params) => {
+    webContentsSend('SPELLCHECK_RESULT', params.misspelledWord, params.dictionarySuggestions);
+  });
+
+  mainWindow.webContents.on('devtools-opened', () => {
+    webContentsSend('WINDOW_DEVTOOLS_OPENED');
+  });
+
+  mainWindow.webContents.on('devtools-closed', () => {
+    webContentsSend('WINDOW_DEVTOOLS_CLOSED');
   });
 
   mainWindow.on('focus', () => {

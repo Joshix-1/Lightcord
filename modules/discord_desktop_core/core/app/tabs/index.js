@@ -1,7 +1,7 @@
 const fs = require("fs")
 const { join } = require("path")
 const { pathToFileURL } = require("url")
-const ipc = require("../discord_native/ipc")
+const ipc = require("../discord_native/renderer/ipc")
 
 let webviews = new Map()
 window.webviews = webviews

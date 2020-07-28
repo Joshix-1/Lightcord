@@ -51,10 +51,7 @@ exports.default = [{
   label: '&View',
   submenu: [{
     label: '&Reload',
-    click: () => {
-      let window = _electron.BrowserWindow.getFocusedWindow()
-      window.webContents.reloadIgnoringCache()
-    },
+    click: () => _electron.BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache(),
     accelerator: 'Control+R'
   }, {
     label: 'Toggle &Full Screen',

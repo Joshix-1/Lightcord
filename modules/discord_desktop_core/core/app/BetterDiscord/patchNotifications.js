@@ -1,4 +1,4 @@
-const ipcRenderer = require("../discord_native/ipc")
+const ipcRenderer = require("../discord_native/renderer/ipc")
 
 
 if(process.platform === "win32"){

@@ -5,7 +5,7 @@
 
 process.on("uncaughtException", console.error)
 
-const ipcRenderer = require('./discord_native/ipc');
+const ipcRenderer = require('./discord_native/renderer/ipc');
 const electron = require("electron")
 const moduleAlias = require("./BetterDiscord/loaders/module-alias")
 const path = require("path")
@@ -40,7 +40,7 @@ const DiscordNative = {
   os: require('./discord_native/renderer/os'),
   app: require('./discord_native/renderer/app'),
   clipboard: require('./discord_native/renderer/clipboard'),
-  ipc: require('./discord_native/renderer/ipc'),
+  ipc: ipcRenderer,
   gpuSettings: require('./discord_native/renderer/gpuSettings'),
   window: require('./discord_native/renderer/window'),
   powerMonitor: require('./discord_native/renderer/powerMonitor'),
@@ -62,9 +62,17 @@ DiscordNative.remotePowerMonitor = DiscordNative.powerMonitor;
 
 const BetterDiscord = require("./BetterDiscord")
 
+const _setImmediate = setImmediate;
+const _clearImmediate = clearImmediate;
 process.once('loaded', () => {
   // Implementing DiscordNative
   global.DiscordNative = DiscordNative;
+
+  // We keep these two functions in global because electron doesn't put these
+  // nodejs APIs in the module scope, and these two functions
+  // aren't harmful at all.
+  global.setImmediate = _setImmediate;
+  global.clearImmediate = _clearImmediate;
 
   // Since nodeIntegration has been disable
   // We're adding node propertys on window so it's easier

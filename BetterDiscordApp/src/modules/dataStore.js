@@ -12,6 +12,7 @@ let dataPath = "";
 if (process.platform === "win32") dataPath = process.env.APPDATA;
 else if (process.platform === "darwin") dataPath = path.join(process.env.HOME, "Library", "Preferences");
 else dataPath = path.join(process.env.XDG_CONFIG_HOME ? process.env.XDG_CONFIG_HOME : process.env.HOME, ".config");
+dataPath = path.join(dataPath, "BetterDiscord");
 
 export default new class DataStore {
     constructor() {
@@ -22,9 +23,6 @@ export default new class DataStore {
 
     initialize() {
         try {
-            if (!fs.existsSync(dataPath)) fs.mkdirSync(dataPath);
-            if (!fs.existsSync(path.join(dataPath, "plugins"))) fs.mkdirSync(path.join(dataPath, "plugins"));
-            if (!fs.existsSync(path.join(dataPath, "themes"))) fs.mkdirSync(path.join(dataPath, "themes"));
             if (!fs.existsSync(this.BDFile)) fs.writeFileSync(this.BDFile, JSON.stringify(this.data, null, 4), "binary");
             const data = JSON.parse(fs.readFileSync(this.BDFile, "binary"))
             if (data.hasOwnProperty("settings")) this.data = data;

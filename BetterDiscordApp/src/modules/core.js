@@ -19,14 +19,9 @@ import {remote as electron} from "electron"
 import v2 from "./v2";
 import contentManager from "./contentManager";
 
-const {ipcRenderer} = require("electron");
-
-function Core() {
-    // Object.assign(bdConfig, __non_webpack_require__(DataStore.configFile));
-    // this.init();
-}
-
 let methods
+function Core() {}
+
 
 Core.prototype.setConfig = function(config) {
     if (this.hasStarted) return;
@@ -69,28 +64,6 @@ Core.prototype.init = async function() {
     }
 
     Utils.suppressErrors(this.patchAttributes.bind(this), "LC Plugin Certifier Patch")();
-
-    /*
-    const latestLocalVersion = bdConfig.updater ? bdConfig.updater.LatestVersion : bdConfig.latestVersion;
-    if (latestLocalVersion > bdConfig.version) {
-        Utils.showConfirmationModal("Update Available", [`There is an update available for BandagedBD's Injector (${latestLocalVersion}).`, "You can either update and restart now, or later."], {
-            confirmText: "Update Now",
-            cancelText: "Maybe Later",
-            onConfirm: async () => {
-                const onUpdateFailed = () => {Utils.alert("Could Not Update", `Unable to update automatically, please download the installer and reinstall normally.<br /><br /><a href='https://github.com/rauenzi/BetterDiscordApp/releases/latest' target='_blank'>Download Installer</a>`);};
-                try {
-                    const didUpdate = await this.updateInjector();
-                    if (!didUpdate) return onUpdateFailed();
-                    const app = require("electron").remote.app;
-                    app.relaunch();
-                    app.exit();
-                }
-                catch (err) {
-                    onUpdateFailed();
-                }
-            }
-        });
-    }*/
 
     Utils.log("Startup", "Initializing Settings");
     this.initSettings();
@@ -673,15 +646,20 @@ Core.prototype.patchMemberList = function() {
 };
 
 Core.prototype.updateInjector = async function() {
+    // There will never be an injection path, so we do not need the code below. 
+    // Insert comments so it will be erased when production.
+    
     const injectionPath = DataStore.injectionPath;
     if (!injectionPath) return false;
+
+    /*
 
     const fs = require("fs");
     const path = require("path");
     const rmrf = require("rimraf");
     const yauzl = require("yauzl");
     const mkdirp = require("mkdirp");
-    const request = /*require("request");*/ null
+    const request = require("request");
 
     const parentPath = path.resolve(injectionPath, "..");
     const folderName = path.basename(injectionPath);
@@ -755,7 +733,7 @@ Core.prototype.updateInjector = async function() {
     await new Promise(resolve => fs.unlink(savedZip, resolve));
 
     Utils.log("InjectorUpdate", "Injector Updated!");
-    return success;
+    return success;*/
 };
 
 export default new Core();

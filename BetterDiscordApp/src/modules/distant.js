@@ -1,5 +1,4 @@
 import BugHunterBadge from "../svg/bug_hunter"
-import LightcordUserBadge from "../svg/LightcordUser";
 import nodeFetch from "node-fetch"
 import { settingsCookie } from "../0globals";
 import Circus from "../svg/circus";
@@ -31,25 +30,7 @@ export default new class DistantServer {
     set cache(data){
         if(typeof data !== "object" || typeof this._cache !== "object")return this._cache = data
         return this._cache = Object.assign(this._cache, data)
-    }/*
-
-    async delete(){
-        BdApi.showToast("Deleting all infos about you on Lightcord Servers...", {type: "warn"})
-        return handleRequest(Routes.delete, "delete")
-        .then(async res => {
-            if(res.status !== 200){
-                BdApi.showToast("An error occured, couldn't delete informations. See console for more infos", {type: "error"})
-                throw new Error(`Couldn't delete all informations: ${(res.status+" "+res.statusText+" "+await res.text())}`)
-            }
-            console.info(`Succesfully deleted informations.`)
-            BdApi.showToast("Succesfully deleted informations", {type: "success"})
-            window.Lightcord.Api.Authorization = null
-            return res.json()
-        }).catch((err) => {
-            BdApi.showToast("An error occured, couldn't delete informations. See console for more infos", {type: "error"})
-            throw new Error(`Couldn't delete all informations: ${err.stack}`)
-        })
-    }*/
+    }
 
     /**
      * Get custom badges from the user ID.

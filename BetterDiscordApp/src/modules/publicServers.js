@@ -31,7 +31,7 @@ export default new class V2_PublicServers {
         let [
             classNameLayers
         ] = [
-            BDModules.get(e => e.layers && e.layer)[0].layers.split(" ")[0]
+            Utils.removeDa(BDModules.get(e => e.layers && e.layer)[0].layers)
         ]
         const layers = DOM.query(".layers, ."+classNameLayers);
         if (!layers) return false;
@@ -80,6 +80,7 @@ export default new class V2_PublicServers {
     removeButton() {
         this.guildPatch();
         delete this.guildPatch;
-        DOM.query("#bd-pub-li").remove();
+        const button = DOM.query("#bd-pub-li");
+        if (button) button.remove();
     }
 };

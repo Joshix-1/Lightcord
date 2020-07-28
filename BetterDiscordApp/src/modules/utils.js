@@ -1,4 +1,4 @@
-import {bbdVersion, settingsCookie} from "../0globals";
+import {bbdVersion} from "../0globals";
 import WebpackModules from "./webpackModules";
 import BDV2 from "./v2";
 import DOM from "./domtools";
@@ -40,7 +40,7 @@ export default class Utils {
     }
 
     static getTextArea() {
-        return DOM.query("."+BDModules.get(e => e.channelTextArea && e.titleWrapper)[0].channelTextArea.split(" ")[0]+" textarea");
+        return DOM.query("."+this.removeDa(BDModules.get(e => e.channelTextArea && e.titleWrapper)[0].channelTextArea)+" textarea");
     }
 
     static insertText(textarea, text) {
@@ -201,8 +201,8 @@ export default class Utils {
      */
     static showToast(content, options = {}) {
         if (!document.querySelector(".bd-toasts")) {
-            const container = document.querySelector("."+BDModules.get(e => e.sidebar && e.hasNotice)[0].sidebar.split(" ")[9]+" + div") || null;
-            const memberlist = container ? container.querySelector("."+BDModules.get(e => e.membersWrap)[0].membersWrap) : null;
+            const container = document.querySelector("."+this.removeDa(BDModules.get(e => e.sidebar && e.hasNotice)[0].sidebar)+" + div") || null;
+            const memberlist = container ? container.querySelector("."+this.removeDa(BDModules.get(e => e.membersWrap)[0].membersWrap)) : null;
             const form = container ? container.querySelector("form") : null;
             const left = container ? container.getBoundingClientRect().left : 310;
             const right = memberlist ? memberlist.getBoundingClientRect().left : 0;

@@ -2,10 +2,8 @@ import {bdConfig, bdplugins, bdthemes, settingsCookie} from "../0globals";
 import pluginModule from "./pluginModule";
 import themeModule from "./themeModule";
 import Utils from "./utils";
-import * as crypto from "crypto"
 import dataStore from "./dataStore";
-import pluginCertifier, { encryptSettingsCache, decryptSettingsCache, processFile } from "./pluginCertifier";
-import { captureRejectionSymbol } from "events";
+import { encryptSettingsCache, decryptSettingsCache, processFile } from "./pluginCertifier";
 
 const path = require("path");
 const fs = require("fs");

@@ -1,6 +1,5 @@
 /* BDEvents */
 const EventEmitter = require("events");
-
 export default new class BDEvents extends EventEmitter {
     constructor(){
         super()

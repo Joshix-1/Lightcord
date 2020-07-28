@@ -14,7 +14,7 @@ const BdApi = {
     get ReactComponent() {return BDV2.ReactComponent;},
     get WindowConfigFile() {return Utils.WindowConfigFile;},
     get settings() {return settings;},
-    get emotes() {return {}}, // deprecated, deleted all emotes from betterdiscord.
+    get emotes() {return null}, // deprecated, deleted all emotes from betterdiscord.
     get screenWidth() { return Math.max(document.documentElement.clientWidth, window.innerWidth || 0); },
     get screenHeight() { return Math.max(document.documentElement.clientHeight, window.innerHeight || 0); }
 };

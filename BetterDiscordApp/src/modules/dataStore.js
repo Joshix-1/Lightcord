@@ -1,6 +1,5 @@
 const __non_webpack_require__ = window.require
 
-import {bdConfig} from "../0globals";
 import Utils from "./utils";
 import ContentManager from "./contentManager";
 

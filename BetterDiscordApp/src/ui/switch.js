@@ -5,7 +5,7 @@ let classnames = []
 function getClassName(name){
     let className = classnames.find(e => e.startsWith(name+"-"))
     if(className)return className
-    className = BDModules.get(e => e.name)[0]
+    className = BDModules.get(e => e[name])[0][name]
     classnames.push(className)
     return className
 }

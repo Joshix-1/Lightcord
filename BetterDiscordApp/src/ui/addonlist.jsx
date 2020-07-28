@@ -237,4 +237,4 @@ Object.defineProperty(CardList.prototype, "render", {
     configurable: false,
     set: function() {console.warn("Addon policy for plugins #5 https://github.com/rauenzi/BetterDiscordApp/wiki/Addon-Policies#plugins");},
     get: () => originalRender
-}); 
+});

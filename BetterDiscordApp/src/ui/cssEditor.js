@@ -3,6 +3,7 @@ import Settings from "../modules/settingsPanel";
 import BDV2 from "../modules/v2";
 import DataStore from "../modules/dataStore";
 import DOM from "../modules/domtools";
+import Utils from "../modules/utils"
 
 import SettingsTitle from "./settingsTitle";
 import Checkbox from "./checkbox";
@@ -218,7 +219,7 @@ export default class V2C_CssEditor extends BDV2.reactComponent {
     }
 
     injectDetachedRoot() {
-        const app = DOM.query(".app, ."+BDModules.get(e => e.app && e.layers)[0].app.split(" ")[0]);
+        const app = DOM.query(".app, ."+Utils.removeDa(BDModules.get(e => e.app && e.layers)[0].app));
         if (!app) return false;
         DOM.insertAfter(DOM.createElement(`<div id="bd-customcss-detach-container">`), app);
         return true;

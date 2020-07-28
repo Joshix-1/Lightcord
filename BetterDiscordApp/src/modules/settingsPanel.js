@@ -76,35 +76,7 @@ export default new class V2_SettingsPanel {
         this.sidebar.register("plugins", makeComponent(this.renderAddonPane("plugins")))
         this.sidebar.register("themes", makeComponent(this.renderAddonPane("themes")))
     }
-
-    get root() {
-        const _root = DOM.query("#bd-settingspane-container");
-        if (!_root) {
-            if (!this.injectRoot()) return null;
-            return this.root;
-        }
-        return _root;
-    }
-
-    injectRoot() {
-        let [
-            classNameLayer,
-            classSidebar
-        ] = [
-            BDModules.get(e => e.layer && e.animating)[0].layer.split(" ")[0],
-            BDModules.get(e => e.standardSidebarView)[0]
-        ]
-        const sidebar = DOM.query("."+classNameLayer+" ."+classSidebar.standardSidebarView.split(" ")[0]+", ."+classNameLayer+" .ui-standard-sidebar-view");
-        if (!sidebar) return false;
-        const root = DOM.createElement(`<div id="bd-settingspane-container" class="${classSidebar.contentRegion} content-region">`);
-        sidebar.append(root);
-
-        Utils.onRemoved(root, () => {
-            BDV2.reactDom.unmountComponentAtNode(root);
-        });
-        return true;
-    }
-
+    
     get coreSettings() {
         const settings = this.getSettings("core");
         const categories = [...new Set(settings.map(s => s.category))];
@@ -123,10 +95,6 @@ export default new class V2_SettingsPanel {
         return this.getSettings("status")
     }
 
-    get MsgLogSettings() {
-        return this.getSettings("msglog")
-    }
-
     getSettings(category) {
         return Object.keys(settings).reduce((arr, key) => {
             const setting = settings[key];
@@ -138,7 +106,6 @@ export default new class V2_SettingsPanel {
         }, []);
     }
 
-    onClick() {}
 
     onChange(id, checked, sidebar) {
         this.updateSettings(id, checked, sidebar);
@@ -212,10 +179,10 @@ export default new class V2_SettingsPanel {
             else dMode.stopCopySelector();
         }
 
-        /*if (id === "reactDevTools") {
+        if (id === "reactDevTools") {
             if (enabled) reactDevTools.start();
             else reactDevTools.stop();
-        }*/
+        }
         if (id === "lightcord-1") {
             if (enabled) window.Lightcord.Settings.devMode = true
             else window.Lightcord.Settings.devMode = false
@@ -292,7 +259,7 @@ export default new class V2_SettingsPanel {
     }
 
     async initializeSettings() {
-        //if (settingsCookie.reactDevTools) reactDevTools.start();
+        if (settingsCookie.reactDevTools) reactDevTools.start();
         if (settingsCookie["bda-gs-2"]) DOM.addClass(document.body, "bd-minimal");
         if (settingsCookie["bda-gs-3"]) DOM.addClass(document.body, "bd-minimal-chan");
         if (settingsCookie["bda-gs-1"]) publicServersModule.addButton();

@@ -157,19 +157,5 @@ export default new class DevMode {
             return names.join(" > ");
         }
         return fullPath(element)
-        /*
-        const rules = this.getRules(element);
-        const latestRule = rules[rules.length - 1];
-        if (latestRule) return latestRule.selectorText;
-        else if (element.classList.length) return `.${Array.from(element.classList).join(".")}`;
-        return `.${Array.from(element.parentElement.classList).join(".")}`;*/
-    }
-
-    getRules(element, css = element.ownerDocument.styleSheets) {
-        //if (window.getMatchedCSSRules) return window.getMatchedCSSRules(element);
-        const sheets = [...css].filter(s => !s.href || !s.href.includes("BetterDiscordApp"));
-        const rules = sheets.map(s => [...(s.cssRules || [])]).flat();
-        const elementRules = rules.filter(r => r && r.selectorText && element.matches(r.selectorText) && r.style.length && r.selectorText.split(", ").length < 8 && !r.selectorText.split(", ").includes("*"));
-        return elementRules;
     }
 };

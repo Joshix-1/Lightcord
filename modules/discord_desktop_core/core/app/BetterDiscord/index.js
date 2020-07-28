@@ -48,7 +48,7 @@ async function privateInit(){
     ModuleLoader.get(e => e.getCurrentHub)[0].getCurrentHub().getClient().getOptions().enabled = false
 
     // setting react in require cache
-    const React = ModuleLoader.get(e => !["Component", "PureComponent", "Children", "createElement", "cloneElement"].map(c => !!e[c]).includes(false))[0]
+    const React = ModuleLoader.get(e => !["Component", "PureComponent", "Children", "createElement", "cloneElement"].find(k => !e[k]))[0]
     window.React = React
 
     const ReactDOM = ModuleLoader.get(e => e.findDOMNode)[0]
@@ -278,7 +278,7 @@ async function privateInit(){
         DiscordNative.ipc.send("UPDATE_THEME", data.settings.theme)
     })
 
-    require("lightcordapi/js/main.js")
+    require("lightcordapi/js/main.min.js")
 
     /*
     if(shouldShowPrompt){

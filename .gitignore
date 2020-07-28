@@ -110,3 +110,7 @@ builds
 dist
 
 distApp
+
+# discord_voice debug
+discord-last-webrtc_0
+discord-webrtc_0

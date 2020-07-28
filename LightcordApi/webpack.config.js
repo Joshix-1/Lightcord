@@ -23,7 +23,8 @@ module.exports = {
         request: `request`,
         "node-fetch": "node-fetch",
         "uuid/v1": "uuid/v1",
-        "uuid/v4": "uuid/v4"
+        "uuid/v4": "uuid/v4",
+        "powercord/webpack": "powercord/webpack"
     },
     resolve: {
         extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],

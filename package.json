@@ -13,8 +13,8 @@
     "build:electron_linux": "electron-packager ./distApp --ignore=\"(distApp|builds|\\.ts|\\.dll)\" --arch=x64 --protocol=discord --platform=\"linux\" --out=builds --icon=app.ico --executable-name=\"Lightcord\" --asar.unpack=*.{node,so.4} --overwrite",
     "build:minify": "node build.js",
     "build:after": "node afterbuild.js",
-    "devInstall": "npm i -g --arch=ia32 electron@8.4.0 && npm i -g typescript && npm i --save-dev @types/node@12.12.39 && npm i --save-dev --arch=ia32 electron@8.4.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\"",
-    "devInstall:64": "npm i -g --arch=x64 electron@8.4.0 && npm i -g typescript && npm i --save-dev @types/node@12.12.39 && npm i --save-dev --arch=x64 electron@8.4.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\""
+    "devInstall": "npm i --save-dev --arch=ia32 electron@8.4.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\"",
+    "devInstall:64": "npm i --save-dev --arch=x64 electron@8.4.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\""
   },
   "author": "",
   "license": "ISC",
@@ -34,7 +34,7 @@
     "@types/auto-launch": "^5.0.1",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/mkdirp": "^1.0.0",
-    "@types/node": "^12.12.39",
+    "@types/node": "12.12.39",
     "@types/rimraf": "^3.0.0",
     "@types/uuid": "^8.0.0",
     "@types/yauzl": "^2.9.1",

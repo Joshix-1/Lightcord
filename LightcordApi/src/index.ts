@@ -8,6 +8,8 @@ import excludeProperties from "./modules/excludeProperties"
 import cloneNullProto from "./modules/cloneNullProto"
 import NOOP from "./modules/noop"
 import unfreeze from "./modules/Unfreeze"
+import { isNative, isImported } from "./modules/environnement"
+import * as bandagedbdApi from "@bandagedbd/bdapi"
 patchers.patch()
 
 const LightcordApi = {
@@ -21,19 +23,29 @@ const LightcordApi = {
         cloneNullProto: cloneNullProto,
         NOOP: NOOP,
         unfreeze: unfreeze
-    }
+    },
+    get isNative(){return isNative},
+    get isImported(){return isImported}
 }
 
 declare global {
     var React:typeof import("react")
     interface Window {
+        /**
+         * Lightcord is only availlaible in Lightcord (native)
+         */
         Lightcord: LightcordGlobal,
+        /**
+         * BDModules is only availlaible in Lightcord (native)
+         */
         BDModules: {
             modules:any[],
             get(filter:(mod:any)=>boolean, modules?:any[]):any[],
             get(id:number, modules?:any[]):any,
             get(ids: [number|((mod:any)=>boolean)], modules?:any[]):any
-        }
+        },
+        BdApi: typeof bandagedbdApi.BdApi,
+        EDApi: typeof bandagedbdApi.BdApi
     }
     var Lightcord:LightcordGlobal
 }
@@ -59,7 +71,7 @@ export interface LightcordGlobal {
     },
     Api: LightcordApiGlobal,
     BetterDiscord: {
-        BdApi: typeof import("@bandagedbd/bdapi").BdApi,
+        BdApi: typeof bandagedbdApi.BdApi,
         [mod:string]:any
     }
 }

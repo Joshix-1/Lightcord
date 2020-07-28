@@ -572,7 +572,7 @@ class PresenceErrorCatcher extends React.Component {
                 return this.render()
             }
         }else{
-            emptyClasses = emptyClasses || BDV2.WebpackModules.find(e => e.emptyStateImage)
+            emptyClasses = emptyClasses || BDV2.WebpackModules.find(e => e.emptyStateImage && e.emptyState)
             if(!emptyClasses){
                 Utils.showToast("An error occured. Please check the console for more informations.")
                 return null
@@ -584,7 +584,7 @@ class PresenceErrorCatcher extends React.Component {
                     backgroundColor: "var(--background-primary)", 
                     padding: "30px 30px", 
                     borderRadius: "8px"
-                }} className="lc-tab-box-shadow">
+                }} className={`lc-tab-box-shadow ${emptyClasses.emptyState}`}>
                     <div className={emptyClasses.emptyStateImage} style={{
                         marginTop: "20px"
                     }}>

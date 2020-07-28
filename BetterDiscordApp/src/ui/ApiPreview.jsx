@@ -30,10 +30,13 @@ export default class ApiPreview extends React.PureComponent {
             <formModule.FormSection tag="h2" title="Lightcord's Api Availlable components">
                 <formModule.FormText type="description" className="" selectable={false}>
                     These components are here for the plugin devs. They can quickly embed any component below with this panel.
+                    <div style={{marginTop: "20px"}}></div>
+                    <Lightcord.Api.Components.general.AlertBox type="info">All these components have error handling. If you want none, add `.original` after the component path.</Lightcord.Api.Components.general.AlertBox>
+                    <Lightcord.Api.Components.general.AlertBox type="warn">We do not recommend modifying these component by a plugin. Only do this if you know what you are doing.</Lightcord.Api.Components.general.AlertBox>
                 </formModule.FormText>
                 <MarginTop></MarginTop>
                 <Lightcord.Api.Components.inputs.Button color="brand" look="outlined" size="medium" hoverColor="green" onClick={() => {
-                    remote.shell.openExternal("https://github.com/lightcord/lightcord/wiki/Apis")
+                    remote.shell.openExternal("https://lightcord.deroku.xyz/LightcordApi/docs")
                 }} wrapper={false}>
                     Documentation
                 </Lightcord.Api.Components.inputs.Button>

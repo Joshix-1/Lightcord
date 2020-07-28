@@ -14,9 +14,11 @@ var _electron = require('electron');
 var _appFeatures = require('./appFeatures');
 
 var _mainScreen = require('./mainScreen');
+const { join } = require('path');
 
 const MIN_POPOUT_WIDTH = 320;
 const MIN_POPOUT_HEIGHT = 180;
+/** @type {Electron.BrowserWindowConstructorOptions} */
 const DEFAULT_POPOUT_OPTIONS = {
   title: 'Lightcord Popout',
   backgroundColor: '#2f3136',
@@ -29,7 +31,8 @@ const DEFAULT_POPOUT_OPTIONS = {
   webPreferences: {
     nodeIntegration: false,
     nativeWindowOpen: true
-  }
+  },
+  icon: join(__dirname, 'discord.png')
 };
 const features = (0, _appFeatures.getFeatures)();
 

@@ -152,6 +152,8 @@ export class Notice extends EventEmitter {
         index:number
     }
 
+    private nextTickRefresh:boolean = false
+
     get removed():boolean{
         return !notices.find(e => e.id === this.id)
     }
@@ -166,36 +168,55 @@ export class Notice extends EventEmitter {
         return this.data.id
     }
 
+    update(data: Partial<notice>){
+        for(let key in data){
+            if(key === "id")continue
+            this.data[key] = data[key]
+        }
+
+        if(!this.nextTickRefresh){
+            this.nextTickRefresh = true
+            process.nextTick(() => {
+                this.nextTickRefresh = false
+                noticeEvents.emit("noticeUpdate")
+            })
+        }
+    }
+
     get text(){
         return this.data.text
     }
     set text(text){
-        this.data.text = text
-        noticeEvents.emit("noticeUpdate")
+        this.update({
+            text
+        })
     }
 
     get type(){
         return this.data.type
     }
     set type(type){
-        this.data.type = type
-        noticeEvents.emit("noticeUpdate")
+        this.update({
+            type
+        })
     }
 
     get buttonText(){
         return this.data.buttonText
     }
     set buttonText(buttonText:string){
-        this.data.buttonText = buttonText
-        noticeEvents.emit("noticeUpdate")
+        this.update({
+            buttonText
+        })
     }
 
     get onClick(){
         return this.data.onClick
     }
     set onClick(onClick){
-        this.data.onClick = onClick
-        noticeEvents.emit("noticeUpdate")
+        this.update({
+            onClick
+        })
     }
 
     remove(){

@@ -76,6 +76,7 @@ export const settings = {
     "Scroll To Settings":         {id: "fork-ps-3", info: "Auto-scrolls to a plugin's settings when the button is clicked (only if out of view)", implemented: true, hidden: false, cat: "core", category: "content manager"},
     "Automatic Loading":          {id: "fork-ps-5", info: "Automatically loads, reloads, and unloads plugins and themes", implemented: true, hidden: false, cat: "core", category: "content manager"},
     "Enable Edit Button":         {id: "fork-ps-7", info: "Enable an Edit Button on the plugin and theme panel.", implemented: true, hidden: false, cat: "core", category: "content manager"},
+    "Themes in Popout Window":    {id: "lightcord-9", info: "Enable themes in Popout Window. (For example, when detaching screenshare.)", implemented: true, hidden: false, cat: "core", category: "content manager", experimental: true},
 
     /* Developer */
     "Developer Mode":         	  {id: "bda-gs-8", info: "Developer Mode Toggle", implemented: true, hidden: false, cat: "core", category: "developer settings"},
@@ -146,6 +147,7 @@ export const defaultCookie = {
     "lightcord-6": true,
     "lightcord-7": false,
     "lightcord-8": false,
+    "lightcord-9": false,
     "lightcord-10": false,
     "no_window_bound": false,
 };

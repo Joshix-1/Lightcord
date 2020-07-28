@@ -2,6 +2,7 @@ import NOOP from "../../modules/noop"
 import WebpackLoader from "../../modules/WebpackLoader"
 import Tooltip from "../general/Tooltip"
 import Utils from "../../modules/Utils"
+import { createProxyErrorCatcherClass } from "../private/ErrorCatcher"
 
 const Constants = {
     defaultColor: 10070709,
@@ -57,9 +58,13 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
 
     /** Preload the component. */
     static preload(){
-        if(ColorPicker.prototype.modules[0])return
-        if(isFetching)return
-        new ColorPicker({}).render()
+        if(ColorPicker.prototype.modules[0])return // already loaded
+        if(isFetching)return // is fetching so don't double preload.
+        try{ // If we caught an error
+            new ColorPicker({}).render()
+        }catch(e){
+            console.error(e)
+        }
     }
 
     onChange(val){
@@ -114,9 +119,10 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
                     return {
                         id: null
                     }
-                }
+                },
+                renderHeader: GuildSettingsRoles.prototype.renderHeader
             })
-            const GuildRoleSettings = settings.props.children.type
+            const GuildRoleSettings = settings.props.children[1].type
             let children = GuildRoleSettings.prototype.renderColorPicker.call({
                 props: {
                     role: {
@@ -128,6 +134,7 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
                 }
             }).props.children
             children.type(children.props).props.children.type._ctor().then(c => {
+                ColorPickerModules = null
                 this.forceUpdate()
                 resolve()
             })
@@ -175,7 +182,7 @@ export default class ColorPicker extends React.PureComponent<ColorPickerProps, {
     }
 
     static help = {
-        info: "To convert hex colors to decimal, you can do `Lightcord.Api.Utils.HexColorToDecimal('#yourcolor')` and go back with `Lightcord.Api.Utils.DecimalColorToHex(7506394)`",
+        info: "To convert hex colors to decimal, you can do `Lightcord.Api.Utils.HexColorToDecimal('#7289DA')` and go back with `Lightcord.Api.Utils.DecimalColorToHex(7506394)`",
         warn: "The component may not appear instantly. The component needs to be loaded, so you could experience 50-300ms loading time depending on your internet connection."
     }
 }

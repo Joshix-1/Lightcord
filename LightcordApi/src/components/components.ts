@@ -13,25 +13,27 @@ import cloneNullProto from "../modules/cloneNullProto"
 import Tooltip from "./general/Tooltip"
 import ColorPicker from "./inputs/ColorPicker"
 import AlertBox from "./general/AlertBox"
+import { createProxyErrorCatcherClass } from "./private/ErrorCatcher"
 
+const RadioGroupProxied = createProxyErrorCatcherClass(RadioGroup)
 export default cloneNullProto({
     inputs: cloneNullProto({
-        Button: DiscordButton,
-        Switch: Switch,
-        Choices: RadioGroup,
-        RadioGroup: RadioGroup,
-        TextArea: TextArea,
-        TextInput: TextInput,
-        Dropdown: Dropdown,
-        ColorPicker: ColorPicker
+        Button: createProxyErrorCatcherClass(DiscordButton),
+        Switch: createProxyErrorCatcherClass(Switch),
+        Choices: RadioGroupProxied,
+        RadioGroup: RadioGroupProxied,
+        TextArea: createProxyErrorCatcherClass(TextArea),
+        TextInput: createProxyErrorCatcherClass(TextInput),
+        Dropdown: createProxyErrorCatcherClass(Dropdown),
+        ColorPicker: createProxyErrorCatcherClass(ColorPicker)
     }),
     general: cloneNullProto({
-        Title: Title,
-        SettingsTitle: SettingsTitle,
-        SettingSubTitle: SettingSubTitle,
-        Tabs: Tabs,
-        CodeBlock: CodeBlock,
-        Tooltip: Tooltip,
-        AlertBox: AlertBox
+        Title: createProxyErrorCatcherClass(Title),
+        SettingsTitle: createProxyErrorCatcherClass(SettingsTitle),
+        SettingSubTitle: createProxyErrorCatcherClass(SettingSubTitle),
+        Tabs: createProxyErrorCatcherClass(Tabs),
+        CodeBlock: createProxyErrorCatcherClass(CodeBlock),
+        Tooltip: createProxyErrorCatcherClass(Tooltip),
+        AlertBox: createProxyErrorCatcherClass(AlertBox)
     })
 })

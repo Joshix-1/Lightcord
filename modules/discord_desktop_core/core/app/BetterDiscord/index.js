@@ -157,7 +157,7 @@ async function privateInit(){
 
     let constants = ModuleLoader.get(m=>m.API_HOST)[0]
     let dispatcher = ModuleLoader.get(m=>m.Dispatcher&&m.default&&m.default.dispatch)[0].default
-    require("../../../../../BetterDiscordApp/css/main.css")
+    require("../../../../../BetterDiscordApp/dist/style.css")
     require("./lightcord.css")
 
     function getCurrentHypesquad(){
@@ -351,7 +351,7 @@ async function privateInit(){
         dispatcher.subscribe(constants.ActionTypes.CONNECTION_OPEN || "CONNECTION_OPEN", onConn)
     }*/
 
-    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/js/main.js").default)(BetterDiscordConfig, require("./betterdiscord"))
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/dist/index.js").default)(BetterDiscordConfig, require("./betterdiscord"))
 
     const Utils = window.Lightcord.BetterDiscord.Utils
     const DOMTools = window.Lightcord.BetterDiscord.DOM

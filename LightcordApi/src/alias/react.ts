@@ -3,7 +3,7 @@ import { ReactSelector } from "./selectors";
 window.React = (window.React || // If in Lightcord
     (()=>{ // If in Standard BetterDiscord
         try{
-            return window.BdApi.findModule(ReactSelector as any)
+            return window.BdApi.React
         }catch(e){
             return null
         }
@@ -18,7 +18,7 @@ window.React = (window.React || // If in Lightcord
     })() || 
     (()=>{ // If in EnhancedDiscord
         try{
-            return window.EDApi.findModule(ReactSelector as any)
+            return window.EDApi.React
         }catch(e){
             return null
         }

@@ -48,6 +48,8 @@ declare global {
         EDApi: typeof bandagedbdApi.BdApi
     }
     var Lightcord:LightcordGlobal
+    var BdApi: typeof bandagedbdApi.BdApi
+    var EDApi: typeof bandagedbdApi.BdApi
 }
 
 export default LightcordApi

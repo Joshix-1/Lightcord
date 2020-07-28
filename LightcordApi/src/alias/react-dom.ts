@@ -4,7 +4,7 @@ import { ReactDOMSelector } from "./selectors"
 window.ReactDOM = (window["Reac"+"tDOM"] || // If in Lightcord
     (()=>{ // If in Standard BetterDiscord
         try{
-            return window.BdApi.findModule(ReactDOMSelector as any)
+            return window.BdApi.ReactDOM
         }catch(e){
             return null
         }
@@ -19,7 +19,7 @@ window.ReactDOM = (window["Reac"+"tDOM"] || // If in Lightcord
     })() || 
     (()=>{ // If in EnhancedDiscord
         try{
-            return window.EDApi.findModule(ReactDOMSelector as any)
+            return window.EDApi.ReactDOM
         }catch(e){
             return null
         }

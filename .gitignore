@@ -108,6 +108,7 @@ builds
 
 # must build typescript itself
 dist
+!BetterDiscordApp/dist
 
 distApp
 

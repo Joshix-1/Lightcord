@@ -108,3 +108,7 @@ export default new class Utils {
         }
     }
 }
+
+export class LightcordApiError extends Error {
+    name:string = "LightcordApiError"
+}

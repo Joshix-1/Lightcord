@@ -204,7 +204,7 @@ Object.defineProperty(Permissions.prototype, "raw", {
  * @typedef {string|number|Permissions|PermissionResolvable[]} PermissionResolvable
  */
 export type PermissionResolvable =
-    | string
+    | keyof typeof Permissions.FLAGS
     | number
     | Permissions
     | PermissionResolvable[];

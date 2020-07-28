@@ -25,6 +25,16 @@ let channelsModuleInternal2:{
     deleteChannel(id: Snowflake):void
 }
 
+let channelsModuleInternal4:{
+    createChannel(guildId:Snowflake, type:string, name:string, 
+        permissionOverwrites: {
+            id: Snowflake,
+            type: "role"|"member",
+            allow: number,
+            deny: number
+        }[], bitrate:number, userLimit:number, parentId:Snowflake, skuId:Snowflake, branchId:Snowflake):void
+} = requireModule(e => e.default && e.default.createChannel)
+
 let channelsModuleInternal3:{
     hasUnread(channel_id:Snowflake):boolean,
     hasCategoryUnread(channel_id:Snowflake):boolean,
@@ -54,5 +64,6 @@ export = {
     get lastMessageId(){
         set3()
         return channelsModuleInternal3.lastMessageId
-    }
+    },
+    createGuildChannel: channelsModuleInternal4.createChannel
 }

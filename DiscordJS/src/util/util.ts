@@ -11,6 +11,7 @@ import { ChannelTypes } from "./Constants";
 import CategoryChannel from "../structures/CategoryChannel";
 import Collection from "@discordjs/collection";
 import Permissions, { PermissionResolvable } from "./Permissions";
+import PermissionOverwrites from "../structures/PermissionOverwrites";
 
 export function createChannel(channel:DiscordChannel):Channel{
     let constructor = channels[channel.type] || BaseChannel
@@ -140,8 +141,6 @@ export type ChannelCreationOverwrites = {
     denied?: PermissionResolvable,
     id?: GuildMemberResolvable | RoleResolvable
 }
-
-export type PermissionOverwrites = keyof typeof Permissions.FLAGS | number | Permissions | PermissionResolvable[]
 
 export {BitFieldResolvable} from "./BitField"
 

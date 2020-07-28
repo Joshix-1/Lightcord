@@ -7,9 +7,14 @@ gulp.task("watch-css", function() {
   return gulp.watch(["./src/styles/index.css"], minifyCSS);
 });
 
-function minifyCSS() {
-  return gulp.src("./src/styles/index.css")
+async function minifyCSS() {
+  return [
+    gulp.src("./src/styles/index.css")
         .pipe(csso({restructure: false}))
+        .pipe(rename("style.min.css"))
+        .pipe(gulp.dest("./dist")),
+	gulp.src("./src/styles/index.css")
         .pipe(rename("style.css"))
-        .pipe(gulp.dest("./dist"));
+        .pipe(gulp.dest("./dist"))
+  ]
 }

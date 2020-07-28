@@ -1,13 +1,14 @@
 import { Snowflake, Channel } from ".."
 import { DiscordGuild, channelsModule, guildModule, UserSettingsModule, ConstantsModule, CdnModule, AckModule } from "../util/DiscordToModules"
 import BaseStructure from "./BaseStructure"
-import { createChannel, createGuildMember, createRole, UserResolvable, resolveUserID, ChannelData, ChannelCreationOverwrites, PermissionOverwrites } from "../util/util"
+import { createChannel, createGuildMember, createRole, UserResolvable, resolveUserID, ChannelData, ChannelCreationOverwrites } from "../util/util"
 import Collection from "@discordjs/collection"
 import SnowflakeUtil from "../util/Snowflake"
 import GuildMember from "./GuildMember"
-import { MessageNotificationType } from "../util/Constants"
+import { MessageNotificationType, ChannelTypes } from "../util/Constants"
 import Role from "./Role"
 import DiscordJSError from "../util/DiscordJSError"
+import PermissionOverwrites from "./PermissionOverwrites"
 
 export default class Guild extends BaseStructure {
     DiscordGuild:DiscordGuild
@@ -302,8 +303,20 @@ export default class Guild extends BaseStructure {
         return id
     }
 
-    createChannel(name:string, typeOrOptions:string|ChannelData = 'text', permissionOverwrites?: ChannelCreationOverwrites[] | Collection<Snowflake, PermissionOverwrites>, reason?: string){
-
+    createChannel(name:string, typeOrOptions:ChannelTypes|ChannelData = ChannelTypes.TEXT, permissionOverwrites?: ChannelCreationOverwrites[] | Collection<Snowflake, PermissionOverwrites>, reason?: string){
+        const [opts, type] = typeof typeOrOptions === "string" ? [
+            {},
+            typeOrOptions
+        ] : [
+            typeOrOptions,
+            typeOrOptions.type
+        ]
+        const options = {
+            name: name || "Unknown Channel",
+            type: type || "text"
+        }
+        //TODO: CreateGuildChannels and handle permissions
+        //channelsModule.createGuildChannel(this.id, options.type, optinos.name)
     }
 
     fetch():Promise<Guild>{ // Guild is synced by Discord. Only refreshing from cache.

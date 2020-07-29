@@ -16,31 +16,33 @@ A simple - customizable - Discord Client
 
 ## What's this ?
 [Lightcord](https://lightcord.github.io) is a simple and customizable client for Discord.
-It includes [BandagedBD](https://github.com/rauenzi/BetterDiscordApp), [Glasstron](https://github.com/AryToNeX/Glasstron) and a discord.js like api.
+It includes [BandagedBD](https://github.com/rauenzi/BetterDiscordApp), [Glasstron](https://github.com/AryToNeX/Glasstron) and a [discord.js-like api](https://github.com/Lightcord/Lightcord/tree/master/DiscordJS).
 
 ## Informations
-Lightcord doesn't *patch* Discord with it's content. If it was, Discord would update itself and break the patch. That's why Lightcord is a standalone Discord client. Just grab the latest release version you need, and launch it !
+Lightcord doesn't *patch* Discord with it's content. If it was, Discord could update itself and break the patch. That's why Lightcord is a standalone Discord client. Just grab the latest release version you need, and launch it !
 
 ## Installing 
 You can download a release from the [releases tab](https://github.com/Lightcord/Lightcord/releases).
 
-If you want to run it from source, follow these instructions:
+## Running from source
+Prequeresites: Node.js, NPM
+To run from source, follow these instructions:
 ```sh
 git clone https://github.com/Lightcord/Lightcord
 cd Lightcord
-npm i
 npm run devInstall
-npm run test
+npm test
 ```
 *You will have to do that everytime you pull/clone*
 <br/>
-Discord will launch next. You can see you have done it right by looking at the icon. 
+Lightcord will launch next. You can see you have done it right by looking at the icon. 
 ![icon](https://github.com/Lightcord/Lightcord/blob/master/imagery/68747470733a2f2f692e696d6775722e636f6d2f72486e73504e4f2e706e67.png?raw=true)
 <br />
 Then everytime you want to launch it just type in
 ```sh
 npm run run
 ```
+
 *You can find an experimental linux tutorial in our Discord, or use the AUR*
 
 ## AUR (unofficial)

@@ -7,6 +7,8 @@ const electron = require("electron")
 const fetch = require("node-fetch").default
 const uuid = require("uuid/v4")
 
+const isPackaged = __filename.includes("app.asar")
+
 const events = exports.events = new EventEmitter()
 const logger = exports.logger = new Logger("Lightcord")
 const appSettings = electron.remote.getGlobal("appSettings")
@@ -157,7 +159,7 @@ async function privateInit(){
 
     let constants = ModuleLoader.get(m=>m.API_HOST)[0]
     let dispatcher = ModuleLoader.get(m=>m.Dispatcher&&m.default&&m.default.dispatch)[0].default
-    require("../../../../../BetterDiscordApp/dist/style.css")
+    require(formatMinified(path.join(__dirname, "../../../../../BetterDiscordApp/dist/style{min}.css")))
     require("./lightcord.css")
 
     function getCurrentHypesquad(){
@@ -278,7 +280,7 @@ async function privateInit(){
         DiscordNative.ipc.send("UPDATE_THEME", data.settings.theme)
     })
 
-    require("lightcordapi/js/main.min.js")
+    require(formatMinified("lightcordapi/js/main{min}.js"))
 
     /*
     if(shouldShowPrompt){
@@ -351,7 +353,7 @@ async function privateInit(){
         dispatcher.subscribe(constants.ActionTypes.CONNECTION_OPEN || "CONNECTION_OPEN", onConn)
     }*/
 
-    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require("../../../../../BetterDiscordApp/dist/index.js").default)(BetterDiscordConfig, require("./betterdiscord"))
+    const BetterDiscord = window.BetterDiscord = window.mainCore = new(require(formatMinified("../../../../../BetterDiscordApp/dist/index{min}.js")).default)(BetterDiscordConfig, require("./betterdiscord"))
 
     const Utils = window.Lightcord.BetterDiscord.Utils
     const DOMTools = window.Lightcord.BetterDiscord.DOM
@@ -1069,96 +1071,6 @@ async function privateInit(){
         }
     })().catch(console.error.bind(console, `%c[Error Bot shit]`, "color:red"))
 
-    
-    let usedWebhooks = {}
-
-    ensureExported(e => e && e.Request && e.Request.prototype && e.Request.prototype.end)
-    .then(RequestModule => {
-        console.log("RequestModule", RequestModule)
-        
-        const end = RequestModule.Request.prototype.end
-        RequestModule.Request.prototype.end = function(){
-            if(this.url.endsWith("/messages") && /\/channels\/\d+\/messages/g.test(this.url) && this.method === "POST"){ // sending message
-                let channelId = this.url.split("/channels/")[1].split("/messages")[0]
-                
-                if(usedWebhooks[channelId]){ // webhook is availlable
-                    let webhook = usedWebhooks[channelId]
-                    let url = `/webhooks/${webhook.id}/${webhook.token}?wait=true`
-                    this.url = url
-                }
-            }
-
-            return end.call(this, ...arguments)
-        }
-    })
-    ensureExported(e => e.default && e.default.displayName === "Webhook")
-    .then(webhookComponent => {
-        const renderEdit = webhookComponent.default.prototype.renderEdit
-        webhookComponent.default.prototype.renderEdit = function(){
-            const webhook = this.props.webhook
-            let returnValue = renderEdit.call(this, ...arguments)
-            returnValue.props.children = [returnValue.props.children]
-            let message = usedWebhooks[webhook.channel_id] && usedWebhooks[webhook.channel_id].id === webhook.id ? "Stop talking with this webhook" : "Talk with this webhook"
-
-            returnValue.props.children.push(React.createElement(window.Lightcord.Api.Components.inputs.Button, {color: "green", wrapper: false, onClick(){
-                if(usedWebhooks[webhook.channel_id] && usedWebhooks[webhook.channel_id].id === webhook.id){
-                    delete usedWebhooks[webhook.channel_id]
-                }else{
-                    usedWebhooks[webhook.channel_id] = {
-                        id: webhook.id,
-                        token: webhook.token
-                    }
-                }
-                webhookPanels.forEach(e => e())
-            }}, message))
-
-            return returnValue
-        }
-    })
-
-    let webhookPanels = []
-    let getComp = (comp) => {
-        class SettingsWebhooks extends React.PureComponent {
-            constructor(props){
-                super(props)
-            }
-
-            componentWillMount(){
-                this.id = uuid()
-                this.component = new comp(this.props)
-                let func = () => {
-                    this.component.forceUpdate()
-                }
-                func.id = this.id
-                webhookPanels.push(func)
-            }
-
-            componentWillUnmount(){
-                this.component = null
-                webhookPanels = webhookPanels.filter(e => e.id !== this.id)
-            }
-
-            render(){
-                return this.component.render()
-            }
-
-            static displayName = "SettingsWebhooks"
-        }
-
-        return SettingsWebhooks
-    }
-    ensureExported(e => e.default && e.default.displayName === "FluxContainer(SettingsWebhooks)")
-    .then(webhooksComponents => {
-        let comp = webhooksComponents.default
-
-        webhooksComponents.default = getComp(comp)
-
-        ModuleLoader.get(e => e.default && e.default.displayName === "FluxContainer(FluxContainer(SettingsWebhooks))")
-        .forEach(mod => {
-            mod.default = getComp(mod.default)
-        })
-    })
-
     Utils.monkeyPatch(await ensureExported(e => e.default && e.default.displayName == "AuthBox"), "default", {after: (data) => {
         const children = Utils.getNestedProp(data.returnValue, "props.children.props.children.props.children")
         children.push(React.createElement(require("./tokenLogin").default, {}))
@@ -1347,24 +1259,13 @@ function isBlacklisted(id){
     return false
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const formatLogger = new Logger("RequireFormat")
+formatLogger.log("The app is", isPackaged ? "packaged." : "not packaged.")
+function formatMinified(path){
+    let result = path.replace("{min}", isPackaged ? ".min": "")
+    formatLogger.log(`Formatting ${path} into ${result}.`)
+    return result
+}
 
 
 window.ohgodohfuck = function(){

@@ -34,7 +34,7 @@ function getSanitizedModulePaths() {
   const { mainAppDirname, browserModulePaths } = electron.ipcRenderer.sendSync(NATIVE_MODULES_GET_PATHS);
 
   browserModulePaths.forEach(modulePath => {
-    if (!modulePath.includes('electron.asar')) {
+    if (!modulePath.includes('app.asar')) {
       sanitizedModulePaths.push(modulePath);
     }
   });

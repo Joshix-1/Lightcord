@@ -10782,8 +10782,135 @@
         var n = new o(e, t);
         return n.setUndoManager(new u), n
     }, t.EditSession = o, t.UndoManager = u, t.version = "1.2.9"
-}), define("ace/theme/monokai", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
-    t.isDark = !0, t.cssClass = "ace-monokai", t.cssText = ".ace-monokai .ace_gutter {background: #2F3129;color: #8F908A}.ace-monokai .ace_print-margin {width: 1px;background: #555651}.ace-monokai {background-color: #272822;color: #F8F8F2}.ace-monokai .ace_cursor {color: #F8F8F0}.ace-monokai .ace_marker-layer .ace_selection {background: #49483E}.ace-monokai.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px #272822;}.ace-monokai .ace_marker-layer .ace_step {background: rgb(102, 82, 0)}.ace-monokai .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid #49483E}.ace-monokai .ace_marker-layer .ace_active-line {background: #202020}.ace-monokai .ace_gutter-active-line {background-color: #272727}.ace-monokai .ace_marker-layer .ace_selected-word {border: 1px solid #49483E}.ace-monokai .ace_invisible {color: #52524d}.ace-monokai .ace_entity.ace_name.ace_tag,.ace-monokai .ace_keyword,.ace-monokai .ace_meta.ace_tag,.ace-monokai .ace_storage {color: #F92672}.ace-monokai .ace_punctuation,.ace-monokai .ace_punctuation.ace_tag {color: #fff}.ace-monokai .ace_constant.ace_character,.ace-monokai .ace_constant.ace_language,.ace-monokai .ace_constant.ace_numeric,.ace-monokai .ace_constant.ace_other {color: #AE81FF}.ace-monokai .ace_invalid {color: #F8F8F0;background-color: #F92672}.ace-monokai .ace_invalid.ace_deprecated {color: #F8F8F0;background-color: #AE81FF}.ace-monokai .ace_support.ace_constant,.ace-monokai .ace_support.ace_function {color: #66D9EF}.ace-monokai .ace_fold {background-color: #A6E22E;border-color: #F8F8F2}.ace-monokai .ace_storage.ace_type,.ace-monokai .ace_support.ace_class,.ace-monokai .ace_support.ace_type {font-style: italic;color: #66D9EF}.ace-monokai .ace_entity.ace_name.ace_function,.ace-monokai .ace_entity.ace_other,.ace-monokai .ace_entity.ace_other.ace_attribute-name,.ace-monokai .ace_variable {color: #A6E22E}.ace-monokai .ace_variable.ace_parameter {font-style: italic;color: #FD971F}.ace-monokai .ace_string {color: #E6DB74}.ace-monokai .ace_comment {color: #75715E}.ace-monokai .ace_indent-guide {background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWPQ0FD0ZXBzd/wPAAjVAoxeSgNeAAAAAElFTkSuQmCC) right repeat-y}";
+}), define("ace/theme/discord", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
+    //TODO: Finish discord theme for custom css.
+    t.isDark = !0, t.cssClass = "ace-discord", t.cssText = `
+.ace-discord {
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+    border: 1px solid var(--background-floating);
+    border-bottom: none
+}
+.ace-discord .ace_gutter {
+    background: var(--background-secondary-alt);
+    color: var(--text-normal);
+}
+
+.ace-discord .ace_print-margin {
+    width: 1px;
+    background: none;
+}
+
+.ace-discord .ace_marker-layer .ace_active-line {
+    background: var(--background-tertiary);
+}
+
+.ace-discord .ace_gutter-active-line {
+    background-color: var(--background-tertiary);
+}
+
+.ace-discord .ace_text-layer {
+    color: var(--text-normal);
+}
+
+.ace-discord .ace_cursor {
+    color: var(--text-normal)
+}
+
+.ace-discord .ace_marker-layer .ace_selection {
+    background: var(--background-accent)
+}
+
+.ace-discord.ace_multiselect .ace_selection.ace_start {
+    box-shadow: 0 0 3px 0px var(--background-secondary);
+}
+
+.ace-discord .ace_marker-layer .ace_step {
+    background: rgb(102, 82, 0)
+}
+
+.ace-discord .ace_marker-layer .ace_bracket {
+    margin: -1px 0 0 -1px;
+    border: 1px solid var(--background-primary)
+}
+
+.ace-discord .ace_marker-layer .ace_selected-word {
+    border: 1px solid var(--background-primary)
+}
+
+.ace-discord .ace_invisible {
+    color: var(--text-muted)
+}
+
+.ace-discord .ace_entity.ace_name.ace_tag,
+.ace-discord .ace_keyword,
+.ace-discord .ace_meta.ace_tag,
+.ace-discord .ace_storage {
+    color: #F92672
+}
+
+.ace-discord .ace_punctuation,
+.ace-discord .ace_punctuation.ace_tag {
+    color: #fff
+}
+
+.ace-discord .ace_constant.ace_character,
+.ace-discord .ace_constant.ace_language,
+.ace-discord .ace_constant.ace_numeric,
+.ace-discord .ace_constant.ace_other {
+    color: #AE81FF
+}
+
+.ace-discord .ace_invalid {
+    color: #F8F8F0;
+    background-color: #F92672
+}
+
+.ace-discord .ace_invalid.ace_deprecated {
+    color: #F8F8F0;
+    background-color: #AE81FF
+}
+
+.ace-discord .ace_support.ace_constant,
+.ace-discord .ace_support.ace_function {
+    color: #66D9EF
+}
+
+.ace-discord .ace_fold {
+    background-color: #A6E22E;
+    border-color: #F8F8F2
+}
+
+.ace-discord .ace_storage.ace_type,
+.ace-discord .ace_support.ace_class,
+.ace-discord .ace_support.ace_type {
+    font-style: italic;
+    color: #66D9EF
+}
+
+.ace-discord .ace_entity.ace_name.ace_function,
+.ace-discord .ace_entity.ace_other,
+.ace-discord .ace_entity.ace_other.ace_attribute-name,
+.ace-discord .ace_variable {
+    color: #A6E22E
+}
+
+.ace-discord .ace_variable.ace_parameter {
+    font-style: italic;
+    color: #FD971F
+}
+
+.ace-discord .ace_string {
+    color: #E6DB74
+}
+
+.ace-discord .ace_comment {
+    color: #75715E
+}
+
+.ace-discord .ace_indent-guide {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWPQ0FD0ZXBzd/wPAAjVAoxeSgNeAAAAAElFTkSuQmCC) right repeat-y
+}`;
     var r = e("../lib/dom");
     r.importCssString(t.cssText, t.cssClass)
 }), define("ace/mode/css_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/mode/text_highlight_rules"], function(e, t, n) {

@@ -33,7 +33,7 @@ export default class V2C_CssEditor extends BDV2.reactComponent {
     componentDidMount() {
         // this.updateLineCount();
         this.editor = ace.edit("bd-customcss-editor");
-        this.editor.setTheme("ace/theme/monokai");
+        this.editor.setTheme("ace/theme/discord");
         this.editor.session.setMode("ace/mode/css");
         this.editor.setShowPrintMargin(false);
         this.editor.setFontSize(14);

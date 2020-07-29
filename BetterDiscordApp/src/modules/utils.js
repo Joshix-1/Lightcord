@@ -2,7 +2,6 @@ import {bbdVersion} from "../0globals";
 import WebpackModules from "./webpackModules";
 import BDV2 from "./v2";
 import DOM from "./domtools";
-
 export default class Utils {
     /** Document/window width */
     static get screenWidth() { return Math.max(document.documentElement.clientWidth, window.innerWidth || 0); }
@@ -40,7 +39,7 @@ export default class Utils {
     }
 
     static getTextArea() {
-        return DOM.query("."+this.removeDa(BDModules.get(e => e.channelTextArea && e.titleWrapper)[0].channelTextArea)+" textarea");
+        return DOM.query("."+removeDa(BDModules.get(e => e.channelTextArea && e.titleWrapper)[0].channelTextArea)+" textarea");
     }
 
     static insertText(textarea, text) {
@@ -201,8 +200,8 @@ export default class Utils {
      */
     static showToast(content, options = {}) {
         if (!document.querySelector(".bd-toasts")) {
-            const container = document.querySelector("."+this.removeDa(BDModules.get(e => e.sidebar && e.hasNotice)[0].sidebar)+" + div") || null;
-            const memberlist = container ? container.querySelector("."+this.removeDa(BDModules.get(e => e.membersWrap)[0].membersWrap)) : null;
+            const container = document.querySelector("."+removeDa(BDModules.get(e => e.sidebar && e.hasNotice)[0].sidebar)+" + div") || null;
+            const memberlist = container ? container.querySelector("."+removeDa(BDModules.get(e => e.membersWrap)[0].membersWrap)) : null;
             const form = container ? container.querySelector("form") : null;
             const left = container ? container.getBoundingClientRect().left : 310;
             const right = memberlist ? memberlist.getBoundingClientRect().left : 0;
@@ -482,10 +481,14 @@ export default class Utils {
         }, {modalKey: key});
     }
 
-    static removeDa(className){
-        if(!className)return className
-        return className.split(" ").filter(e => !e.startsWith("da-")).join(" ")
+    static get removeDa(){
+        return removeDa
     }
+}
+
+function removeDa(className){
+    if(!className)return className
+    return className.split(" ").filter(e => !e.startsWith("da-")).join(" ")
 }
 
 Utils.showToast = Utils.suppressErrors(Utils.showToast, "Could not show toast.");

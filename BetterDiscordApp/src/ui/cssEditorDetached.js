@@ -23,7 +23,7 @@ export default class V2C_CssEditorDetached extends BDV2.reactComponent {
         BDV2.editorDetached = true;
         // this.updateLineCount();
         this.editor = ace.edit("bd-customcss-editor-detached");
-        this.editor.setTheme("ace/theme/monokai");
+        this.editor.setTheme("ace/theme/discord");
         this.editor.session.setMode("ace/mode/css");
         this.editor.setShowPrintMargin(false);
         this.editor.setFontSize(14);

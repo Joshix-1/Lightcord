@@ -263,8 +263,9 @@ export default new class ContentManager {
         try {window.require(path.resolve(baseFolder, filename));}
         catch (error) {return {name: filename, file: filename, message: "Could not be compiled.", error: {message: error.message, stack: error.stack}};}
         const content = window.require(path.resolve(baseFolder, filename));
-        if(!content.name)return {name: filename, file: filename, message: "Cannot escape the ID.", error: {message: "Cannot read property 'replace' of undefined", stack: "Cannot read property 'replace' of undefined"}}
+        if(!content.name)return {name: filename, file: filename, message: "Cannot escape the ID.", error: new Error("Cannot read property 'replace' of undefined")}
         content.id = Utils.escapeID(content.name);
+        //if(!id)return {name: filename, file: filename, message: "Invalid ID", error: new Error("Please fix the name of "+filename+". BetterDiscord can't escape an ID.")}
         if (isPlugin) {
             if (!content.type) return;
             try {

@@ -1,6 +1,7 @@
 import Utils from "./Utils"
 import Notices, { notices } from "../components/private/Notices"
 import { isNative } from "./environnement";
+import WebpackLoader from "./WebpackLoader";
 
 export function patch(){
     /** START NOTICE */
@@ -101,6 +102,96 @@ export function patch(){
             }
         })
         /** END USERPROFILE PATCH */
+
+        /** START WEBHOOK PATCH */
+/*
+        let usedWebhooks = {}
+
+        getModule(e => e && e.Request && e.Request.prototype && e.Request.prototype.end)
+        .then(RequestModule => {
+            const end = RequestModule.Request.prototype.end
+            RequestModule.Request.prototype.end = function(){
+                if(this.url.endsWith("/messages") && /\/channels\/\d+\/messages/g.test(this.url) && this.method === "POST"){ // sending message
+                    let channelId = this.url.split("/channels/")[1].split("/messages")[0]
+                    
+                    if(usedWebhooks[channelId]){ // webhook is availlable
+                        let webhook = usedWebhooks[channelId]
+                        let url = `/webhooks/${webhook.id}/${webhook.token}?wait=true`
+                        this.url = url
+                    }
+                }
+
+                return end.call(this, ...arguments)
+            }
+        })
+        getModule(e => e.default && e.default.displayName === "Webhook")
+        .then(webhookComponent => {
+            const renderEdit = webhookComponent.default.prototype.renderEdit
+            webhookComponent.default.prototype.renderEdit = function(){
+                const webhook = this.props.webhook
+                let returnValue = renderEdit.call(this, ...arguments)
+                returnValue.props.children = [returnValue.props.children]
+                let message = usedWebhooks[webhook.channel_id] && usedWebhooks[webhook.channel_id].id === webhook.id ? "Stop talking with this webhook" : "Talk with this webhook"
+
+                returnValue.props.children.push(React.createElement(window.Lightcord.Api.Components.inputs.Button, {color: "green", wrapper: false, onClick(){
+                    if(usedWebhooks[webhook.channel_id] && usedWebhooks[webhook.channel_id].id === webhook.id){
+                        delete usedWebhooks[webhook.channel_id]
+                    }else{
+                        usedWebhooks[webhook.channel_id] = {
+                            id: webhook.id,
+                            token: webhook.token
+                        }
+                    }
+                    webhookPanels.forEach(e => e())
+                }}, message))
+
+                return returnValue
+            }
+        })
+
+        let webhookPanels = []
+        let getComp = (comp) => {
+            class SettingsWebhooks extends React.PureComponent {
+                constructor(props){
+                    super(props)
+                }
+
+                componentWillMount(){
+                    this.id = uuid()
+                    this.component = new comp(this.props)
+                    let func = () => {
+                        this.component.forceUpdate()
+                    }
+                    func.id = this.id
+                    webhookPanels.push(func)
+                }
+
+                componentWillUnmount(){
+                    this.component = null
+                    webhookPanels = webhookPanels.filter(e => e.id !== this.id)
+                }
+
+                render(){
+                    return this.component.render()
+                }
+
+                static displayName = "SettingsWebhooks"
+            }
+
+            return SettingsWebhooks
+        }
+        getModule(e => e.default && e.default.displayName === "FluxContainer(SettingsWebhooks)")
+        .then(webhooksComponents => {
+            let comp = webhooksComponents.default
+
+            webhooksComponents.default = getComp(comp)
+
+            WebpackLoader.find(e => e.default && e.default.displayName === "FluxContainer(FluxContainer(SettingsWebhooks))")
+            .forEach(mod => {
+                mod.default = getComp(mod.default)
+            })
+        })*/
+        /** END WEBHOOK PATCH */
     }
 
     // TODO: Add in app-notifications / confirmations.

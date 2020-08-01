@@ -79,7 +79,7 @@ export function createProxyErrorCatcherClass<base = Function>(Class:base):base &
     const ClassCopy = (class Proxied extends React.Component {
         render(){
             return <ErrorCatcher key={uuid()}>
-                {React.createElement(Class as any, {...this.props, key: uuid()})}
+                {React.createElement(Class as any, {ref: "original", ...this.props, key: uuid()})}
             </ErrorCatcher>
         }
 

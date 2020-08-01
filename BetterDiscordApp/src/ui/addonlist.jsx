@@ -15,6 +15,7 @@ import BdApi from "../modules/bdApi";
 import Utils from "../modules/utils";
 import TooltipWrap from "./tooltipWrap";
 import bdEvents from "../modules/bdEvents";
+import EmulatedTooltip from "./tooltip";
 
 const Tooltip = WebpackModules.findByDisplayName("Tooltip");
 
@@ -174,9 +175,14 @@ export default class CardList extends BDV2.reactComponent {
         if(typeof window.PluginUpdates.checkAll !== "function")return null
         if(!this.isPlugins)return null
 
+        let tooltipIsShowing = false
+        let tooltip
         return <TooltipWrap text="Checks for updates of plugins that support this feature. Right-click for a list.">
-            <span style={{marginLeft: "10px"}}>
-                <Lightcord.Api.Components.inputs.Button color="brand" look="filled" size="min" hoverColor="default" onClick={() => {
+            <span style={{marginLeft: "10px"}} onMouseLeave={() => {
+                    tooltipIsShowing = false
+                    tooltip.hide()
+                }}>
+                <Lightcord.Api.Components.inputs.Button ref="checkUpdateButton" color="brand" look="filled" size="min" hoverColor="default" onClick={() => {
                     try{
                         Utils.showToast("Plugin update check in progress.", {type: "info"})
                         window.PluginUpdates.checkAll()
@@ -190,7 +196,17 @@ export default class CardList extends BDV2.reactComponent {
                         console.error(e)
                         Utils.showToast("An error occured while checking update.", {type: "error"})
                     }
-                }} wrapper={false} disabled={false}>
+                }} wrapper={false} disabled={false} onRightClick={() => {
+                    if(!this.refs.checkUpdateButton)return
+                    if (!window.PluginUpdates || !window.PluginUpdates.plugins) return;
+                    if(tooltipIsShowing)return
+                    tooltip = new EmulatedTooltip(this.refs.checkUpdateButton.refs.original.refs.button, Object.values(window.PluginUpdates.plugins).map(p => p.name).join(", "), {
+                        side: "bottom",
+                        attachEvents: false
+                    })
+                    tooltip.show()
+                    tooltipIsShowing = true
+                }}>
                     Check for Updates
                 </Lightcord.Api.Components.inputs.Button>
             </span>
@@ -209,7 +225,13 @@ export default class CardList extends BDV2.reactComponent {
         const addonCards = this.getAddons();
 
         return <ContentColumn title={`${this.props.type.toUpperCase()}—${addonCards.length}`}>
-            <button key="folder-button" className="bd-button bd-pfbtn" onClick={this.openFolder.bind(this)}>Open {this.isPlugins ? "Plugin" : "Theme"} Folder</button>
+            <Lightcord.Api.Components.inputs.Button key="folder-button" color="brand" 
+                look="filled" size="min" hoverColor="default" onClick={this.openFolder.bind(this)} wrapper={false}
+                style={{
+                    marginLeft: "10px"
+                }}>
+                Open {this.isPlugins ? "Plugin" : "Theme"} Folder
+            </Lightcord.Api.Components.inputs.Button>
             {this.renderCheckUpdates()}
             {!settingsCookie["fork-ps-5"] && refreshIcon}
             <div className="bd-controls bd-addon-controls">

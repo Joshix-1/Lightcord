@@ -145,6 +145,7 @@ Core.prototype.patchPopoutWindow = async function() {
     .then(popoutModule => {
         if(canceled)return
 
+        /*
         // Not a good idea to do it like that.
         const interceptor = window.Lightcord.DiscordModules.dispatcher._interceptor
         window.Lightcord.DiscordModules.dispatcher.setInterceptor(function(action){
@@ -173,7 +174,7 @@ Core.prototype.patchPopoutWindow = async function() {
                 const window = popoutModule.default.getWindow(ev.key)
                 console.log(window)
             })
-        })
+        })*/
     })
 };
 

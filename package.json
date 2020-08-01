@@ -14,7 +14,8 @@
     "build:minify": "node build.js",
     "build:after": "node afterbuild.js",
     "devInstall": "npm i --save-dev --arch=ia32 electron@8.4.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\"",
-    "devInstall:64": "npm i --save-dev --arch=x64 electron@8.4.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\""
+    "devInstall:64": "npm i --save-dev --arch=x64 electron@8.4.0 && node installSubModules.js && echo \"Everything is installed. You should be able to do `npm run test` to compile everything and launch.\"",
+    "versions": "echo Electron: && electron -v && echo Typescript: && tsc -v"
   },
   "author": "",
   "license": "ISC",

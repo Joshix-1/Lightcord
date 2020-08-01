@@ -38,13 +38,6 @@ const toPx = function(value) {
     return `${value}px`;
 };
 
-/* <div class="layer-v9HyYc da-layer" style="left: 234.5px; bottom: 51px;">
-    <div class="tooltip-2QfLtc da-tooltip tooltipTop-XDDSxx tooltipBlack-PPG47z">
-        <div class="tooltipPointer-3ZfirK da-tooltipPointer"></div>
-        User Settings
-    </div>
-</div> */
-
 export default class EmulatedTooltip {
 	/**
 	 *
@@ -56,9 +49,10 @@ export default class EmulatedTooltip {
 	 * @param {string} [options.side=top] - can be any of top, right, bottom, left
 	 * @param {boolean} [options.preventFlip=false] - prevents moving the tooltip to the opposite side if it is too big or goes offscreen
      * @param {boolean} [options.disabled=false] - whether the tooltip should be disabled from showing on hover
+     * @param {boolean} [options.attachEvents=true] - whether the tooltip should listen to mouseenter and mouseleave events.
 	 */
 	constructor(node, text, options = {}) {
-		const {style = "black", side = "top", preventFlip = false, disabled = false} = options;
+		const {style = "black", side = "top", preventFlip = false, disabled = false, attachEvents = true} = options;
 		this.node = node instanceof jQuery ? node[0] : node;
         this.label = text;
         this.style = style.toLowerCase();
@@ -85,28 +79,30 @@ export default class EmulatedTooltip {
 		this.tooltipElement.append(this.labelElement);
 		this.element.append(this.tooltipElement);
 
-		this.node.addEventListener("mouseenter", () => {
-            if (this.disabled) return;
-            this.show();
-
-			const observer = new MutationObserver((mutations) => {
-				mutations.forEach((mutation) => {
-					const nodes = Array.from(mutation.removedNodes);
-					const directMatch = nodes.indexOf(this.node) > -1;
-					const parentMatch = nodes.some(parent => parent.contains(this.node));
-					if (directMatch || parentMatch) {
-						this.hide();
-						observer.disconnect();
-					}
+		if(attachEvents){
+			this.node.addEventListener("mouseenter", () => {
+				if (this.disabled) return;
+				this.show();
+	
+				const observer = new MutationObserver((mutations) => {
+					mutations.forEach((mutation) => {
+						const nodes = Array.from(mutation.removedNodes);
+						const directMatch = nodes.indexOf(this.node) > -1;
+						const parentMatch = nodes.some(parent => parent.contains(this.node));
+						if (directMatch || parentMatch) {
+							this.hide();
+							observer.disconnect();
+						}
+					});
 				});
+	
+				observer.observe(document.body, {subtree: true, childList: true});
 			});
-
-			observer.observe(document.body, {subtree: true, childList: true});
-		});
-
-		this.node.addEventListener("mouseleave", () => {
-			this.hide();
-		});
+	
+			this.node.addEventListener("mouseleave", () => {
+				this.hide();
+			});
+		}
     }
 
     /** Container where the tooltip will be appended. */

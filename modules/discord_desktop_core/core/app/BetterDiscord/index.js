@@ -442,7 +442,7 @@ async function privateInit(){
                     data.friend_suggestion_count = data.friend_suggestion_count || 0
                     data.presences = data.presences || []
                 }else{
-                    logger.log(`Logged in as an user. Skipping`)
+                    logger.log(`Logged in as an user. Skipping user spoofing.`)
                 }
             }
             let returnValue = _handleDispatch.call(this, ...arguments)

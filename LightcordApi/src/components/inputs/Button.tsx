@@ -1,17 +1,20 @@
 import WebpackLoader from "../../modules/WebpackLoader"
-import { MouseEventHandler, ReactNode } from "react"
+import { ReactNode, CSSProperties } from "react"
+import NOOP from "../../modules/noop"
 
 let ButtonModules
 
 type ButtonProps = {
     children?: ReactNode,
-    onClick?: MouseEventHandler,
+    onClick?: () => void,
     color?: ButtonColor,
     wrapper?: boolean,
     look?: ButtonLook,
     size?: ButtonSize,
     hoverColor?: ButtonHovers,
-    disabled?: boolean
+    disabled?: boolean,
+    style?: CSSProperties,
+    onRightClick?: () => void
 }
 export default class Button extends React.Component<ButtonProps, {hover: boolean}> {
     constructor(props:ButtonProps){
@@ -72,6 +75,16 @@ export default class Button extends React.Component<ButtonProps, {hover: boolean
             }else{
                 props.disabled = false
             }
+            if("style" in this.props){
+                props.style = this.props.style
+            }else{
+                props.style = {}
+            }
+            if("onRightClick" in this.props){
+                props.onRightClick = this.props.onRightClick
+            }else{
+                props.onRightClick = NOOP
+            }
         }
 
         if(props.color){
@@ -123,19 +136,19 @@ export default class Button extends React.Component<ButtonProps, {hover: boolean
         if(hover)hover = " " + hover
 
         let button = <button type="button" 
-            className={`${flexModule.flexChild} ${euhModule1.button} ${colorsModule.ButtonLooks[props.look.toUpperCase()]} ${colorsModule.ButtonColors[props.color.toUpperCase()]}${buttonSize}${hoverColor}${hover} ${euhModule1.grow}`} 
-            style={{flex: "0 1 auto"}} onClick={this.props.onClick} onMouseEnter={(ev) => {
+            ref="button" className={`${flexModule.flexChild} ${euhModule1.button} ${colorsModule.ButtonLooks[props.look.toUpperCase()]} ${colorsModule.ButtonColors[props.color.toUpperCase()]}${buttonSize}${hoverColor}${hover} ${euhModule1.grow}`} 
+            style={{flex: "0 1 auto", ...props.style}} onClick={() => props.onClick()} onMouseEnter={(ev) => {
                 if(!hoverColor)return
                 this.setState({hover: true})
             }} onMouseLeave={(ev) => {
                 if(!hoverColor)return
                 this.setState({hover: false})
-            }} disabled={props.disabled}>
+            }} disabled={props.disabled} onContextMenu={() => props.onRightClick()}>
             <div className={euhModule1.contents}>{props.children}</div>
         </button>
 
         if(props.wrapper){
-            return <div className={buttonModule.buttonWrapper}>
+            return <div ref="wrapper" className={buttonModule.buttonWrapper}>
                 {button}
             </div>
         }

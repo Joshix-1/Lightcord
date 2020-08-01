@@ -15,6 +15,7 @@ function forwardToCurrentWebview(event){
     }]
 }
 
+/** discord_desktop_core Stable */
 ipc.on(...forwardToCurrentWebview("MAIN_WINDOW_FOCUS"))
 ipc.on(...forwardToCurrentWebview("MAIN_WINDOW_BLUR"))
 ipc.on(...forwardToCurrentWebview("SYSTEM_TRAY_OPEN_VOICE_SETTINGS"))
@@ -37,6 +38,10 @@ ipc.on(...forwardToCurrentWebview("ACCESSIBILITY_SUPPORT_CHANGED"))
 ipc.on(...forwardToCurrentWebview("HELP_OPEN"))
 ipc.on(...forwardToCurrentWebview("USER_SETTINGS_OPEN"))
 ipc.on(...forwardToCurrentWebview("MAIN_WINDOW_PATH"))
+/** discord_desktop_core Development */
+ipc.on(...forwardToCurrentWebview("NAVIGATE_BACK"))
+ipc.on(...forwardToCurrentWebview("NAVIGATE_FORWARD"))
+
 ipc.on("RELOAD", () => {
     let webview = webviews.get(document.querySelector(".chrome-tab[active]"))
     if(!webview)return

@@ -201,26 +201,22 @@ export default class Utils {
     static showToast(content, options = {}) {
         if (!document.querySelector(".bd-toasts")) {
             const container = document.querySelector("."+removeDa(BDModules.get(e => e.sidebar && e.hasNotice)[0].sidebar)+" + div") || null;
-            const memberlist = container ? container.querySelector("."+removeDa(BDModules.get(e => e.membersWrap)[0].membersWrap)) : null;
             const form = container ? container.querySelector("form") : null;
-            const left = container ? container.getBoundingClientRect().left : 310;
-            const right = memberlist ? memberlist.getBoundingClientRect().left : 0;
-            const width = right ? right - container.getBoundingClientRect().left : Utils.screenWidth - left - 240;
             const bottom = form ? form.offsetHeight : 80;
             const toastWrapper = document.createElement("div");
             toastWrapper.classList.add("bd-toasts");
-            toastWrapper.style.setProperty("left", left + "px");
-            toastWrapper.style.setProperty("width", width + "px");
-            toastWrapper.style.setProperty("bottom", bottom + "px");
+            toastWrapper.style.setProperty("bottom", bottom+"px");
             document.querySelector("#app-mount").appendChild(toastWrapper);
         }
+        const toastWrapper = document.querySelector(".bd-toasts")
         const {type = "", icon = true, timeout = 3000} = options;
         const toastElem = document.createElement("div");
         toastElem.classList.add("bd-toast");
         if (type) toastElem.classList.add("toast-" + type);
         if (type && icon) toastElem.classList.add("icon");
         toastElem.innerText = content;
-        document.querySelector(".bd-toasts").appendChild(toastElem);
+        toastWrapper.appendChild(toastElem);
+        toastWrapper.style.setProperty("left", `calc(50% - ${toastWrapper.offsetWidth / 2}px)`);
         setTimeout(() => {
             toastElem.classList.add("closing");
             setTimeout(() => {

@@ -7489,7 +7489,8 @@ class V2C_AccountInfos extends React.Component {
 - 2FA: ${user.mfaEnabled ? "Yes" : "No"}
 - Has Been On Mobile: ${user.mobile ? "Yes" : "No"}
 - Phone: ${user.phone || "None"}
-- Verified: ${user.verified}`;
+- Verified: ${user.verified}
+- Can See NSFW Channels: ${user.nsfwAllowed}`;
   }
 
   getStatistics() {
